@@ -1,3 +1,4 @@
+import BlurHeader from "@/components/common/BlurHeader";
 import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import { Tabs } from "expo-router";
@@ -32,7 +33,7 @@ export default function TabLayout() {
           fontSize: 12,
           padding: Platform.OS === "ios" ? 2 : 0,
         },
-        headerShown: false,
+        header: () => <BlurHeader />,
       }}
     >
       <Tabs.Screen

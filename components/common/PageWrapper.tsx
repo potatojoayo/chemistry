@@ -1,7 +1,6 @@
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import BlurHeader from "./BlurHeader";
 
 export default function PageWrapper({
   children,
@@ -13,7 +12,6 @@ export default function PageWrapper({
 
   return (
     <View className="flex-1 bg-background">
-      <BlurHeader />
       <ScrollView
         className="bg-background flex-1"
         showsVerticalScrollIndicator={false}

@@ -17,7 +17,7 @@ module.exports = {
         light: ["Light", "sans-serif"],
         regular: ["Regular", "sans-serif"],
         medium: ["Medium", "sans-serif"],
-        semiBold: ["SemiBold", "sans-serif"],
+        semibold: ["SemiBold", "sans-serif"],
         bold: ["Bold", "sans-serif"],
         extraBold: ["ExtraBold", "sans-serif"],
       },

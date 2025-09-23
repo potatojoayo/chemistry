@@ -54,7 +54,15 @@
           "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone."
         }
       ],
-      "expo-font"
+      "expo-font",
+      [
+        "@sentry/react-native/expo",
+        {
+          "url": "https://sentry.io/",
+          "project": "chemistry",
+          "organization": "llubb-q0"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

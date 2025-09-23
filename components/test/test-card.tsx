@@ -2,7 +2,7 @@ import { FontAwesome6, Octicons } from "@expo/vector-icons";
 import { Link, RelativePathString } from "expo-router";
 import { Platform, Text, TouchableOpacity, View } from "react-native";
 
-export default function TestCardItem({
+export default function TestCard({
   title,
   description,
   link,
@@ -30,7 +30,7 @@ export default function TestCardItem({
         <View className="ml-2 flex-1 flex flex-col">
           <View className="flex items-start justify-between flex-row">
             <Text
-              className={` font-bold ${Platform.OS === "ios" ? "text-xl" : "text-lg"}`}
+              className={` ${Platform.OS === "ios" ? "text-xl font-bold" : "text-lg font-semibold"}`}
               style={{ color: textColor }}
             >
               {title}
