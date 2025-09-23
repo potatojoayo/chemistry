@@ -1,10 +1,6 @@
 import PageWrapper from "@/components/common/PageWrapper";
 import TestCardItem from "@/components/test/test-card-item";
-import {
-  Ionicons,
-  MaterialCommunityIcons,
-  MaterialIcons,
-} from "@expo/vector-icons";
+import { Ionicons, MaterialIcons, Octicons } from "@expo/vector-icons";
 import { Platform, Text, View } from "react-native";
 
 export default function Home() {
@@ -24,17 +20,17 @@ export default function Home() {
         <View className="border-t border-foreground my-6" />
         <View className="flex flex-col gap-4">
           <TestCardItem
-            title="에니어그램"
-            description="에니어그램은 인간의 성격을 9가지 유형으로 나누어 설명합니다. 겉으로 드러난 모습이 아니라, 나를 움직이는 핵심 욕구와 두려움을 비춰주는 심리학적 거울입니다. 스스로를 더 깊이 이해하고 관계 속에서 진짜 나를 발견할 수 있습니다."
-            link="/tests/enneagram"
-            color="#26B066"
-          />
-          <TestCardItem
-            title="OCEAN"
-            description="OCEAN은 인간의 성격을 개방성·성실성·외향성·친화성·신경성의 다섯 축으로 비춥니다. 점수가 옳고 그름을 말하지는 않아요. 다만, 당신이 어떻게 세상을 보고 반응하는지에 대한 명확한 지도를 건네줍니다."
+            title="BIG 5"
+            description="BIG 5는 인간의 성격을 개방성·성실성·외향성·친화성·신경성의 다섯 축으로 비춥니다. 점수가 옳고 그름을 말하지는 않아요. 다만, 당신이 어떻게 세상을 보고 반응하는지에 대한 명확한 지도를 건네줍니다."
             link="/tests/ocean"
             color="#5AAEFF"
             icon={<MaterialIcons name="waves" size={32} color="#222" />}
+          />
+          <TestCardItem
+            title="에니어그램"
+            description="에니어그램은 인간의 성격을 9가지 유형으로 나누어 설명합니다. 겉으로 드러난 모습이 아니라, 나를 움직이는 핵심 욕구와 두려움을 비춰주는 심리학적 거울입니다. 스스로를 더 깊이 이해하고 관계 속에서 진짜 나를 발견할 수 있습니다."
+            link="/login"
+            color="#26B066"
           />
           <TestCardItem
             title="DISC"
@@ -44,12 +40,17 @@ export default function Home() {
             icon={<Ionicons name="disc" size={32} color="#222" />}
           />
           <TestCardItem
-            title="MBTI"
-            description="MBTI는 외향·내향, 감각·직관, 사고·감정, 판단·인식 네 가지 축을 조합해 우리의 성격을 16가지 유형으로 보여줍니다. 많은 사람들이 자기이해와 관계 탐색의 첫걸음으로 삼는 친숙한 심리학 도구입니다."
-            link="/tests/mbti"
+            title="애착유형"
+            description="애착 이론은 우리가 사랑하고 관계 맺는 방식을 설명합니다. 안정형, 불안형, 회피형, 혼란형 네 가지 유형 속에서 당신의 관계 패턴을 발견하고 더 건강한 친밀감을 만들어가세요."
+            link="/tests/attachment"
             color="#ffd54f"
             icon={
-              <MaterialCommunityIcons name="puzzle" size={32} color="#222" />
+              <Octicons
+                name="heart-fill"
+                size={28}
+                color="#222"
+                className="ml-1"
+              />
             }
           />
         </View>

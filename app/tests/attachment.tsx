@@ -1,9 +1,9 @@
 import { Text, View } from "react-native";
 
-export default function Mbti() {
+export default function Attachment() {
   return (
     <View>
-      <Text>Mbti</Text>
+      <Text>Attachment</Text>
     </View>
   );
 }
