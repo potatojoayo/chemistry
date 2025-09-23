@@ -24,7 +24,9 @@ export default function TestCardItem({
         style={{ backgroundColor: color }}
         activeOpacity={0.9}
       >
-        {icon || <Octicons name="north-star" size={32} color={textColor} />}
+        <View className="w-10">
+          {icon || <Octicons name="north-star" size={32} color={textColor} />}
+        </View>
         <View className="ml-2 flex-1 flex flex-col">
           <View className="flex items-start justify-between flex-row">
             <Text

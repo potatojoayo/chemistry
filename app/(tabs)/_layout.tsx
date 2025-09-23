@@ -1,4 +1,5 @@
 import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
+import { BlurView } from "expo-blur";
 import { Tabs } from "expo-router";
 import { Platform } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -8,18 +9,28 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: "#D9E9CF",
-        tabBarInactiveTintColor: "gray",
+        tabBarActiveTintColor: "#ECEEDF",
+        tabBarInactiveTintColor: "#666",
         tabBarLabelPosition: "below-icon",
         tabBarStyle: {
-          backgroundColor: "#111",
+          position: "absolute",
           borderTopColor: "transparent",
           height: 60 + bottom,
         },
+        tabBarBackground: () => (
+          <BlurView
+            intensity={40}
+            tint="dark"
+            style={{
+              flex: 1,
+              backgroundColor: "transparent",
+            }}
+          />
+        ),
         tabBarLabelStyle: {
-          fontFamily: "semiBold",
-          fontSize: 10,
-          padding: Platform.OS === "ios" ? 4 : 0,
+          fontFamily: "bold",
+          fontSize: 12,
+          padding: Platform.OS === "ios" ? 2 : 0,
         },
         headerShown: false,
       }}
