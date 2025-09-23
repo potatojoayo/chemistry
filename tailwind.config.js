@@ -9,6 +9,8 @@ module.exports = {
         background: "#222",
         foreground: "#ECEEDF",
         green: "#D9E9CF",
+        red: "#fae1dd",
+        yellow: "#fefae0",
       },
       fontFamily: {
         light: ["Light", "sans-serif"],

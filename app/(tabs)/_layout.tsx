@@ -1,5 +1,6 @@
 import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
+import { Platform } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function TabLayout() {
@@ -18,7 +19,7 @@ export default function TabLayout() {
         tabBarLabelStyle: {
           fontFamily: "semiBold",
           fontSize: 10,
-          padding: 4,
+          padding: Platform.OS === "ios" ? 4 : 0,
         },
         headerShown: false,
       }}
@@ -29,7 +30,7 @@ export default function TabLayout() {
           title: "차트",
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons
-              size={28}
+              size={24}
               name="view-grid-plus"
               color={color}
             />
@@ -41,7 +42,7 @@ export default function TabLayout() {
         options={{
           title: "마이페이지",
           tabBarIcon: ({ color }) => (
-            <FontAwesome5 size={28} solid name="user-circle" color={color} />
+            <FontAwesome5 size={22} solid name="user-circle" color={color} />
           ),
         }}
       />

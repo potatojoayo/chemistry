@@ -21,7 +21,7 @@ export default function PageWrapper({
         <View
           className="max-w-xl w-full mx-auto h-full"
           style={{
-            paddingTop: insets.top, // status bar + 헤더 높이 + 여백
+            paddingTop: insets.top + 52, // status bar + 헤더 높이 + 여백
           }}
         >
           {children}
