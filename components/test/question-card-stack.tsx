@@ -23,9 +23,9 @@ export default function QuestionCardStack({
     <View className="flex flex-col justify-center items-center relative mb-16 w-[90vw] max-w-[800px]">
       <View className="h-[280px] w-full flex flex-row items-centerr">
         {test.questions.map((question, index) => {
-          // if (index > currentIndex + showCount || index < currentIndex) {
-          //   return null;
-          // }
+          if (index > currentIndex + showCount || index < currentIndex) {
+            return null;
+          }
           return (
             <QuestionCard
               key={question.content}
