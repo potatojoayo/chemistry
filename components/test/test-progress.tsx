@@ -1,4 +1,4 @@
-import { Test } from "@/stores/test-store";
+import { Test } from "@/lib/types";
 import { useEffect } from "react";
 import { Platform, Text, View } from "react-native";
 import Animated, {
@@ -20,7 +20,6 @@ export default function TestProgress({ test }: { test: Test }) {
   const animatedStyle = useAnimatedStyle(() => {
     return {
       width: `${animatedProgress.value}%`,
-      backgroundColor: test.color,
     };
   });
 
@@ -29,16 +28,13 @@ export default function TestProgress({ test }: { test: Test }) {
       {/* 퍼센트 텍스트와 진행률 바 */}
       <View className="flex-row items-center gap-3">
         <Text
-          className={` font-semibold ${Platform.OS === "web" ? "text-base" : "text-lg"}`}
-          style={{
-            color: test.currentQuestionIndex === 0 ? "#ECEEDF" : test.color,
-          }}
+          className={`${test.currentQuestionIndex === 0 ? "text-foreground" : "text-green"} font-semibold ${Platform.OS === "web" ? "text-base" : "text-lg"}`}
         >
           {progress}%
         </Text>
         <View className="flex-1 h-2 bg-foreground rounded-full overflow-hidden">
           <Animated.View
-            className="h-full  rounded-full"
+            className="h-full  rounded-full bg-green"
             style={animatedStyle}
           />
         </View>

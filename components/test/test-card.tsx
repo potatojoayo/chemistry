@@ -1,4 +1,4 @@
-import { Test } from "@/stores/test-store";
+import { Test } from "@/lib/types";
 import { FontAwesome6, Octicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { RelativePathString, useRouter } from "expo-router";
@@ -19,8 +19,8 @@ export default function TestCard({
       style={{ backgroundColor: test.color }}
       activeOpacity={0.9}
       onPress={() => {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         router.push(`/tests/${test.id}` as RelativePathString);
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         // if (test.progressIndex > 0) {
         //   router.push(`/tests/${test.id}` as RelativePathString);
         // } else {

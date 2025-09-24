@@ -28,7 +28,7 @@ export default function QuestionSelection({
     >
       <View className="h-11 items-center justify-center flex">
         <View
-          className={`rounded-full  ${size === "lg" ? "h-11 w-11 p-1.5" : size === "md" ? "h-10 w-10 p-1.5" : "h-8 w-8 p-1"} border-2 ${color === "positive" ? "border-green" : color === "negative" ? "border-red" : "border-gray"}`}
+          className={`rounded-full  ${size === "lg" ? "h-11 w-11 p-2" : size === "md" ? "h-10 w-10 p-2" : "h-8 w-8 p-1.5"} border-2 ${color === "positive" ? "border-green" : color === "negative" ? "border-red" : "border-gray"}`}
         >
           {selected && (
             <View

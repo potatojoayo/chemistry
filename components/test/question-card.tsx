@@ -1,4 +1,5 @@
-import { Test, useTestStore } from "@/stores/test-store";
+import { Test } from "@/lib/types";
+import { useTestStore } from "@/stores/test-store";
 import { useCallback } from "react";
 import { Platform, Text, useWindowDimensions, View } from "react-native";
 import Animated, {
@@ -71,10 +72,12 @@ export default function QuestionCard({
     >
       <Text className="text-background font-semibold">{test.name}</Text>
       <View className="border-t border-background w-full mt-1"></View>
-      <Text className="text-background mt-12 text-2xl text-center font-medium">
-        {test.questions[index].content}
-      </Text>
-      <View className="mt-10 flex flex-row items-center justify-center gap-4">
+      <View className=" h-32 items-center justify-center flex flex-row px-6">
+        <Text className="text-background text-2xl text-center font-medium">
+          {test.questions[index].content}
+        </Text>
+      </View>
+      <View className="mt-2 flex flex-row items-center justify-center gap-4">
         <QuestionSelection
           label="전혀\n아니다"
           color="negative"

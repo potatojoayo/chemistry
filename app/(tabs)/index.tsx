@@ -5,6 +5,7 @@ import {
   Ionicons,
   MaterialCommunityIcons,
   MaterialIcons,
+  Octicons,
 } from "@expo/vector-icons";
 import { Platform, Text, View } from "react-native";
 
@@ -31,7 +32,7 @@ export default function Home() {
           />
           <TestCard
             test={tests.find((test) => test.id === "enneagram")!}
-            icon={<MaterialIcons name="waves" size={32} color="#222" />}
+            icon={<Octicons name="north-star" size={32} color="#222" />}
           />
           <TestCard
             test={tests.find((test) => test.id === "disc")!}
@@ -42,9 +43,8 @@ export default function Home() {
             icon={
               <MaterialCommunityIcons
                 name="head-heart"
-                size={32}
+                size={36}
                 color="#222"
-                className="ml-1"
               />
             }
           />

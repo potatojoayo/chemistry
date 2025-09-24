@@ -50,7 +50,7 @@ export default function TestsLayout() {
       }}
     >
       <Stack.Screen
-        name="big5"
+        name="big-5"
         options={{
           title: "BIG 5",
         }}

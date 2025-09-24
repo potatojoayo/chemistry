@@ -1,8 +1,14 @@
-import { Test, useTestStore } from "@/stores/test-store";
+import { Test } from "@/lib/types";
+import { useTestStore } from "@/stores/test-store";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { useEffect } from "react";
 import { Platform, Text, TouchableOpacity, View } from "react-native";
-import { useSharedValue, withTiming } from "react-native-reanimated";
+import Animated, {
+  interpolate,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 import QuestionCard from "./question-card";
 
 export default function QuestionCardStack({ test }: { test: Test }) {
@@ -26,6 +32,17 @@ export default function QuestionCardStack({ test }: { test: Test }) {
     };
   }, [animatedCurrentQuestionIndex, test.id]);
 
+  const animatedStyle = useAnimatedStyle(() => {
+    const opacity = interpolate(
+      animatedCurrentQuestionIndex.value,
+      [0, test.questions.length],
+      [1, 0]
+    );
+    return {
+      opacity,
+    };
+  });
+
   return (
     <View className="flex flex-col justify-center items-center relative mb-16 w-[90vw] max-w-[480px]">
       <View
@@ -41,61 +58,43 @@ export default function QuestionCardStack({ test }: { test: Test }) {
             />
           );
         })}
+        {test.currentQuestionIndex === test.questions.length && (
+          <View className="flex-1 flex justify-center items-center"></View>
+        )}
       </View>
-      <View className="w-full flex flex-row gap-4">
+      <Animated.View
+        className="w-full flex flex-row gap-4 "
+        style={animatedStyle}
+      >
         <TouchableOpacity
           activeOpacity={0.7}
-          className={`flex-1 h-16 rounded-full items-center justify-center gap-2 flex flex-row px-6 ${
-            test.currentQuestionIndex > 0 ? "bg-foreground" : "bg-gray"
+          className={`flex-1 h-16 rounded-full items-center justify-center bg-foreground gap-2 flex flex-row px-6 ${
+            test.currentQuestionIndex > 0 ? "opacity-100" : "opacity-30"
           }`}
           onPress={() => {
             goPrev({ id: test.id });
           }}
           disabled={test.currentQuestionIndex <= 0}
         >
-          <FontAwesome6
-            name="arrow-left"
-            size={14}
-            color={test.currentQuestionIndex > 0 ? "#222" : "#666"}
-          />
-          <Text
-            className={`font-semibold text-xl ${
-              test.currentQuestionIndex > 0 ? "text-background" : "text-muted"
-            }`}
-          >
-            이전
-          </Text>
+          <FontAwesome6 name="arrow-left" size={14} color="#222" />
+          <Text className={`font-semibold text-xl text-background`}>이전</Text>
         </TouchableOpacity>
         <TouchableOpacity
           activeOpacity={0.7}
-          className={`flex-1 h-16 rounded-full items-center justify-center gap-2 flex flex-row px-6 ${
+          className={`bg-foreground flex-1 h-16 rounded-full items-center justify-center gap-2 flex flex-row px-6 ${
             test.currentQuestionIndex < test.progressIndex
-              ? "bg-foreground"
-              : "bg-gray"
+              ? "opacity-100"
+              : "opacity-30"
           }`}
           onPress={() => {
             goNext({ id: test.id });
           }}
           disabled={test.currentQuestionIndex >= test.progressIndex}
         >
-          <Text
-            className={`font-semibold text-xl ${
-              test.currentQuestionIndex < test.progressIndex
-                ? "text-background"
-                : "text-muted"
-            }`}
-          >
-            다음
-          </Text>
-          <FontAwesome6
-            name="arrow-right"
-            size={14}
-            color={
-              test.currentQuestionIndex < test.progressIndex ? "#222" : "#666"
-            }
-          />
+          <Text className={`font-semibold text-xl text-background`}>다음</Text>
+          <FontAwesome6 name="arrow-right" size={14} color="#222" />
         </TouchableOpacity>
-      </View>
+      </Animated.View>
     </View>
   );
 }
