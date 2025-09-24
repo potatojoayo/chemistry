@@ -1,5 +1,7 @@
+import { Test, useTestStore } from "@/stores/test-store";
+import { useCallback } from "react";
 import { Text, useWindowDimensions, View } from "react-native";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { Gesture } from "react-native-gesture-handler";
 import Animated, {
   interpolate,
   runOnJS,
@@ -8,26 +10,24 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
+import QuestionSelection from "./question-selection";
 
 export default function QuestionCard({
-  question,
+  test,
   index,
-  totalCount,
   showCount,
-  testName,
   currentIndex,
   animatedValue,
   setCurrentIndex,
 }: {
-  question: string;
+  test: Test;
   index: number;
-  totalCount: number;
   showCount: number;
-  testName: string;
   currentIndex: number;
   animatedValue: SharedValue<number>;
   setCurrentIndex: React.Dispatch<React.SetStateAction<number>>;
 }) {
+  const { setAnswer, setCurrentQuestionIndex } = useTestStore();
   const { width } = useWindowDimensions();
   const translateX = useSharedValue(0);
   const direction = useSharedValue(0);
@@ -88,7 +88,7 @@ export default function QuestionCard({
     );
 
     return {
-      zIndex: totalCount - index,
+      zIndex: test.questions.length - index,
       transform: [
         {
           scale: isCurrent ? scale : scale,
@@ -101,18 +101,83 @@ export default function QuestionCard({
     };
   });
 
+  const handleAnswer = useCallback(
+    (answer: number) => {
+      setAnswer({ id: test.id, index, answer });
+      setCurrentQuestionIndex({ id: test.id, index: currentIndex + 1 });
+
+      translateX.value = withTiming(width * 1.1 * -1, {}, () => {
+        runOnJS(setCurrentIndex)(currentIndex + 1);
+      });
+      animatedValue.value = withTiming(currentIndex + 1);
+    },
+    [
+      test.id,
+      index,
+      currentIndex,
+      setAnswer,
+      setCurrentQuestionIndex,
+      animatedValue,
+      setCurrentIndex,
+      translateX,
+      width,
+    ]
+  );
+
   return (
-    <GestureDetector gesture={pan}>
-      <Animated.View
-        className="w-full rounded-xl bg-foreground p-4 absolute h-64"
-        style={animatedStyle}
-      >
-        <View className="border-t border-background w-full"></View>
-        <Text className="text-background font-bold">{testName}</Text>
-        <Text className="text-background mt-8 text-2xl text-center">
-          {question}
-        </Text>
-      </Animated.View>
-    </GestureDetector>
+    // <GestureDetector gesture={pan}>
+    <Animated.View
+      className="w-full rounded-xl bg-foreground p-4 absolute h-72"
+      style={animatedStyle}
+    >
+      <View className="border-t border-background w-full"></View>
+      <Text className="text-background font-bold">{test.name}</Text>
+      <Text className="text-background mt-8 text-2xl text-center font-medium ">
+        {test.questions[index].content}
+      </Text>
+      <View className="mt-10 flex flex-row items-center justify-center gap-4">
+        <QuestionSelection
+          label="전혀\n그렇지않다"
+          color="negative"
+          size="lg"
+          onPress={() => {
+            handleAnswer(1);
+          }}
+        />
+        <QuestionSelection
+          label="그렇지않다"
+          color="negative"
+          size="md"
+          onPress={() => {
+            handleAnswer(2);
+          }}
+        />
+        <QuestionSelection
+          label="보통이다"
+          color="neutral"
+          size="sm"
+          onPress={() => {
+            handleAnswer(3);
+          }}
+        />
+        <QuestionSelection
+          label="그렇다"
+          color="positive"
+          size="md"
+          onPress={() => {
+            handleAnswer(4);
+          }}
+        />
+        <QuestionSelection
+          label="매우\n그렇다"
+          color="positive"
+          size="lg"
+          onPress={() => {
+            handleAnswer(5);
+          }}
+        />
+      </View>
+    </Animated.View>
+    // </GestureDetector>
   );
 }

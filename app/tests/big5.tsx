@@ -1,12 +1,11 @@
 import TestPageContent from "@/components/test/test-page-content";
-
-const questions = [
-  "I like to be ready for worst-case scenarios.",
-  "I prefer planning over spontaneity.",
-  "I get energy from social interactions.",
-  "I stay calm under pressure.",
-];
+import { useTestStore } from "@/stores/test-store";
 
 export default function Big5() {
-  return <TestPageContent questions={questions} />;
+  const { tests } = useTestStore();
+  const test = tests.find((test) => test.id === "big-5");
+  if (!test) {
+    return null;
+  }
+  return <TestPageContent test={test} />;
 }

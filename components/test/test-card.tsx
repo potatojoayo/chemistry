@@ -3,14 +3,14 @@ import { Link, RelativePathString } from "expo-router";
 import { Platform, Text, TouchableOpacity, View } from "react-native";
 
 export default function TestCard({
-  title,
+  name,
   description,
   link,
   color = "#ECEEDF",
   textColor = "#222",
   icon,
 }: {
-  title: string;
+  name: string;
   description: string;
   link: RelativePathString;
   color?: string;
@@ -33,7 +33,7 @@ export default function TestCard({
               className={` ${Platform.OS === "ios" ? "text-xl font-bold" : "text-lg font-semibold"}`}
               style={{ color: textColor }}
             >
-              {title}
+              {name}
             </Text>
           </View>
           <View
