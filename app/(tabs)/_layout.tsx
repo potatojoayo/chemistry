@@ -31,7 +31,7 @@ export default function TabLayout() {
         tabBarLabelStyle: {
           fontFamily: "bold",
           fontSize: 12,
-          padding: Platform.OS === "ios" ? 2 : 0,
+          padding: Platform.OS === "web" ? 0 : 2,
         },
         header: () => <BlurHeader />,
       }}

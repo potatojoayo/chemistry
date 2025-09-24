@@ -1,152 +1,93 @@
 import { Test, useTestStore } from "@/stores/test-store";
 import { useCallback } from "react";
-import { Text, useWindowDimensions, View } from "react-native";
-import { Gesture } from "react-native-gesture-handler";
+import { Platform, Text, useWindowDimensions, View } from "react-native";
 import Animated, {
+  Extrapolation,
   interpolate,
-  runOnJS,
   SharedValue,
   useAnimatedStyle,
-  useSharedValue,
-  withTiming,
 } from "react-native-reanimated";
 import QuestionSelection from "./question-selection";
 
 export default function QuestionCard({
   test,
   index,
-  showCount,
-  currentIndex,
-  animatedValue,
-  setCurrentIndex,
+  animatedCurrentQuestionIndex,
 }: {
   test: Test;
   index: number;
-  showCount: number;
-  currentIndex: number;
-  animatedValue: SharedValue<number>;
-  setCurrentIndex: React.Dispatch<React.SetStateAction<number>>;
+  animatedCurrentQuestionIndex: SharedValue<number>;
 }) {
-  const { setAnswer, setCurrentQuestionIndex } = useTestStore();
-  const { width } = useWindowDimensions();
-  const translateX = useSharedValue(0);
-  const direction = useSharedValue(0);
-  const pan = Gesture.Pan()
-    .onUpdate((event) => {
-      const isSwipedRight = event.translationX > 0;
-      direction.value = isSwipedRight ? 1 : -1;
-      if (index === currentIndex) {
-        translateX.value = event.translationX;
-        animatedValue.value = interpolate(
-          Math.abs(event.translationX),
-          [0, width],
-          [index, index + 1]
-        );
-      }
-    })
-    .onEnd((e) => {
-      if (index === currentIndex) {
-        if (Math.abs(e.translationX) > 150 || Math.abs(e.velocityX) > 1000) {
-          translateX.value = withTiming(
-            width * 1.1 * direction.value,
-            {},
-            () => {
-              runOnJS(setCurrentIndex)(currentIndex + 1);
-            }
-          );
-          animatedValue.value = withTiming(currentIndex + 1);
-        } else {
-          translateX.value = withTiming(0, { duration: 500 });
-        }
-      }
-    });
-
-  const animatedStyle = useAnimatedStyle(() => {
-    const isCurrent = index === currentIndex;
-    const rotateZ = interpolate(
-      Math.abs(translateX.value),
-      [0, width],
-      [0, 20]
-    );
-
-    const translateY = interpolate(
-      animatedValue.value,
-      [index - 1, index],
-      [-20, 0]
-    );
-
-    const scale = interpolate(
-      animatedValue.value,
-      [index - 1, index],
-      [0.9, 1]
-    );
-
-    const opacity = interpolate(
-      animatedValue.value + showCount,
-      [index, index + 1],
-      [0, 1]
-    );
-
-    return {
-      zIndex: test.questions.length - index,
-      transform: [
-        {
-          scale: isCurrent ? scale : scale,
-        },
-        { translateY: isCurrent ? 0 : translateY },
-        { translateX: translateX.value },
-        { rotateZ: isCurrent ? `${direction.value * rotateZ}deg` : "0deg" },
-      ],
-      opacity: index < showCount + currentIndex ? 1 : opacity,
-    };
-  });
+  const { answerToQuestion } = useTestStore();
 
   const handleAnswer = useCallback(
     (answer: number) => {
-      setAnswer({ id: test.id, index, answer });
-      setCurrentQuestionIndex({ id: test.id, index: currentIndex + 1 });
-
-      translateX.value = withTiming(width * 1.1 * -1, {}, () => {
-        runOnJS(setCurrentIndex)(currentIndex + 1);
+      answerToQuestion({
+        id: test.id,
+        index,
+        answer,
       });
-      animatedValue.value = withTiming(currentIndex + 1);
     },
-    [
-      test.id,
-      index,
-      currentIndex,
-      setAnswer,
-      setCurrentQuestionIndex,
-      animatedValue,
-      setCurrentIndex,
-      translateX,
-      width,
-    ]
+    [answerToQuestion, index, test.id]
   );
+  const { width } = useWindowDimensions();
+
+  const animatedStyle = useAnimatedStyle(() => {
+    const diff = animatedCurrentQuestionIndex.value - index;
+
+    // diff == 0: 현재 카드
+    // diff < 0: 뒤 카드
+    // diff > 0: 앞 카드
+
+    const translateY = interpolate(diff, [-1, 0], [-20, 0]);
+    const scale = interpolate(diff, [-1, 0], [0.9, 1]);
+    const zIndex = test.questions.length - index;
+    const opacity = interpolate(diff, [-3, -2, -1, 0], [0, 1, 1, 1]);
+    const translateX = interpolate(
+      diff,
+      [0, 1],
+      [0, -width],
+      Extrapolation.CLAMP
+    );
+    const rotate = interpolate(diff, [0, 1], [0, -20], Extrapolation.CLAMP);
+
+    return {
+      transform: [
+        { translateY },
+        { scale },
+        { translateX },
+        { rotate: `${rotate}deg` },
+      ],
+      zIndex,
+      opacity,
+    };
+  });
 
   return (
     // <GestureDetector gesture={pan}>
     <Animated.View
-      className="w-full rounded-xl bg-foreground p-4 absolute h-72"
+      className={`w-full rounded-2xl bg-foreground p-4 absolute ${Platform.OS === "web" ? "h-[300px]" : "h-[260px]"} border`}
       style={animatedStyle}
     >
-      <View className="border-t border-background w-full"></View>
-      <Text className="text-background font-bold">{test.name}</Text>
-      <Text className="text-background mt-8 text-2xl text-center font-medium ">
+      <Text className="text-background font-semibold">{test.name}</Text>
+      <View className="border-t border-background w-full mt-1"></View>
+      <Text className="text-background mt-12 text-2xl text-center font-medium">
         {test.questions[index].content}
       </Text>
       <View className="mt-10 flex flex-row items-center justify-center gap-4">
         <QuestionSelection
-          label="전혀\n그렇지않다"
+          label="전혀\n아니다"
           color="negative"
+          selected={test.questions[index].answer === 1}
           size="lg"
           onPress={() => {
             handleAnswer(1);
           }}
         />
         <QuestionSelection
-          label="그렇지않다"
+          label="아니다"
           color="negative"
+          selected={test.questions[index].answer === 2}
           size="md"
           onPress={() => {
             handleAnswer(2);
@@ -155,6 +96,7 @@ export default function QuestionCard({
         <QuestionSelection
           label="보통이다"
           color="neutral"
+          selected={test.questions[index].answer === 3}
           size="sm"
           onPress={() => {
             handleAnswer(3);
@@ -163,6 +105,7 @@ export default function QuestionCard({
         <QuestionSelection
           label="그렇다"
           color="positive"
+          selected={test.questions[index].answer === 4}
           size="md"
           onPress={() => {
             handleAnswer(4);
@@ -171,6 +114,7 @@ export default function QuestionCard({
         <QuestionSelection
           label="매우\n그렇다"
           color="positive"
+          selected={test.questions[index].answer === 5}
           size="lg"
           onPress={() => {
             handleAnswer(5);

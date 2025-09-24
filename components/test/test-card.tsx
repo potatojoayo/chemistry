@@ -1,70 +1,70 @@
+import { Test } from "@/stores/test-store";
 import { FontAwesome6, Octicons } from "@expo/vector-icons";
-import { Link, RelativePathString } from "expo-router";
+import * as Haptics from "expo-haptics";
+import { RelativePathString, useRouter } from "expo-router";
 import { Platform, Text, TouchableOpacity, View } from "react-native";
 
 export default function TestCard({
-  name,
-  description,
-  link,
-  color = "#ECEEDF",
-  textColor = "#222",
+  test,
   icon,
 }: {
-  name: string;
-  description: string;
-  link: RelativePathString;
-  color?: string;
-  textColor?: string;
+  test: Test;
   icon?: React.ReactNode;
 }) {
+  const textColor = "#222";
+  const router = useRouter();
   return (
-    <Link href={link} asChild>
-      <TouchableOpacity
-        className="flex rounded-xl p-4 flex-row"
-        style={{ backgroundColor: color }}
-        activeOpacity={0.9}
-      >
-        <View className="w-10">
-          {icon || <Octicons name="north-star" size={32} color={textColor} />}
-        </View>
-        <View className="ml-2 flex-1 flex flex-col">
-          <View className="flex items-start justify-between flex-row">
-            <Text
-              className={` ${Platform.OS === "ios" ? "text-xl font-bold" : "text-lg font-semibold"}`}
-              style={{ color: textColor }}
-            >
-              {name}
-            </Text>
-          </View>
-          <View
-            className="border-t border-background my-2"
-            style={{ borderColor: textColor }}
-          ></View>
-          <View
-            className="border-background"
-            style={{ borderColor: textColor }}
+    <TouchableOpacity
+      className="flex rounded-xl p-4 flex-row"
+      style={{ backgroundColor: test.color }}
+      activeOpacity={0.9}
+      onPress={() => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        router.push(`/tests/${test.id}` as RelativePathString);
+        // if (test.progressIndex > 0) {
+        //   router.push(`/tests/${test.id}` as RelativePathString);
+        // } else {
+        //   router.push(`/tests/intro/${test.id}` as RelativePathString);
+        // }
+      }}
+    >
+      <View className="w-10">
+        {icon || <Octicons name="north-star" size={32} color={textColor} />}
+      </View>
+      <View className="ml-2 flex-1 flex flex-col">
+        <View className="flex items-start justify-between flex-row">
+          <Text
+            className={` ${Platform.OS === "web" ? "text-lg font-semibold" : "text-xl font-bold"}`}
+            style={{ color: textColor }}
           >
-            <Text
-              className={`font-medium ${Platform.OS === "ios" ? "text-base" : "text-sm"}`}
-              style={{ color: textColor }}
-            >
-              {description}
-            </Text>
-          </View>
-          <View
-            className="mt-3 rounded-lg p-2 items-center justify-center flex-row gap-2"
-            style={{ backgroundColor: textColor }}
-          >
-            <Text
-              className={`font-medium ${Platform.OS === "ios" ? "text-base" : "text-sm"}`}
-              style={{ color: color }}
-            >
-              검사하기
-            </Text>
-            <FontAwesome6 name="arrow-right-long" size={12} color={color} />
-          </View>
+            {test.name}
+          </Text>
         </View>
-      </TouchableOpacity>
-    </Link>
+        <View
+          className="border-t border-background my-2"
+          style={{ borderColor: textColor }}
+        ></View>
+        <View className="border-background" style={{ borderColor: textColor }}>
+          <Text
+            className={`font-medium ${Platform.OS === "web" ? "text-sm" : "text-base"}`}
+            style={{ color: textColor }}
+          >
+            {test.description}
+          </Text>
+        </View>
+        <View
+          className="mt-3 rounded-lg p-2 items-center justify-center flex-row gap-2"
+          style={{ backgroundColor: textColor }}
+        >
+          <Text
+            className={`font-medium ${Platform.OS === "web" ? "text-sm" : "text-base"}`}
+            style={{ color: test.color }}
+          >
+            검사하기
+          </Text>
+          <FontAwesome6 name="arrow-right-long" size={12} color={test.color} />
+        </View>
+      </View>
+    </TouchableOpacity>
   );
 }

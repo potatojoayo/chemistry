@@ -172,13 +172,13 @@ export default function Login() {
               style={{ width: 320, height: 48 }}
             />
             <Text
-              className={`text-foreground text-center mt-12 leading-snug max-w-lg w-full font-bold ${Platform.OS === "ios" ? "text-3xl" : "text-2xl"}`}
+              className={`text-foreground text-center mt-12 leading-snug max-w-lg w-full font-bold ${Platform.OS === "web" ? "text-2xl" : "text-3xl"}`}
             >
               “자신을 아는 것이{"\n"}
               모든 지혜의 시작이다”
             </Text>
             <Text
-              className={`text-foreground mt-1 text-center font-regular ${Platform.OS === "ios" ? "text-xl" : "text-base"}`}
+              className={`text-foreground mt-1 text-center font-regular ${Platform.OS === "web" ? "text-base" : "text-xl"}`}
             >
               - 아리스토텔레스
             </Text>
@@ -197,14 +197,14 @@ export default function Login() {
               <View className="w-full px-4">
                 <TouchableOpacity className="w-full bg-foreground py-4 px-16 rounded-full">
                   <Text
-                    className={`text-center text-background font-bold ${Platform.OS === "ios" ? "text-xl" : "text-base"}`}
+                    className={`text-center text-background font-bold ${Platform.OS === "web" ? "text-base" : "text-xl"}`}
                   >
                     카카오로 시작하기
                   </Text>
                 </TouchableOpacity>
               </View>
               <Text
-                className={`text-center font-regular text-foreground text-lg  mt-8 px-10 ${Platform.OS === "ios" ? "text-lg" : "text-sm"}`}
+                className={`text-center font-regular text-foreground text-lg  mt-8 px-10 ${Platform.OS === "web" ? "text-sm" : "text-lg"}`}
               >
                 회원가입 시{" "}
                 <Text
