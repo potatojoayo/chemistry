@@ -1,4 +1,4 @@
-import { Test } from "@/stores/test-store";
+import { Test } from "@/lib/types";
 import { View } from "react-native";
 import QuestionCardStack from "./question-card-stack";
 import TestProgress from "./test-progress";

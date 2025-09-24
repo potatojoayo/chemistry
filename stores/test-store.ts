@@ -84,20 +84,42 @@ export const useTestStore = create<TestStore>((set) => ({
     index: number;
     answer: number;
   }) => {
-    set((state) => ({
-      tests: state.tests.map((test) =>
-        test.id === id
-          ? {
-              ...test,
-              questions: test.questions.map((question, i) =>
-                i === index ? { ...question, answer } : question
-              ),
-              progressIndex: index + 1,
-              currentQuestionIndex: index + 1,
-            }
-          : test
-      ),
-    }));
+    set((state) => {
+      const test = state.tests.find((t) => t.id === id);
+      if (!test) return state;
+      const questions = test.questions;
+      const question = questions[index];
+      if (!question) return state;
+      const newQuestions = questions.map((question, i) =>
+        i === index ? { ...question, answer } : question
+      );
+      const newProgressIndex = index + 1;
+      const newCurrentQuestionIndex = newProgressIndex;
+
+      let newResult = test.result;
+
+      if (newProgressIndex === questions.length) {
+        if (test.id === "big-5") {
+          const scorer = new Big5Scorer();
+          newResult = scorer.score(newQuestions);
+        }
+      }
+      console.log(newResult);
+
+      return {
+        tests: state.tests.map((test) =>
+          test.id === id
+            ? {
+                ...test,
+                questions: newQuestions,
+                progressIndex: newProgressIndex,
+                currentQuestionIndex: newCurrentQuestionIndex,
+                result: newResult,
+              }
+            : test
+        ),
+      };
+    });
   },
   clearAnswers: ({ id }: { id: string }) => {
     set((state) => ({

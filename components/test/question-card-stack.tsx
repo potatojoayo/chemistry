@@ -1,10 +1,16 @@
 import { Test } from "@/lib/types";
 import { useTestStore } from "@/stores/test-store";
 import { FontAwesome6 } from "@expo/vector-icons";
+import { RelativePathString, router } from "expo-router";
 import { useEffect } from "react";
-import { Platform, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Platform,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import Animated, {
-  interpolate,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -26,20 +32,22 @@ export default function QuestionCardStack({ test }: { test: Test }) {
           duration: 500,
         });
       }
+      if (currentQuestionIndex === test.questions.length) {
+        setTimeout(() => {
+          router.push(`/tests/${test.id}/result` as RelativePathString);
+        }, 1000);
+      }
     });
     return () => {
       unsub();
     };
-  }, [animatedCurrentQuestionIndex, test.id]);
+  }, [animatedCurrentQuestionIndex, test.id, test.questions.length]);
 
   const animatedStyle = useAnimatedStyle(() => {
-    const opacity = interpolate(
-      animatedCurrentQuestionIndex.value,
-      [0, test.questions.length],
-      [1, 0]
-    );
     return {
-      opacity,
+      opacity: withTiming(
+        animatedCurrentQuestionIndex.value === test.questions.length ? 0 : 1
+      ),
     };
   });
 
@@ -59,7 +67,9 @@ export default function QuestionCardStack({ test }: { test: Test }) {
           );
         })}
         {test.currentQuestionIndex === test.questions.length && (
-          <View className="flex-1 flex justify-center items-center"></View>
+          <View className="flex-1 flex justify-center items-center">
+            <ActivityIndicator size="large" color="#ECEEDF" />
+          </View>
         )}
       </View>
       <Animated.View
