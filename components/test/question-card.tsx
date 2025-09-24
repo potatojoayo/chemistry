@@ -63,6 +63,7 @@ export default function QuestionCard({
 
   const animatedStyle = useAnimatedStyle(() => {
     const isCurrent = index === currentIndex;
+    const isPrevious = index < currentIndex;
     const rotateZ = interpolate(
       Math.abs(translateX.value),
       [0, width],
@@ -91,11 +92,17 @@ export default function QuestionCard({
       zIndex: test.questions.length - index,
       transform: [
         {
-          scale: isCurrent ? scale : scale,
+          scale: isPrevious ? 1 : isCurrent ? scale : scale,
         },
         { translateY: isCurrent ? 0 : translateY },
-        { translateX: translateX.value },
-        { rotateZ: isCurrent ? `${direction.value * rotateZ}deg` : "0deg" },
+        { translateX: isPrevious ? -width * 1.1 : translateX.value },
+        {
+          rotateZ: isPrevious
+            ? "20deg"
+            : isCurrent
+              ? `${direction.value * rotateZ}deg`
+              : "0deg",
+        },
       ],
       opacity: index < showCount + currentIndex ? 1 : opacity,
     };

@@ -13,6 +13,7 @@ module.exports = {
         yellow: "#ffd54f",
         blue: "#5AAEFF",
         gray: "#888",
+        muted: "#666",
       },
       fontFamily: {
         light: ["Light", "sans-serif"],
