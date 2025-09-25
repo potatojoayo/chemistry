@@ -36,6 +36,7 @@ export default function Home() {
               >
                 <Big5RadarChart
                   test={tests.find((test) => test.id === "big-5")!}
+                  size={212}
                   showLegend={false}
                 />
               </TestResultCard>

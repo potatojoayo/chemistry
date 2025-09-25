@@ -126,11 +126,10 @@ const Big5RadarChart = ({
           </SvgText>
           <SvgText
             x={point.x}
-            y={point.y + 15}
-            fontSize="10"
+            y={point.y + 13}
+            fontSize="11"
             fill="#222"
             textAnchor="middle"
-            opacity={0.7}
           >
             {Math.round(score)}
           </SvgText>
