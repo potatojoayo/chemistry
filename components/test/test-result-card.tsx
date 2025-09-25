@@ -4,17 +4,19 @@ import * as Haptics from "expo-haptics";
 import { RelativePathString, useRouter } from "expo-router";
 import { Platform, Text, TouchableOpacity, View } from "react-native";
 
-export default function TestCard({
+export default function TestResultCard({
   test,
   icon,
+  children,
 }: {
   test: Test;
   icon?: React.ReactNode;
+  children: React.ReactNode;
 }) {
   const textColor = "#222";
   const router = useRouter();
 
-  if (test.result) {
+  if (!test.result) {
     return null;
   }
 
@@ -24,22 +26,15 @@ export default function TestCard({
       style={{ backgroundColor: test.color }}
       activeOpacity={0.9}
       onPress={() => {
-        router.push(`/tests/${test.id}` as RelativePathString);
+        router.push(`/tests/${test.id}/result` as RelativePathString);
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        // if (test.progressIndex > 0) {
-        //   router.push(`/tests/${test.id}` as RelativePathString);
-        // } else {
-        //   router.push(`/tests/intro/${test.id}` as RelativePathString);
-        // }
       }}
     >
-      <View className="w-10">
-        {icon || <Octicons name="north-star" size={32} color={textColor} />}
-      </View>
-      <View className="ml-2 flex-1 flex flex-col">
-        <View className="flex items-start justify-between flex-row">
+      <View className="flex-1 flex flex-col">
+        <View className="flex items-center flex-row">
+          {icon || <Octicons name="north-star" size={20} color={textColor} />}
           <Text
-            className={` ${Platform.OS === "web" ? "text-lg font-semibold" : "text-xl font-bold"}`}
+            className={`ml-2 ${Platform.OS === "web" ? "text-lg font-semibold" : "text-2xl font-bold"}`}
             style={{ color: textColor }}
           >
             {test.name}
@@ -49,12 +44,7 @@ export default function TestCard({
           className="border-t border-background my-2"
           style={{ borderColor: textColor }}
         ></View>
-        <Text
-          className={`font-medium ${Platform.OS === "web" ? "text-sm" : "text-base"}`}
-          style={{ color: textColor }}
-        >
-          {test.description}
-        </Text>
+        <View className="mt-4">{children}</View>
         <View
           className="mt-3 rounded-lg p-2 items-center justify-center flex-row gap-2"
           style={{ backgroundColor: textColor }}
@@ -63,7 +53,7 @@ export default function TestCard({
             className={`font-medium ${Platform.OS === "web" ? "text-sm" : "text-base"}`}
             style={{ color: test.color }}
           >
-            검사하기
+            자세히 보기
           </Text>
           <FontAwesome6 name="arrow-right-long" size={12} color={test.color} />
         </View>

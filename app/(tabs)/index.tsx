@@ -1,5 +1,7 @@
 import PageWrapper from "@/components/common/PageWrapper";
+import Big5RadarChart from "@/components/test/big-5-radar-chart";
 import TestCard from "@/components/test/test-card";
+import TestResultCard from "@/components/test/test-result-card";
 import { useTestStore } from "@/stores/test-store";
 import {
   Ionicons,
@@ -24,6 +26,22 @@ export default function Home() {
         >
           내 안의 깊은 세계를 마주하는 일입니다.
         </Text>
+        {tests.some((test) => test.result) && (
+          <View className="flex flex-col">
+            <View className="border-t border-foreground my-6 flex flex-row items-center"></View>
+            <View className="flex flex-col">
+              <TestResultCard
+                test={tests.find((test) => test.id === "big-5")!}
+                icon={<MaterialIcons name="waves" size={24} color="#222" />}
+              >
+                <Big5RadarChart
+                  test={tests.find((test) => test.id === "big-5")!}
+                  showLegend={false}
+                />
+              </TestResultCard>
+            </View>
+          </View>
+        )}
         <View className="border-t border-foreground my-6" />
         <View className="flex flex-col gap-4">
           <TestCard

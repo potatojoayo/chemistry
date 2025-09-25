@@ -403,3 +403,39 @@ export const big5Questions = [
     answer: undefined,
   },
 ];
+
+export const sampleResult: Big5Result = {
+  byTrait: {
+    A: {
+      mean: 5,
+      percentile: 99.94351175190566,
+      scaled0to100: 100,
+      z: 3.4062499999999996,
+    },
+    C: {
+      mean: 5,
+      percentile: 99.94351175190566,
+      scaled0to100: 100,
+      z: 3.4062499999999996,
+    },
+    E: {
+      mean: 5,
+      percentile: 99.99990069288796,
+      scaled0to100: 100,
+      z: 4.894736842105263,
+    },
+    N: {
+      mean: 2,
+      percentile: 26.316792475959396,
+      scaled0to100: 37.5886524822695,
+      z: -0.74468085106383,
+    },
+    O: { mean: 5, percentile: 99.99999945962504, scaled0to100: 100, z: 5.85 },
+  },
+  composite: {
+    mean: 4.202970297029703,
+    percentile: 99.41972971625873,
+    scaled0to100: 94.61195408734602,
+    z: 2.676717245240761,
+  },
+};

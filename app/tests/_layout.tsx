@@ -55,6 +55,12 @@ export default function TestsLayout() {
           title: "BIG 5",
         }}
       />
+      <Stack.Screen
+        name="big-5/result"
+        options={{
+          title: "BIG 5",
+        }}
+      />
     </Stack>
   );
 }

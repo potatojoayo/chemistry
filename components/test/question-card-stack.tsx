@@ -25,23 +25,24 @@ export default function QuestionCardStack({ test }: { test: Test }) {
 
   useEffect(() => {
     const unsub = useTestStore.subscribe((s) => {
-      const currentQuestionIndex =
-        s.tests.find((t) => t.id === test.id)?.currentQuestionIndex ?? 0;
+      const t = s.tests.find((t) => t.id === test.id);
+      if (!t) return;
+      const currentQuestionIndex = t.currentQuestionIndex ?? 0;
       if (currentQuestionIndex >= 0) {
         animatedCurrentQuestionIndex.value = withTiming(currentQuestionIndex, {
           duration: 500,
         });
       }
-      if (currentQuestionIndex === test.questions.length) {
+      if (currentQuestionIndex === t.questions.length && t.result) {
         setTimeout(() => {
-          router.push(`/tests/${test.id}/result` as RelativePathString);
-        }, 1000);
+          router.replace(`/tests/${t.id}/result` as RelativePathString);
+        }, 2000);
       }
     });
     return () => {
       unsub();
     };
-  }, [animatedCurrentQuestionIndex, test.id, test.questions.length]);
+  }, [animatedCurrentQuestionIndex, test.id]);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {

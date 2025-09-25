@@ -1,5 +1,6 @@
+import Big5RadarChart from "@/components/test/big-5-radar-chart";
 import { useTestStore } from "@/stores/test-store";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 
 export default function Big5Result() {
   const { tests } = useTestStore();
@@ -8,9 +9,13 @@ export default function Big5Result() {
     return null;
   }
   return (
-    <View>
-      <Text>BIG 5 Result</Text>
-      <Text>{test.result?.byTrait.A.percentile}</Text>
+    <View className="px-3 flex flex-col">
+      <View
+        className="rounded-xl p-4 flex flex-col shadow"
+        style={{ backgroundColor: test.color }}
+      >
+        <Big5RadarChart test={test} />
+      </View>
     </View>
   );
 }

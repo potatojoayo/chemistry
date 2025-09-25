@@ -1,4 +1,4 @@
-import { big5Questions, Big5Scorer } from "@/lib/scorerer/big-5";
+import { big5Questions, Big5Scorer, sampleResult } from "@/lib/scorerer/big-5";
 import { Test } from "@/lib/types";
 import { create } from "zustand";
 
@@ -36,6 +36,7 @@ export const useTestStore = create<TestStore>((set) => ({
       questions: big5Questions,
       currentQuestionIndex: 0,
       progressIndex: 0,
+      result: sampleResult,
     },
     {
       id: "enneagram",
