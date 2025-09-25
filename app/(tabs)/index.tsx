@@ -1,5 +1,6 @@
 import PageWrapper from "@/components/common/PageWrapper";
 import Big5RadarChart from "@/components/test/big-5-radar-chart";
+import EnneagramPieChart from "@/components/test/enneagram-pie-chart";
 import TestCard from "@/components/test/test-card";
 import TestResultCard from "@/components/test/test-result-card";
 import { useTestStore } from "@/stores/test-store";
@@ -37,6 +38,16 @@ export default function Home() {
                 <Big5RadarChart
                   test={tests.find((test) => test.id === "big-5")!}
                   size={212}
+                  showLegend={false}
+                />
+              </TestResultCard>
+              <TestResultCard
+                test={tests.find((test) => test.id === "enneagram")!}
+                icon={<Octicons name="north-star" size={24} color="#222" />}
+              >
+                <EnneagramPieChart
+                  test={tests.find((test) => test.id === "enneagram")!}
+                  size={240}
                   showLegend={false}
                 />
               </TestResultCard>

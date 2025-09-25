@@ -1,4 +1,9 @@
 import { big5Questions, Big5Scorer, sampleResult } from "@/lib/scorerer/big-5";
+import {
+  enneagramQuestions,
+  EnneagramScorer,
+  sampleResult as enneaSampleResult,
+} from "@/lib/scorerer/enneagram";
 import { Test } from "@/lib/types";
 import { create } from "zustand";
 
@@ -44,9 +49,10 @@ export const useTestStore = create<TestStore>((set) => ({
       color: "#26B066",
       description:
         "에니어그램은 인간의 성격을 9가지 유형으로 나누어 설명합니다. 겉으로 드러난 모습이 아니라, 나를 움직이는 핵심 욕구와 두려움을 비춰주는 심리학적 거울입니다. 스스로를 더 깊이 이해하고 관계 속에서 진짜 나를 발견할 수 있습니다.",
-      questions: [],
+      questions: enneagramQuestions,
       currentQuestionIndex: 0,
       progressIndex: 0,
+      result: enneaSampleResult,
     },
     {
       id: "disc",
@@ -102,6 +108,9 @@ export const useTestStore = create<TestStore>((set) => ({
       if (newProgressIndex === questions.length) {
         if (test.id === "big-5") {
           const scorer = new Big5Scorer();
+          newResult = scorer.score(newQuestions);
+        } else if (test.id === "enneagram") {
+          const scorer = new EnneagramScorer();
           newResult = scorer.score(newQuestions);
         }
       }

@@ -1,4 +1,4 @@
-import { Test } from "@/lib/types";
+import { Big5Result, Test } from "@/lib/types";
 import { useTestStore } from "@/stores/test-store";
 import { Text, View } from "react-native";
 import Svg, {
@@ -30,7 +30,7 @@ const Big5RadarChart = ({
     return null;
   }
 
-  const { result } = currentTest;
+  const result = currentTest.result as Big5Result;
   const center = size / 2;
   const radius = size * 0.35;
 
