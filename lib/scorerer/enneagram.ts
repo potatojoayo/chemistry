@@ -18,6 +18,20 @@ const ENNEA_ORDER: EnneaKey[] = [
   "Type9",
 ];
 
+// ---- 내부 헬퍼(최소 추가) ----
+const typeToNum = (k: EnneaKey) => Number(k.replace("Type", ""));
+const numToKey = (n: number) => `Type${n}` as EnneaKey;
+const neighbors = (n: number): [number, number] => {
+  const left = n === 1 ? 9 : n - 1;
+  const right = n === 9 ? 1 : n + 1;
+  return [left, right];
+};
+// 동점 시 결정 규칙: total ↓, answeredCount ↓, 번호 오름차순
+const cmpScore = (a: EnneaTypeScore, b: EnneaTypeScore) =>
+  b.total - a.total ||
+  b.answeredCount - a.answeredCount ||
+  typeToNum(a.type) - typeToNum(b.type);
+
 export class EnneagramScorer {
   private allowPartial: boolean;
   private reverseSet: Set<string>;
@@ -51,8 +65,6 @@ export class EnneagramScorer {
       answeredAll++;
     }
 
-    // 기본 규칙: 각 유형 4문항(1,10,19,28 / 2,11,20,29 ...).
-    // 입력이 변형되어도 domain 기준으로 집계하므로 안전.
     if (!this.allowPartial) {
       for (const k of ENNEA_ORDER) {
         if (buckets[k].length === 0) {
@@ -79,23 +91,18 @@ export class EnneagramScorer {
       };
     }
 
-    // 3) 랭킹(내림차순) & 동점 처리
-    const ranking = [...ENNEA_ORDER]
-      .map((k) => byType[k])
-      .sort((a, b) => b.total - a.total || b.answeredCount - a.answeredCount);
+    // 3) 랭킹(내림차순) & 주유형 단일 선택
+    const ranking = [...ENNEA_ORDER].map((k) => byType[k]).sort(cmpScore);
 
-    const topScore = ranking[0]?.total ?? 0;
-    const primary = ranking.filter((r) => r.total === topScore);
+    const primary = ranking[0]; // ✅ 단일 값
 
-    // 2위 점수(동점 고려)
-    let wing: EnneaTypeScore[] = [];
-    const second = ranking.find((r) => r.total < topScore);
-    if (second) {
-      const secondScore = second.total;
-      wing = ranking.filter((r) => r.total === secondScore);
-    }
+    // 4) 날개 단일 선택: 주유형의 양옆만 비교
+    const [leftN, rightN] = neighbors(typeToNum(primary.type));
+    const left = byType[numToKey(leftN)];
+    const right = byType[numToKey(rightN)];
+    const wing = [left, right].sort(cmpScore)[0]; // ✅ 단일 값
 
-    // 4) 완성도
+    // 5) 완성도
     const completion = {
       answered: answeredAll,
       totalItems: questions.length,
@@ -116,19 +123,14 @@ export class EnneagramScorer {
   // "Type1"~"Type9" 을 기준으로, 느슨한 문자열도 수용
   private inferType(q: Question): EnneaKey | null {
     const dRaw = (q.domain || "").trim().toLowerCase();
-    // domain이 정확히 TypeX 형태면 그대로 매핑
     for (let i = 1; i <= 9; i++) {
-      const key = `type${i}`;
-      if (dRaw === key) return `Type${i}` as EnneaKey;
+      if (dRaw === `type${i}`) return `Type${i}` as EnneaKey;
     }
 
     // 보조: code 프리픽스 T1_/T2_...
     const c = (q.code || "").toUpperCase();
     const m = c.match(/^T([1-9])_/);
-    if (m) {
-      const i = Number(m[1]);
-      return `Type${i}` as EnneaKey;
-    }
+    if (m) return `Type${Number(m[1])}` as EnneaKey;
 
     return null; // 알 수 없으면 스킵
   }
@@ -456,9 +458,14 @@ export const sampleResult: EnneaResult = {
     },
   },
   completion: { answered: 36, ratio: 1, totalItems: 36 },
-  primary: [
-    { answeredCount: 4, average: 5, maxPossible: 20, total: 20, type: "Type3" },
-  ],
+  primary: {
+    answeredCount: 4,
+    average: 5,
+    maxPossible: 20,
+    total: 20,
+    type: "Type3",
+  },
+
   ranking: [
     { answeredCount: 4, average: 5, maxPossible: 20, total: 20, type: "Type3" },
     {
@@ -512,13 +519,11 @@ export const sampleResult: EnneaResult = {
       type: "Type4",
     },
   ],
-  wing: [
-    {
-      answeredCount: 4,
-      average: 4.75,
-      maxPossible: 20,
-      total: 19,
-      type: "Type7",
-    },
-  ],
+  wing: {
+    answeredCount: 4,
+    average: 4.75,
+    maxPossible: 20,
+    total: 19,
+    type: "Type7",
+  },
 };

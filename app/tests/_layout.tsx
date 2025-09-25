@@ -1,5 +1,6 @@
 import { useTestStore } from "@/stores/test-store";
 import { FontAwesome6 } from "@expo/vector-icons";
+import { BlurView } from "expo-blur";
 import { router, Stack } from "expo-router";
 import { Platform, Pressable, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -10,21 +11,20 @@ export default function TestsLayout() {
   return (
     <Stack
       screenOptions={{
-        contentStyle: { backgroundColor: "#222", paddingTop: top + 64 },
-        headerStyle: {
-          backgroundColor: "#222",
-        },
-        headerShadowVisible: false,
-        headerTintColor: "#ECEEDF",
-        headerTitleStyle: {
-          color: "#ECEEDF",
-          fontFamily: "bold",
-        },
-        headerTransparent: true,
+        contentStyle: { backgroundColor: "#222" },
         header: ({ options }) => {
           return (
-            <View style={{ paddingTop: top }}>
-              <View className="h-16 flex flex-row items-center px-6  ">
+            <BlurView
+              intensity={20}
+              tint="dark"
+              className="absolute left-0 right-0 z-50 flex flex-row items-center bg-background"
+              style={{
+                top: 0, // SafeArea 밖에서 시작
+                height: top + 56, // status bar 높이 + 헤더 높이
+                paddingTop: top + 12, // status bar + 패딩
+              }}
+            >
+              <View className="flex flex-row items-center px-6  ">
                 <Pressable
                   className="flex flex-row items-center"
                   onPress={() => {
@@ -44,7 +44,7 @@ export default function TestsLayout() {
                   </Text>
                 </Pressable>
               </View>
-            </View>
+            </BlurView>
           );
         },
       }}
@@ -59,6 +59,18 @@ export default function TestsLayout() {
         name="big-5/result"
         options={{
           title: "BIG 5",
+        }}
+      />
+      <Stack.Screen
+        name="enneagram/index"
+        options={{
+          title: "에니어그램",
+        }}
+      />
+      <Stack.Screen
+        name="enneagram/result"
+        options={{
+          title: "에니어그램",
         }}
       />
     </Stack>

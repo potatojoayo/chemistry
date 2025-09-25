@@ -1,3 +1,4 @@
+import { ENNEAGRAM_TYPE_DESCRIPTIONS } from "@/lib/descriptions/enneargram";
 import { EnneaKey, EnneaResult, Test } from "@/lib/types";
 import { useTestStore } from "@/stores/test-store";
 import { Text, View } from "react-native";
@@ -32,18 +33,14 @@ const EnneagramPieChart = ({
   const center = size / 2;
   const radius = size * 0.35;
 
-  // 에니어그램 9개 유형과 색상 (이미지와 유사하게)
-  const types = [
-    { key: "Type1", name: "완벽주의자", color: "#FF8C42" }, // 오렌지-피치
-    { key: "Type2", name: "조력자", color: "#FF6B6B" }, // 코랄
-    { key: "Type3", name: "성취자", color: "#FF1493" }, // 핫핑크
-    { key: "Type4", name: "예술가", color: "#8A2BE2" }, // 보라
-    { key: "Type5", name: "사색가", color: "#20B2AA" }, // 틸
-    { key: "Type6", name: "충성가", color: "#00CED1" }, // 시안
-    { key: "Type7", name: "열정가", color: "#32CD32" }, // 에메랄드 그린
-    { key: "Type8", name: "도전자", color: "#90EE90" }, // 라임 그린
-    { key: "Type9", name: "중재자", color: "#FFD700" }, // 골드
-  ];
+  // 에니어그램 9개 유형과 색상 (ENNEAGRAM_TYPE_DESCRIPTIONS에서 가져옴)
+  const types = Object.entries(ENNEAGRAM_TYPE_DESCRIPTIONS).map(
+    ([key, description]) => ({
+      key: key as EnneaKey,
+      name: description.title,
+      color: description.color,
+    })
+  );
 
   // 각 유형의 점수를 0-100 스케일로 변환
   const getTypeScore = (typeKey: string) => {
@@ -94,9 +91,10 @@ const EnneagramPieChart = ({
       // 섹션의 중간 각도
       const midAngle = (startAngle + endAngle) / 2;
 
-      // 점수에 비례한 반지름 (점수가 높을수록 긴 반지름)
+      // 점수에 비례한 반지름 (점수 차이를 더 극명하게 표현)
       const radiusRatio = score / maxScore;
-      const segmentRadius = radius * 0.3 + radius * 0.7 * radiusRatio;
+      // 최소 반지름을 더 작게, 최대 반지름을 더 크게 하여 차이를 극대화
+      const segmentRadius = radius * 0.05 + radius * 0.95 * radiusRatio;
 
       // 오프셋 적용
       const offsetDistance = 4;
@@ -167,11 +165,11 @@ const EnneagramPieChart = ({
     const offsetCenterX = center + path.offsetX;
     const offsetCenterY = center + path.offsetY;
 
-    // 조각 안의 중간 지점에 라벨 배치
+    // 조각 안의 중간 지점에 라벨 배치 (동일한 비율 적용)
     const maxScore = Math.max(...types.map((type) => getTypeScore(type.key)));
     const radiusRatio = path.score / maxScore;
-    const segmentRadius = radius * 0.4 + radius * 0.9 * radiusRatio;
-    const labelRadius = segmentRadius * 0.5; // 조각의 60% 지점에 배치
+    const segmentRadius = radius * 0.05 + radius * 0.95 * radiusRatio;
+    const labelRadius = segmentRadius * 0.5; // 조각의 50% 지점에 배치
 
     const x = offsetCenterX + labelRadius * Math.cos(midAngle);
     const y = offsetCenterY + labelRadius * Math.sin(midAngle) + 4;
@@ -181,7 +179,12 @@ const EnneagramPieChart = ({
 
   return (
     <View className="items-center justify-center">
-      <Svg width={size} height={size}>
+      <Svg
+        width={size}
+        height={size}
+        className=""
+        style={{ transform: [{ scale: 1.25 }] }}
+      >
         <Defs>
           {/* 그라디언트 정의 */}
           {types.map((type) => (
@@ -237,7 +240,7 @@ const EnneagramPieChart = ({
 
       {/* 범례 */}
       {showLegend && (
-        <View className="mt-6 flex-row flex-wrap justify-center gap-3">
+        <View className="flex-row flex-wrap justify-center gap-3">
           {types.map((type, index) => {
             const score = getTypeScore(type.key);
             if (score <= 0) return null;
@@ -246,11 +249,11 @@ const EnneagramPieChart = ({
             return (
               <View key={index} className="flex-row items-center gap-2">
                 <View
-                  className="w-3 h-3 rounded-full"
+                  className="w-2 h-2 rounded-full"
                   style={{ backgroundColor: type.color }}
                 />
                 <Text className="text-xs text-background">
-                  {type.name}: {percentage}%
+                  {type.key.replace("Type", "")}-{type.name}: ({percentage}%)
                 </Text>
               </View>
             );

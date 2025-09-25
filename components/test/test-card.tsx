@@ -26,11 +26,6 @@ export default function TestCard({
       onPress={() => {
         router.push(`/tests/${test.id}` as RelativePathString);
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        // if (test.progressIndex > 0) {
-        //   router.push(`/tests/${test.id}` as RelativePathString);
-        // } else {
-        //   router.push(`/tests/intro/${test.id}` as RelativePathString);
-        // }
       }}
     >
       <View className="w-10">

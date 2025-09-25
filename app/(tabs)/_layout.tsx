@@ -1,4 +1,4 @@
-import BlurHeader from "@/components/common/BlurHeader";
+import BlurHeader from "@/components/common/blur-header";
 import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import { Tabs } from "expo-router";

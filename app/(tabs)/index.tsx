@@ -1,4 +1,4 @@
-import PageWrapper from "@/components/common/PageWrapper";
+import TabPageWrapper from "@/components/common/tab-page-wrapper";
 import Big5RadarChart from "@/components/test/big-5-radar-chart";
 import EnneagramPieChart from "@/components/test/enneagram-pie-chart";
 import TestCard from "@/components/test/test-card";
@@ -15,7 +15,7 @@ import { Platform, Text, View } from "react-native";
 export default function Home() {
   const { tests } = useTestStore();
   return (
-    <PageWrapper>
+    <TabPageWrapper>
       <View className="p-3 flex flex-col">
         <Text
           className={`text-foreground  font-semibold ${Platform.OS === "web" ? "text-xl" : "text-2xl"}`}
@@ -29,15 +29,15 @@ export default function Home() {
         </Text>
         {tests.some((test) => test.result) && (
           <View className="flex flex-col">
-            <View className="border-t border-foreground my-6 flex flex-row items-center"></View>
-            <View className="flex flex-col">
+            <View className="border-t border-foreground my-4 flex flex-row items-center"></View>
+            <View className="flex flex-col gap-4">
               <TestResultCard
                 test={tests.find((test) => test.id === "big-5")!}
                 icon={<MaterialIcons name="waves" size={24} color="#222" />}
               >
                 <Big5RadarChart
                   test={tests.find((test) => test.id === "big-5")!}
-                  size={212}
+                  size={210}
                   showLegend={false}
                 />
               </TestResultCard>
@@ -47,14 +47,14 @@ export default function Home() {
               >
                 <EnneagramPieChart
                   test={tests.find((test) => test.id === "enneagram")!}
-                  size={240}
+                  size={210}
                   showLegend={false}
                 />
               </TestResultCard>
             </View>
           </View>
         )}
-        <View className="border-t border-foreground my-6" />
+        <View className="border-t border-foreground my-4" />
         <View className="flex flex-col gap-4">
           <TestCard
             test={tests.find((test) => test.id === "big-5")!}
@@ -80,6 +80,6 @@ export default function Home() {
           />
         </View>
       </View>
-    </PageWrapper>
+    </TabPageWrapper>
   );
 }

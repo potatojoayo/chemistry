@@ -120,6 +120,7 @@ const Big5RadarChart = ({
             y={point.y}
             fontSize="12"
             fill="#222"
+            fontWeight="bold"
             textAnchor="middle"
           >
             {trait.name}

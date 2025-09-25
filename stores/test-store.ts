@@ -1,9 +1,5 @@
 import { big5Questions, Big5Scorer, sampleResult } from "@/lib/scorerer/big-5";
-import {
-  enneagramQuestions,
-  EnneagramScorer,
-  sampleResult as enneaSampleResult,
-} from "@/lib/scorerer/enneagram";
+import { enneagramQuestions, EnneagramScorer } from "@/lib/scorerer/enneagram";
 import { Test } from "@/lib/types";
 import { create } from "zustand";
 
@@ -28,6 +24,7 @@ interface TestStore {
   clearAnswers: ({ id }: { id: string }) => void;
   goPrev: ({ id }: { id: string }) => void;
   goNext: ({ id }: { id: string }) => void;
+  takeReTest: ({ id }: { id: string }) => void;
 }
 
 export const useTestStore = create<TestStore>((set) => ({
@@ -52,7 +49,7 @@ export const useTestStore = create<TestStore>((set) => ({
       questions: enneagramQuestions,
       currentQuestionIndex: 0,
       progressIndex: 0,
-      result: enneaSampleResult,
+      // result: enneaSampleResult,
     },
     {
       id: "disc",
@@ -114,7 +111,6 @@ export const useTestStore = create<TestStore>((set) => ({
           newResult = scorer.score(newQuestions);
         }
       }
-      console.log(newResult);
 
       return {
         tests: state.tests.map((test) =>
@@ -190,6 +186,19 @@ export const useTestStore = create<TestStore>((set) => ({
         };
       }
       return state;
+    });
+  },
+  takeReTest: ({ id }: { id: string }) => {
+    set((state) => {
+      const test = state.tests.find((t) => t.id === id);
+      if (!test) return state;
+      return {
+        tests: state.tests.map((test) =>
+          test.id === id
+            ? { ...test, currentQuestionIndex: 0, progressIndex: 0 }
+            : test
+        ),
+      };
     });
   },
 }));

@@ -2,7 +2,7 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-export default function PageWrapper({
+export default function TabPageWrapper({
   children,
 }: {
   children: React.ReactNode;
