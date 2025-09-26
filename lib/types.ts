@@ -6,7 +6,7 @@ export interface Test {
   questions: Question[];
   progressIndex: number;
   currentQuestionIndex: number;
-  result?: Big5Result | EnneaResult | null;
+  result?: Big5Result | EnneaResult | DiscResult | null;
 }
 
 export interface Question {
@@ -90,4 +90,32 @@ export type WingText = {
   oneLine: string; // 한 줄 요약
   description: string; // 본문
   advice: string; // 성장 조언/핵심 팁
+};
+
+// DISC
+export type DiscKey = "D" | "I" | "S" | "C";
+
+export type DiscStyleScore = {
+  style: DiscKey;
+  total: number; // 합계 (최대 25)
+  average: number; // 평균
+  answeredCount: number; // 응답 수 (최대 5)
+  maxPossible: number; // answeredCount * 5
+  scaled0to100: number; // (total-5)/(25-5) * 100  (응답 수 부족 시 동적으로 환산)
+};
+
+export type DiscResult = {
+  byStyle: Record<DiscKey, DiscStyleScore>;
+  ranking: DiscStyleScore[]; // 점수 내림차순 정렬
+  primary: DiscStyleScore; // 1위
+  secondary: DiscStyleScore; // 2위
+  completion: { answered: number; totalItems: number; ratio: number };
+};
+
+export type DiscDescription = {
+  title: string; // 예: "하늘의 제왕, 독수리 (주도형)"
+  animals: string[]; // 예: ["독수리", "사자", "호랑이"]
+  tagline: string; // 한 줄 캐치프레이즈
+  description: string; // 본문
+  advice: string; // 성장 조언
 };

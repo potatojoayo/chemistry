@@ -1,5 +1,6 @@
 import TabPageWrapper from "@/components/common/tab-page-wrapper";
 import Big5RadarChart from "@/components/test/big-5-radar-chart";
+import DiscCircleChart from "@/components/test/disc-circle-chart";
 import EnneagramPieChart from "@/components/test/enneagram-pie-chart";
 import TestCard from "@/components/test/test-card";
 import TestResultCard from "@/components/test/test-result-card";
@@ -48,6 +49,16 @@ export default function Home() {
                 <EnneagramPieChart
                   test={tests.find((test) => test.id === "enneagram")!}
                   size={210}
+                  showLegend={false}
+                />
+              </TestResultCard>
+              <TestResultCard
+                test={tests.find((test) => test.id === "disc")!}
+                icon={<Ionicons name="disc" size={24} color="#222" />}
+              >
+                <DiscCircleChart
+                  test={tests.find((test) => test.id === "disc")!}
+                  size={200}
                   showLegend={false}
                 />
               </TestResultCard>

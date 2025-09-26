@@ -1,4 +1,9 @@
 import { big5Questions, Big5Scorer, sampleResult } from "@/lib/scorerer/big-5";
+import {
+  discQuestions,
+  discSampleResult,
+  DiscScorer,
+} from "@/lib/scorerer/disc";
 import { enneagramQuestions, EnneagramScorer } from "@/lib/scorerer/enneagram";
 import { Test } from "@/lib/types";
 import { create } from "zustand";
@@ -57,9 +62,10 @@ export const useTestStore = create<TestStore>((set) => ({
       color: "#F58476",
       description:
         "DISC는 인간의 행동을 지배(D), 사교(I), 안정(S), 신중(C) 네 가지 유형으로 나눕니다. 당신이 세상과 어울리고 선택하는 방식 속에는 고유한 패턴이 숨어 있습니다. 이 테스트는 그 패턴을 비추어, 관계와 협업에서의 당신의 강점을 알려줍니다.",
-      questions: [],
+      questions: discQuestions,
       currentQuestionIndex: 0,
       progressIndex: 0,
+      result: discSampleResult,
     },
     {
       id: "attachment",
@@ -109,8 +115,13 @@ export const useTestStore = create<TestStore>((set) => ({
         } else if (test.id === "enneagram") {
           const scorer = new EnneagramScorer();
           newResult = scorer.score(newQuestions);
+        } else if (test.id === "disc") {
+          const scorer = new DiscScorer();
+          newResult = scorer.score(newQuestions);
         }
       }
+
+      console.log("newResult", newResult);
 
       return {
         tests: state.tests.map((test) =>
