@@ -1,4 +1,5 @@
 import TabPageWrapper from "@/components/common/tab-page-wrapper";
+import AttachmentChart from "@/components/test/attachment-chart";
 import Big5RadarChart from "@/components/test/big-5-radar-chart";
 import DiscCircleChart from "@/components/test/disc-circle-chart";
 import EnneagramPieChart from "@/components/test/enneagram-pie-chart";
@@ -59,6 +60,22 @@ export default function Home() {
                 <DiscCircleChart
                   test={tests.find((test) => test.id === "disc")!}
                   size={164}
+                  showLegend={false}
+                />
+              </TestResultCard>
+              <TestResultCard
+                test={tests.find((test) => test.id === "attachment")!}
+                icon={
+                  <MaterialCommunityIcons
+                    name="head-heart"
+                    size={24}
+                    color="#222"
+                  />
+                }
+              >
+                <AttachmentChart
+                  test={tests.find((test) => test.id === "attachment")!}
+                  size={200}
                   showLegend={false}
                 />
               </TestResultCard>

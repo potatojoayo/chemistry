@@ -1,3 +1,4 @@
+import AttachmentChart from "@/components/test/attachment-chart";
 import { AttachmentResult } from "@/lib/types";
 import { useTestStore } from "@/stores/test-store";
 import { Text, View } from "react-native";
@@ -22,13 +23,14 @@ export default function AttachmentResultPage() {
       showsVerticalScrollIndicator={false}
     >
       <View
-        className="rounded-xl p-4 flex flex-col shadow"
+        className="rounded-xl p-4 flex flex-col shadow mb-6"
         style={{ backgroundColor: test.color }}
       >
         <View className="border-t border-background"></View>
         <Text className="font-semibold text-xl mb-2 text-background">
           {test.name} 결과
         </Text>
+        <AttachmentChart test={test} size={264} showLegend={true} />
       </View>
     </ScrollView>
   );

@@ -1,5 +1,6 @@
 import {
   attachmentQuestions,
+  attachmentSampleResult,
   AttachmentScorer,
 } from "@/lib/scorerer/attachment";
 import { big5Questions, Big5Scorer } from "@/lib/scorerer/big-5";
@@ -76,6 +77,7 @@ export const useTestStore = create<TestStore>((set) => ({
       questions: attachmentQuestions,
       currentQuestionIndex: 0,
       progressIndex: 0,
+      result: attachmentSampleResult,
     },
   ],
   setCurrentQuestionIndex: ({ id, index }: { id: string; index: number }) => {

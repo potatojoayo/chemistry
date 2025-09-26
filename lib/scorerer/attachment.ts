@@ -167,3 +167,10 @@ export const attachmentQuestions: Question[] = [
     content: "나는 상대방이 내 감정에 너무 깊이 관여하는 것이 불편하다.",
   },
 ];
+
+export const attachmentSampleResult: AttachmentResult = {
+  anxiety: { average: 1, z: -2.287671232876712 },
+  avoidance: { average: 1, z: -2.3333333333333335 },
+  completion: { answered: 18, ratio: 1, totalItems: 18 },
+  integrated: { percentile: 65.63889512688075, z: 1.653972602739726 },
+};
