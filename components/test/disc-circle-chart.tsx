@@ -32,6 +32,7 @@ const DiscCircleChart = ({
   const result = currentTest.result as DiscResult;
   const center = size / 2;
   const radius = size * 0.35;
+  const fontSize = size * 0.1;
 
   // DISC 4개 유형과 색상
   const discTypes = [
@@ -187,18 +188,6 @@ const DiscCircleChart = ({
   const secondPoint = toScreen(angle2);
   const thirdPoint = toScreen(angle3);
 
-  console.log("새로운 점 계산:", {
-    primary,
-    rightNeighbor: rightNeighbor[primary],
-    leftNeighbor: leftNeighbor[primary],
-    rightRatio: ratioTo(rightNeighbor[primary]),
-    leftRatio: ratioTo(leftNeighbor[primary]),
-    angle2,
-    angle3,
-    secondPoint,
-    thirdPoint,
-  });
-
   // 각 타입별 최대 가능한 점수 (DISC 테스트: 각 타입별 5문항 * 5점 = 25점)
   const maxD = 25; // D (주도형): 5문항
   const maxI = 25; // I (사교형): 5문항
@@ -212,17 +201,6 @@ const DiscCircleChart = ({
     C: `${cScore}/${maxC} (${((cScore / maxC) * 100).toFixed(1)}%)`,
     total: total,
   });
-
-  // 디버그: 세 점의 위치 확인
-  console.log("=== 세 점의 위치 ===");
-  console.log("1. Shade Center (메인 원 원주 위):", {
-    x: shadeCenterX,
-    y: shadeCenterY,
-  });
-  console.log("2. Second Point (I 방향):", secondPoint);
-  console.log("3. Third Point (C 방향):", thirdPoint);
-  console.log("User Position:", { x: userX, y: userY });
-  console.log("Main Circle Center:", { x: center, y: center });
 
   // 타원형 shade 계산 (3개 점으로 정의)
   const getShadeEllipse = () => {
@@ -310,7 +288,7 @@ const DiscCircleChart = ({
 
   return (
     <View className="items-center justify-center">
-      <Svg width={size} height={size} style={{ transform: [{ scale: 1.1 }] }}>
+      <Svg width={size} height={size} style={{ transform: [{ scale: 1.15 }] }}>
         <Defs>
           {/* 메인 원 클리핑 패스 */}
           <ClipPath id="mainCircleClip">
@@ -364,8 +342,8 @@ const DiscCircleChart = ({
               key={`label-${type.key}`}
               x={quadrantCenter.x}
               y={quadrantCenter.y}
-              fontSize="24"
-              fill="white"
+              fontSize={fontSize}
+              fill="#222"
               textAnchor="middle"
               fontWeight="bold"
             >

@@ -48,7 +48,7 @@ export default function Home() {
               >
                 <EnneagramPieChart
                   test={tests.find((test) => test.id === "enneagram")!}
-                  size={210}
+                  size={180}
                   showLegend={false}
                 />
               </TestResultCard>
@@ -58,14 +58,16 @@ export default function Home() {
               >
                 <DiscCircleChart
                   test={tests.find((test) => test.id === "disc")!}
-                  size={200}
+                  size={164}
                   showLegend={false}
                 />
               </TestResultCard>
             </View>
           </View>
         )}
-        <View className="border-t border-foreground my-4" />
+        {tests.some((test) => !test.result) && (
+          <View className="border-t border-foreground my-4" />
+        )}
         <View className="flex flex-col gap-4">
           <TestCard
             test={tests.find((test) => test.id === "big-5")!}
