@@ -73,6 +73,31 @@ export default function TestsLayout() {
           title: "에니어그램",
         }}
       />
+      <Stack.Screen
+        name="disc/index"
+        options={{
+          title: "DISC",
+        }}
+      />
+      <Stack.Screen
+        name="disc/result"
+        options={{
+          title: "DISC",
+        }}
+      />
+
+      <Stack.Screen
+        name="attachment/index"
+        options={{
+          title: "애착유형",
+        }}
+      />
+      <Stack.Screen
+        name="attachment/result"
+        options={{
+          title: "애착유형",
+        }}
+      />
     </Stack>
   );
 }

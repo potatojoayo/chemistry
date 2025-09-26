@@ -1,9 +1,9 @@
-import { big5Questions, Big5Scorer, sampleResult } from "@/lib/scorerer/big-5";
 import {
-  discQuestions,
-  discSampleResult,
-  DiscScorer,
-} from "@/lib/scorerer/disc";
+  attachmentQuestions,
+  AttachmentScorer,
+} from "@/lib/scorerer/attachment";
+import { big5Questions, Big5Scorer } from "@/lib/scorerer/big-5";
+import { discQuestions, DiscScorer } from "@/lib/scorerer/disc";
 import { enneagramQuestions, EnneagramScorer } from "@/lib/scorerer/enneagram";
 import { Test } from "@/lib/types";
 import { create } from "zustand";
@@ -43,7 +43,7 @@ export const useTestStore = create<TestStore>((set) => ({
       questions: big5Questions,
       currentQuestionIndex: 0,
       progressIndex: 0,
-      result: sampleResult,
+      // result: sampleResult,
     },
     {
       id: "enneagram",
@@ -65,7 +65,7 @@ export const useTestStore = create<TestStore>((set) => ({
       questions: discQuestions,
       currentQuestionIndex: 0,
       progressIndex: 0,
-      result: discSampleResult,
+      // result: discSampleResult,
     },
     {
       id: "attachment",
@@ -73,7 +73,7 @@ export const useTestStore = create<TestStore>((set) => ({
       color: "#ffd54f",
       description:
         "애착 이론은 우리가 사랑하고 관계 맺는 방식을 설명합니다. 안정형, 불안형, 회피형, 혼란형 네 가지 유형 속에서 당신의 관계 패턴을 발견하고 더 건강한 친밀감을 만들어가세요.",
-      questions: [],
+      questions: attachmentQuestions,
       currentQuestionIndex: 0,
       progressIndex: 0,
     },
@@ -117,6 +117,9 @@ export const useTestStore = create<TestStore>((set) => ({
           newResult = scorer.score(newQuestions);
         } else if (test.id === "disc") {
           const scorer = new DiscScorer();
+          newResult = scorer.score(newQuestions);
+        } else if (test.id === "attachment") {
+          const scorer = new AttachmentScorer();
           newResult = scorer.score(newQuestions);
         }
       }
