@@ -1,7 +1,7 @@
 import { AttachmentResult, Test } from "@/lib/types";
 import React from "react";
 import { Text, View } from "react-native";
-import Svg, { Circle, Line, Rect, Text as SvgText } from "react-native-svg";
+import Svg, { Circle, Line, Path, Text as SvgText } from "react-native-svg";
 
 interface AttachmentChartProps {
   test: Test;
@@ -20,56 +20,55 @@ export default function AttachmentChart({
 
   const center = size / 2;
   const axisLength = size * 0.4; // 축 길이를 늘려서 여유분 확보
-  const fontSize = size * 0.06;
+  const fontSize = 12;
 
-  // 사용자 유형에 따른 색상 결정
+  // 사용자 유형에 따른 색상 결정 (1-5점 기준)
   const getUserTypeColor = (anxiety: number, avoidance: number) => {
-    if (anxiety >= 3.5 && avoidance >= 3.5) return "#F44336"; // 혼란형 (빨간색)
-    if (anxiety < 3.5 && avoidance >= 3.5) return "#2196F3"; // 회피형 (파란색)
-    if (anxiety < 3.5 && avoidance < 3.5) return "#4CAF50"; // 안정형 (녹색)
-    if (anxiety >= 3.5 && avoidance < 3.5) return "#FF9800"; // 불안형 (주황색)
+    if (anxiety >= 3 && avoidance >= 3) return "#F44336"; // 혼란형 (빨간색)
+    if (anxiety < 3 && avoidance >= 3) return "#2196F3"; // 회피형 (파란색)
+    if (anxiety < 3 && avoidance < 3) return "#4CAF50"; // 안정형 (녹색)
+    if (anxiety >= 3 && avoidance < 3) return "#FF9800"; // 불안형 (주황색)
     return "#000"; // 기본값
   };
 
   // 사용자 위치 계산 (1~5 범위를 그래프 안에 맞추기)
-  const userX = center + (anxiety - 3) * (axisLength / 2.2); // 3으로 나누어서 범위 확장
-  const userY = center - (avoidance - 3) * (axisLength / 2.2); // 3으로 나누어서 범위 확장
+  const userX = center + (anxiety - 3) * (axisLength / 2.1); // 3으로 나누어서 범위 확장
+  const userY = center - (avoidance - 3) * (axisLength / 2.1); // 3으로 나누어서 범위 확장
 
   // 간격 설정
-  const offset = 8;
 
   // 4개 사분면 정의 (올바른 Attachment Styles 배치)
   const quadrants = [
     {
       name: "혼란형", // High Anxiety, High Avoidance
-      x: center + offset,
+      x: center,
       y: center - axisLength,
-      width: axisLength - offset,
-      height: axisLength - offset,
+      width: axisLength,
+      height: axisLength,
       color: "#F44336", // 빨간색
     },
     {
       name: "회피형", // Low Anxiety, High Avoidance
       x: center - axisLength,
       y: center - axisLength,
-      width: axisLength - offset,
-      height: axisLength - offset,
+      width: axisLength,
+      height: axisLength,
       color: "#2196F3", // 파란색
     },
     {
       name: "안정형", // Low Anxiety, Low Avoidance
       x: center - axisLength,
-      y: center + offset,
-      width: axisLength - offset,
-      height: axisLength - offset,
+      y: center,
+      width: axisLength,
+      height: axisLength,
       color: "#4CAF50", // 녹색
     },
     {
       name: "불안형", // High Anxiety, Low Avoidance
-      x: center + offset,
-      y: center + offset,
-      width: axisLength - offset,
-      height: axisLength - offset,
+      x: center,
+      y: center,
+      width: axisLength,
+      height: axisLength,
       color: "#FF9800", // 주황색
     },
   ];
@@ -77,22 +76,54 @@ export default function AttachmentChart({
   return (
     <View className="items-center justify-center">
       <Svg width={size} height={size} style={{ transform: [{ scale: 1.15 }] }}>
-        {/* 4개 사분면 */}
-        {quadrants.map((quadrant, index) => (
-          <Rect
-            key={index}
-            x={quadrant.x}
-            y={quadrant.y}
-            width={quadrant.width}
-            height={quadrant.height}
-            rx="8"
-            ry="8"
-            fill={quadrant.color}
-            fillOpacity="0.2"
-            stroke={quadrant.color}
-            strokeWidth="1"
-          />
-        ))}
+        {/* 4개 사분면 - 바깥 모서리만 둥글게 */}
+        {/* 회피형 (좌상) - 좌상 모서리만 둥글게 */}
+        <Path
+          d={`M ${center - axisLength + 8} ${center - axisLength}
+             L ${center} ${center - axisLength}
+             L ${center} ${center}
+             L ${center - axisLength} ${center}
+             L ${center - axisLength} ${center - axisLength + 8}
+             Q ${center - axisLength} ${center - axisLength} ${center - axisLength + 8} ${center - axisLength}
+             Z`}
+          fill={quadrants[1].color}
+        />
+
+        {/* 혼란형 (우상) - 우상 모서리만 둥글게 */}
+        <Path
+          d={`M ${center} ${center - axisLength}
+             L ${center + axisLength - 8} ${center - axisLength}
+             Q ${center + axisLength} ${center - axisLength} ${center + axisLength} ${center - axisLength + 8}
+             L ${center + axisLength} ${center}
+             L ${center} ${center}
+             L ${center} ${center - axisLength}
+             Z`}
+          fill={quadrants[0].color}
+        />
+
+        {/* 안정형 (좌하) - 좌하 모서리만 둥글게 */}
+        <Path
+          d={`M ${center - axisLength} ${center}
+             L ${center} ${center}
+             L ${center} ${center + axisLength}
+             L ${center - axisLength + 8} ${center + axisLength}
+             Q ${center - axisLength} ${center + axisLength} ${center - axisLength} ${center + axisLength - 8}
+             L ${center - axisLength} ${center}
+             Z`}
+          fill={quadrants[2].color}
+        />
+
+        {/* 불안형 (우하) - 우하 모서리만 둥글게 */}
+        <Path
+          d={`M ${center} ${center}
+             L ${center + axisLength} ${center}
+             L ${center + axisLength} ${center + axisLength - 8}
+             Q ${center + axisLength} ${center + axisLength} ${center + axisLength - 8} ${center + axisLength}
+             L ${center} ${center + axisLength}
+             L ${center} ${center}
+             Z`}
+          fill={quadrants[3].color}
+        />
 
         {/* x축 */}
         <Line
@@ -100,8 +131,8 @@ export default function AttachmentChart({
           y1={center}
           x2={center + axisLength}
           y2={center}
-          stroke="#000"
-          strokeWidth="1.5"
+          stroke="#222"
+          strokeWidth="1"
         />
 
         {/* y축 */}
@@ -110,8 +141,8 @@ export default function AttachmentChart({
           y1={center - axisLength}
           x2={center}
           y2={center + axisLength}
-          stroke="#000"
-          strokeWidth="1.5"
+          stroke="#222"
+          strokeWidth="1"
         />
 
         {/* 사분면 텍스트 */}
@@ -121,13 +152,38 @@ export default function AttachmentChart({
             x={quadrant.x + quadrant.width / 2}
             y={quadrant.y + quadrant.height / 2 + 4}
             fontSize={fontSize}
-            fill="#000"
+            fill="#222"
             textAnchor="middle"
             fontWeight="bold"
           >
             {quadrant.name}
           </SvgText>
         ))}
+
+        {/* 축 레이블 */}
+        {/* x축 레이블 (불안) */}
+        <SvgText
+          x={center + axisLength - 20}
+          y={center - 8}
+          fontSize={10}
+          fill="#222"
+          textAnchor="middle"
+          fontWeight="500"
+        >
+          불안 →
+        </SvgText>
+
+        {/* y축 레이블 (회피) */}
+        <SvgText
+          x={center - 18}
+          y={center - axisLength + 14}
+          fontSize={10}
+          fill="#222"
+          textAnchor="middle"
+          fontWeight="500"
+        >
+          회피 ↑
+        </SvgText>
 
         {/* 사용자 위치 점 - 예쁘게 스타일링 */}
         {/* 그림자 효과 */}
@@ -154,23 +210,44 @@ export default function AttachmentChart({
         />
       </Svg>
 
-      {/* 점수 표시 - showLegend가 true일 때만 표시 */}
+      {/* 점수 퍼센테이지 그래프 */}
       {showLegend && (
-        <View className="my-4 p-3 bg-background/10 rounded-lg w-full">
-          <View className="flex-row justify-between">
-            <View className="flex-1 items-center">
-              <Text className="text-background/60 text-sm">불안 (Anxiety)</Text>
-              <Text className="text-background font-bold text-lg">
-                {anxiety.toFixed(1)}
+        <View className="my-4 w-full px-4">
+          {/* 불안 점수 */}
+          <View className="mb-4">
+            <View className="flex-row justify-between items-center mb-2">
+              <Text className="text-background/70 text-sm font-medium">
+                불안
+              </Text>
+              <Text className="text-background font-bold text-sm">
+                {anxiety.toFixed(1)} / 5
               </Text>
             </View>
-            <View className="flex-1 items-center">
-              <Text className="text-background/60 text-sm">
-                회피 (Avoidance)
+            <View className="w-full h-2 bg-background/10 rounded-full">
+              <View
+                className="h-2 bg-[#F44336] rounded-full"
+                style={{ width: `${Math.max(2, ((anxiety - 1) / 4) * 100)}%` }}
+              />
+            </View>
+          </View>
+
+          {/* 회피 점수 */}
+          <View>
+            <View className="flex-row justify-between items-center mb-2">
+              <Text className="text-background/70 text-sm font-medium">
+                회피
               </Text>
-              <Text className="text-background font-bold text-lg">
-                {avoidance.toFixed(1)}
+              <Text className="text-background font-bold text-sm">
+                {avoidance.toFixed(1)} / 5
               </Text>
+            </View>
+            <View className="w-full h-2 bg-background/10 rounded-full">
+              <View
+                className="h-2 bg-[#2196F3] rounded-full"
+                style={{
+                  width: `${Math.max(2, ((avoidance - 1) / 4) * 100)}%`,
+                }}
+              />
             </View>
           </View>
         </View>

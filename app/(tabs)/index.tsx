@@ -31,8 +31,8 @@ export default function Home() {
         {tests.some((test) => test.result) && (
           <View className="flex flex-col">
             <View className="border-t border-foreground my-4 flex flex-row items-center"></View>
-            <View className="flex flex-col gap-4">
-              <View className="flex flex-row gap-4">
+            <View className="flex flex-col gap-3">
+              <View className="flex flex-row gap-3">
                 <Big5ResultCard
                   test={tests.find((test) => test.id === "big-5")!}
                 />
@@ -40,7 +40,7 @@ export default function Home() {
                   test={tests.find((test) => test.id === "enneagram")!}
                 ></EnneagramResultCard>
               </View>
-              <View className="flex flex-row gap-4">
+              <View className="flex flex-row gap-3">
                 <DiscResultCard
                   test={tests.find((test) => test.id === "disc")!}
                 />

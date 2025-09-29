@@ -40,54 +40,6 @@ export default function DiscResultPage() {
       </View>
 
       {/* 주 스타일 */}
-      <View
-        className="rounded-2xl p-6 mt-4 flex flex-col"
-        style={{ backgroundColor: "#444" }}
-      >
-        <Text className="font-semibold text-5xl text-foreground mb-2">
-          {primaryDescription.styleCode}
-        </Text>
-        <Text className="font-medium text-foreground text-lg">
-          {primaryDescription.styleName}
-        </Text>
-        <Text className="font-medium text-foreground/80 text-base">
-          🦅 {primaryDescription.archetype} - {primaryDescription.subtitle}
-        </Text>
-      </View>
-
-      {/* 주 스타일 설명 */}
-      <View className="border-t border-foreground/30 mt-12"></View>
-      <Text className="text-foreground mt-1">주 스타일 특징</Text>
-      <View className="rounded-xl p-5 bg-[#333] mt-3">
-        <Text className="font-medium text-base text-foreground/60 mb-3">
-          {primaryDescription.tagline}
-        </Text>
-        <Text className="font-medium text-base text-foreground">
-          {primaryDescription.description}
-        </Text>
-      </View>
-
-      {/* 부 스타일 */}
-      <View className="border-t border-foreground/30 mt-8"></View>
-      <Text className="text-foreground mt-1">부 스타일</Text>
-      <View className="rounded-xl p-5 bg-[#444] mt-3">
-        <Text className="font-semibold text-lg text-foreground mb-2">
-          {secondaryDescription.styleCode} ({secondaryDescription.styleName})
-        </Text>
-        <Text className="font-medium text-base text-foreground/60 mb-3">
-          {secondaryDescription.archetype} - {secondaryDescription.subtitle}
-        </Text>
-        <Text className="font-medium text-base text-foreground/80">
-          {secondaryDescription.tagline}
-        </Text>
-      </View>
-
-      {/* 조언 */}
-      <View className="border-t border-foreground/30 mt-8"></View>
-      <Text className="text-foreground mt-1">성장을 위한 조언</Text>
-      <View className="rounded-xl p-5 bg-green mt-3">
-        <Text className="font-medium text-xl">{primaryDescription.advice}</Text>
-      </View>
     </ScrollView>
   );
 }

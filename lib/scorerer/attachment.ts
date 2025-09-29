@@ -169,8 +169,8 @@ export const attachmentQuestions: Question[] = [
 ];
 
 export const attachmentSampleResult: AttachmentResult = {
-  anxiety: { average: 1, z: -2.287671232876712 },
-  avoidance: { average: 1, z: -2.3333333333333335 },
+  anxiety: { average: 3.8, z: 0.8 },
+  avoidance: { average: 3.5, z: 0.5 },
   completion: { answered: 18, ratio: 1, totalItems: 18 },
-  integrated: { percentile: 65.63889512688075, z: 1.653972602739726 },
+  integrated: { percentile: 25.2, z: -0.8 },
 };
