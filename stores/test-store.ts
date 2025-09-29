@@ -3,9 +3,17 @@ import {
   attachmentSampleResult,
   AttachmentScorer,
 } from "@/lib/scorerer/attachment";
-import { big5Questions, Big5Scorer } from "@/lib/scorerer/big-5";
-import { discQuestions, DiscScorer } from "@/lib/scorerer/disc";
-import { enneagramQuestions, EnneagramScorer } from "@/lib/scorerer/enneagram";
+import { big5Questions, Big5Scorer, sampleResult } from "@/lib/scorerer/big-5";
+import {
+  discQuestions,
+  discSampleResult,
+  DiscScorer,
+} from "@/lib/scorerer/disc";
+import {
+  enneagramQuestions,
+  EnneagramScorer,
+  sampleResult as enneaSampleResult,
+} from "@/lib/scorerer/enneagram";
 import { Test } from "@/lib/types";
 import { create } from "zustand";
 
@@ -44,7 +52,7 @@ export const useTestStore = create<TestStore>((set) => ({
       questions: big5Questions,
       currentQuestionIndex: 0,
       progressIndex: 0,
-      // result: sampleResult,
+      result: sampleResult,
     },
     {
       id: "enneagram",
@@ -55,7 +63,7 @@ export const useTestStore = create<TestStore>((set) => ({
       questions: enneagramQuestions,
       currentQuestionIndex: 0,
       progressIndex: 0,
-      // result: enneaSampleResult,
+      result: enneaSampleResult,
     },
     {
       id: "disc",
@@ -66,7 +74,7 @@ export const useTestStore = create<TestStore>((set) => ({
       questions: discQuestions,
       currentQuestionIndex: 0,
       progressIndex: 0,
-      // result: discSampleResult,
+      result: discSampleResult,
     },
     {
       id: "attachment",
@@ -125,8 +133,6 @@ export const useTestStore = create<TestStore>((set) => ({
           newResult = scorer.score(newQuestions);
         }
       }
-
-      console.log("newResult", newResult);
 
       return {
         tests: state.tests.map((test) =>

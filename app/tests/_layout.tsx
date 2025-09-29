@@ -32,13 +32,9 @@ export default function TestsLayout() {
                     clearAnswers({ id: "big-5" });
                   }}
                 >
-                  <FontAwesome6
-                    name="arrow-left-long"
-                    size={24}
-                    color="#ECEEDF"
-                  />
+                  <FontAwesome6 name="chevron-left" size={20} color="#ECEEDF" />
                   <Text
-                    className={`text-foreground font-bold ml-4 mb-[2px] ${Platform.OS === "web" ? "text-lg" : "text-2xl"}`}
+                    className={`text-foreground font-bold ml-3 ${Platform.OS === "web" ? "text-lg" : "text-2xl"}`}
                   >
                     {options.title}
                   </Text>

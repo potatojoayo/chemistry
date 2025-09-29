@@ -188,20 +188,6 @@ const DiscCircleChart = ({
   const secondPoint = toScreen(angle2);
   const thirdPoint = toScreen(angle3);
 
-  // 각 타입별 최대 가능한 점수 (DISC 테스트: 각 타입별 5문항 * 5점 = 25점)
-  const maxD = 25; // D (주도형): 5문항
-  const maxI = 25; // I (사교형): 5문항
-  const maxS = 25; // S (안정형): 5문항
-  const maxC = 25; // C (신중형): 5문항
-
-  console.log("각 분야별 점수 및 비율:", {
-    D: `${dScore}/${maxD} (${((dScore / maxD) * 100).toFixed(1)}%)`,
-    I: `${iScore}/${maxI} (${((iScore / maxI) * 100).toFixed(1)}%)`,
-    S: `${sScore}/${maxS} (${((sScore / maxS) * 100).toFixed(1)}%)`,
-    C: `${cScore}/${maxC} (${((cScore / maxC) * 100).toFixed(1)}%)`,
-    total: total,
-  });
-
   // 타원형 shade 계산 (3개 점으로 정의)
   const getShadeEllipse = () => {
     // 세 점을 지나는 타원 계산

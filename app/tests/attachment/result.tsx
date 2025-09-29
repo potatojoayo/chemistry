@@ -16,18 +16,19 @@ export default function AttachmentResultPage() {
 
   return (
     <ScrollView
-      className="px-3 flex flex-col max-w-3xl w-full mx-auto"
+      className="flex flex-col max-w-3xl w-full mx-auto"
       style={{
         paddingTop: top + 64,
+        paddingHorizontal: 16,
       }}
       showsVerticalScrollIndicator={false}
     >
       <View
-        className="rounded-xl p-4 flex flex-col shadow mb-6"
+        className="rounded-3xl p-5 flex flex-col shadow mb-6"
         style={{ backgroundColor: test.color }}
       >
         <View className="border-t border-background"></View>
-        <Text className="font-semibold text-xl mb-2 text-background">
+        <Text className="font-semibold text-lg mb-2 text-background">
           {test.name} 결과
         </Text>
         <AttachmentChart test={test} size={264} showLegend={true} />

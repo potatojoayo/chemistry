@@ -32,7 +32,7 @@ const EnneagramPieChart = ({
   const result = currentTest.result as EnneaResult;
   const center = size / 2;
   const radius = size * 0.35;
-  const fontSize = size * 0.05;
+  const fontSize = size * 0.04;
 
   // 에니어그램 9개 유형과 색상 (ENNEAGRAM_TYPE_DESCRIPTIONS에서 가져옴)
   const types = Object.entries(ENNEAGRAM_TYPE_DESCRIPTIONS).map(
@@ -184,7 +184,7 @@ const EnneagramPieChart = ({
         width={size}
         height={size}
         className=""
-        style={{ transform: [{ scale: 1.5 }] }}
+        style={{ transform: [{ scale: 1.4 }] }}
       >
         <Defs>
           {/* 그라디언트 정의 */}

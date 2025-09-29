@@ -89,9 +89,6 @@ export default function Login() {
           }),
         ]).start();
       }
-      if (event.status === "idle") {
-        console.log("idle");
-      }
     });
 
     // 15초마다 fade-out 후 replay

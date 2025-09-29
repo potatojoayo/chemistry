@@ -51,15 +51,24 @@ export type EnneaKey =
   | "Type8"
   | "Type9";
 export type EnneaWingKey =
-  | "Wing1"
-  | "Wing2"
-  | "Wing3"
-  | "Wing4"
-  | "Wing5"
-  | "Wing6"
-  | "Wing7"
-  | "Wing8"
-  | "Wing9";
+  | "Wing1w9"
+  | "Wing1w2"
+  | "Wing2w1"
+  | "Wing2w3"
+  | "Wing3w2"
+  | "Wing3w4"
+  | "Wing4w3"
+  | "Wing4w5"
+  | "Wing5w4"
+  | "Wing5w6"
+  | "Wing6w5"
+  | "Wing6w7"
+  | "Wing7w6"
+  | "Wing7w8"
+  | "Wing8w7"
+  | "Wing8w9"
+  | "Wing9w8"
+  | "Wing9w1";
 
 export type EnneaTypeScore = {
   type: EnneaKey;
@@ -74,6 +83,7 @@ export type EnneaResult = {
   ranking: EnneaTypeScore[]; // 점수 내림차순 정렬
   primary: EnneaTypeScore; // ✅ 단일 값
   wing: EnneaTypeScore; // ✅ 단일 값 (주유형의 양옆 중 선택)
+  wingKey: EnneaWingKey; // ✅ 새로 추가: 주유형+날개 조합 키
   completion: {
     answered: number; // 전체 응답한 문항 수
     totalItems: number; // 전체 문항 수
@@ -86,7 +96,9 @@ export type EnneagramScorerOptions = {
   reverseCodes?: string[]; // 역채점 문항 코드 (예: ["T3_02"])
 };
 export type WingText = {
-  label: string; // 예: "1번 날개: 완벽주의자"
+  wingCode: string; // 예: "1w2"
+  archetype: string; // 예: "옹호자"
+  subtitle: string; // 예: "따뜻한 열정을 지닌 사회 개혁가"
   oneLine: string; // 한 줄 요약
   description: string; // 본문
   advice: string; // 성장 조언/핵심 팁
@@ -113,7 +125,10 @@ export type DiscResult = {
 };
 
 export type DiscDescription = {
-  title: string; // 예: "하늘의 제왕, 독수리 (주도형)"
+  styleCode: string; // 예: "D"
+  styleName: string; // 예: "주도형"
+  archetype: string; // 예: "독수리"
+  subtitle: string; // 예: "하늘의 제왕"
   animals: string[]; // 예: ["독수리", "사자", "호랑이"]
   tagline: string; // 한 줄 캐치프레이즈
   description: string; // 본문

@@ -1,10 +1,9 @@
 import TabPageWrapper from "@/components/common/tab-page-wrapper";
-import AttachmentChart from "@/components/test/attachment-chart";
-import Big5RadarChart from "@/components/test/big-5-radar-chart";
-import DiscCircleChart from "@/components/test/disc-circle-chart";
-import EnneagramPieChart from "@/components/test/enneagram-pie-chart";
+import AttachmentResultCard from "@/components/test/attachment-result-card";
+import Big5ResultCard from "@/components/test/big-5-result-card";
+import DiscResultCard from "@/components/test/disc-result-card";
+import EnneagramResultCard from "@/components/test/enneargram-result-card";
 import TestCard from "@/components/test/test-card";
-import TestResultCard from "@/components/test/test-result-card";
 import { useTestStore } from "@/stores/test-store";
 import {
   Ionicons,
@@ -33,52 +32,22 @@ export default function Home() {
           <View className="flex flex-col">
             <View className="border-t border-foreground my-4 flex flex-row items-center"></View>
             <View className="flex flex-col gap-4">
-              <TestResultCard
-                test={tests.find((test) => test.id === "big-5")!}
-                icon={<MaterialIcons name="waves" size={24} color="#222" />}
-              >
-                <Big5RadarChart
+              <View className="flex flex-row gap-4">
+                <Big5ResultCard
                   test={tests.find((test) => test.id === "big-5")!}
-                  size={210}
-                  showLegend={false}
                 />
-              </TestResultCard>
-              <TestResultCard
-                test={tests.find((test) => test.id === "enneagram")!}
-                icon={<Octicons name="north-star" size={24} color="#222" />}
-              >
-                <EnneagramPieChart
+                <EnneagramResultCard
                   test={tests.find((test) => test.id === "enneagram")!}
-                  size={180}
-                  showLegend={false}
-                />
-              </TestResultCard>
-              <TestResultCard
-                test={tests.find((test) => test.id === "disc")!}
-                icon={<Ionicons name="disc" size={24} color="#222" />}
-              >
-                <DiscCircleChart
+                ></EnneagramResultCard>
+              </View>
+              <View className="flex flex-row gap-4">
+                <DiscResultCard
                   test={tests.find((test) => test.id === "disc")!}
-                  size={164}
-                  showLegend={false}
                 />
-              </TestResultCard>
-              <TestResultCard
-                test={tests.find((test) => test.id === "attachment")!}
-                icon={
-                  <MaterialCommunityIcons
-                    name="head-heart"
-                    size={24}
-                    color="#222"
-                  />
-                }
-              >
-                <AttachmentChart
+                <AttachmentResultCard
                   test={tests.find((test) => test.id === "attachment")!}
-                  size={200}
-                  showLegend={false}
                 />
-              </TestResultCard>
+              </View>
             </View>
           </View>
         )}

@@ -3,6 +3,7 @@ import {
   EnneaKey,
   EnneaResult,
   EnneaTypeScore,
+  EnneaWingKey,
   Question,
 } from "../types";
 
@@ -31,6 +32,16 @@ const cmpScore = (a: EnneaTypeScore, b: EnneaTypeScore) =>
   b.total - a.total ||
   b.answeredCount - a.answeredCount ||
   typeToNum(a.type) - typeToNum(b.type);
+
+// 주유형과 날개 유형을 기반으로 wingKey 생성
+const getWingKey = (
+  primaryType: EnneaKey,
+  wingType: EnneaKey
+): EnneaWingKey => {
+  const primaryNum = typeToNum(primaryType);
+  const wingNum = typeToNum(wingType);
+  return `Wing${primaryNum}w${wingNum}` as EnneaWingKey;
+};
 
 export class EnneagramScorer {
   private allowPartial: boolean;
@@ -102,14 +113,17 @@ export class EnneagramScorer {
     const right = byType[numToKey(rightN)];
     const wing = [left, right].sort(cmpScore)[0]; // ✅ 단일 값
 
-    // 5) 완성도
+    // 5) wingKey 생성: 주유형 + 날개 조합
+    const wingKey = getWingKey(primary.type, wing.type);
+
+    // 6) 완성도
     const completion = {
       answered: answeredAll,
       totalItems: questions.length,
       ratio: questions.length ? answeredAll / questions.length : 0,
     };
 
-    return { byType, ranking, primary, wing, completion };
+    return { byType, ranking, primary, wing, wingKey, completion };
   }
 
   // ===== Helpers =====
@@ -521,9 +535,10 @@ export const sampleResult: EnneaResult = {
   ],
   wing: {
     answeredCount: 4,
-    average: 4.75,
+    average: 4.5,
     maxPossible: 20,
-    total: 19,
-    type: "Type7",
+    total: 18,
+    type: "Type2",
   },
+  wingKey: "Wing3w2", // Type3 + Type2 날개
 };
