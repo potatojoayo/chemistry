@@ -26,9 +26,9 @@ export default function QuestionSelection({
       className="flex flex-col items-center justify-center gap-2 w-14"
       onPress={handlePress}
     >
-      <View className="h-11 items-center justify-center flex">
+      <View className="h-9 items-center justify-center flex">
         <View
-          className={`rounded-full  ${size === "lg" ? "h-11 w-11 p-2" : size === "md" ? "h-10 w-10 p-2" : "h-8 w-8 p-1.5"} border-2 ${color === "positive" ? "border-green" : color === "negative" ? "border-red" : "border-gray"}`}
+          className={`rounded-full  ${size === "lg" ? "h-9 w-9 p-1.5" : size === "md" ? "h-7 w-7 p-1" : "h-6 w-6 p-1"} border-2 ${color === "positive" ? "border-green" : color === "negative" ? "border-red" : "border-gray"}`}
         >
           {selected && (
             <View
@@ -37,9 +37,9 @@ export default function QuestionSelection({
           )}
         </View>
       </View>
-      <View className="h-8 justify-center flex flex-row">
+      <View className="h-6 justify-center flex flex-row">
         <Text
-          className={`${color === "positive" ? "text-green" : color === "negative" ? "text-red" : "text-gray"} text-center text-xs font-bold`}
+          className={`${color === "positive" ? "text-green" : color === "negative" ? "text-red" : "text-gray"} text-center text-xs font-medium`}
         >
           {displayLabel}
         </Text>

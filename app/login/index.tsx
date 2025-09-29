@@ -29,6 +29,11 @@ export default function Login() {
       player.loop = false;
       player.muted = true; // 음소거로 자동재생 보장
       player.playbackRate = 0.5; // 재생속도 조절 (1.0 = 정상속도, 0.5 = 절반속도, 2.0 = 2배속)
+      // iOS Safari 설정
+      if (Platform.OS === "web") {
+        (player as any).allowsExternalPlayback = false;
+        (player as any).allowsPictureInPicturePlayback = false;
+      }
     }
   );
 
@@ -138,12 +143,12 @@ export default function Login() {
             <VideoView
               player={player}
               nativeControls={false}
-              fullscreenOptions={{
-                enable: false,
-              }}
+              allowsFullscreen={false}
+              allowsPictureInPicture={false}
               style={{
                 width: "100%",
                 height: "100%",
+                pointerEvents: "none", // 터치 이벤트 차단
               }}
               contentFit="cover"
             />

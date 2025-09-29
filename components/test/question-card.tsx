@@ -1,7 +1,7 @@
 import { Test } from "@/lib/types";
 import { useTestStore } from "@/stores/test-store";
 import { useCallback } from "react";
-import { Platform, Text, useWindowDimensions, View } from "react-native";
+import { Text, useWindowDimensions, View } from "react-native";
 import Animated, {
   Extrapolation,
   interpolate,
@@ -67,17 +67,17 @@ export default function QuestionCard({
   return (
     // <GestureDetector gesture={pan}>
     <Animated.View
-      className={`w-full rounded-2xl bg-foreground p-4 absolute ${Platform.OS === "web" ? "h-[300px]" : "h-[260px]"} border`}
+      className={`w-full rounded-2xl bg-foreground p-4 absolute h-[280px] border`}
       style={animatedStyle}
     >
       <Text className="text-background font-semibold">{test.name}</Text>
       <View className="border-t border-background w-full mt-1"></View>
       <View className=" h-32 items-center justify-center flex flex-row px-6">
-        <Text className="text-background text-2xl text-center font-medium">
+        <Text className="text-background text-xl text-center font-medium">
           {test.questions[index].content}
         </Text>
       </View>
-      <View className="mt-2 flex flex-row items-center justify-center gap-4">
+      <View className=" flex flex-row items-center justify-around ">
         <QuestionSelection
           label="전혀\n아니다"
           color="negative"
