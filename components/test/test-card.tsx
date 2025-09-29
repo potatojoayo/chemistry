@@ -20,7 +20,7 @@ export default function TestCard({
 
   return (
     <TouchableOpacity
-      className="flex rounded-xl p-4 flex-row hover:opacity-90"
+      className="flex rounded-2xl p-4 flex-row hover:opacity-90"
       style={{ backgroundColor: test.color }}
       activeOpacity={0.9}
       onPress={() => {

@@ -28,9 +28,10 @@ export default function Home() {
         >
           내 안의 깊은 세계를 마주하는 일입니다.
         </Text>
+        {/* <View className="mt-4"></View> */}
+        <View className="border-t border-foreground my-4 flex flex-row items-center"></View>
         {tests.some((test) => test.result) && (
           <View className="flex flex-col">
-            <View className="border-t border-foreground my-4 flex flex-row items-center"></View>
             <View className="flex flex-row flex-wrap gap-3">
               {tests.find((test) => test.id === "big-5")?.result && (
                 <View className="flex-1 min-w-0" style={{ maxWidth: "48%" }}>
@@ -63,9 +64,13 @@ export default function Home() {
             </View>
           </View>
         )}
-        {tests.some((test) => !test.result) && (
-          <View className="border-t border-foreground my-4" />
-        )}
+        {tests.some((test) => !test.result) && <View className="mt-4" />}
+        {tests.some((test) => !test.result) &&
+          tests.some((test) => test.result) && (
+            <Text className="text-foreground my-4 text-lg font-semibold">
+              더 알아보기
+            </Text>
+          )}
         <View className="flex flex-col gap-4">
           <TestCard
             test={tests.find((test) => test.id === "big-5")!}
