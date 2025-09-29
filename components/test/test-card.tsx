@@ -2,7 +2,7 @@ import { Test } from "@/lib/types";
 import { FontAwesome6, Octicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { RelativePathString, useRouter } from "expo-router";
-import { Platform, Text, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 
 export default function TestCard({
   test,
@@ -34,18 +34,18 @@ export default function TestCard({
       <View className="ml-2 flex-1 flex flex-col">
         <View className="flex items-start justify-between flex-row">
           <Text
-            className={` ${Platform.OS === "web" ? "text-lg font-semibold" : "text-xl font-bold"}`}
+            className={`text-base font-semibold`}
             style={{ color: textColor }}
           >
             {test.name}
           </Text>
         </View>
         <View
-          className="border-t border-background my-2"
+          className="border-t border-background my-1"
           style={{ borderColor: textColor }}
         ></View>
         <Text
-          className={`font-medium ${Platform.OS === "web" ? "text-sm" : "text-base"}`}
+          className={`font-medium text-[13px]`}
           style={{ color: textColor }}
         >
           {test.description}
@@ -55,7 +55,7 @@ export default function TestCard({
           style={{ backgroundColor: textColor }}
         >
           <Text
-            className={`font-medium ${Platform.OS === "web" ? "text-sm" : "text-base"}`}
+            className={`font-medium text-[13px]`}
             style={{ color: test.color }}
           >
             검사하기
