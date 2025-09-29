@@ -6,6 +6,9 @@ import TestResultCard from "./test-result-card";
 export default function EnneagramResultCard({ test }: { test: Test }) {
   const result = test.result as EnneaResult;
   const wingDescription = ENNEAGRAM_WING_DESCRIPTIONS[result.wingKey];
+  if (!wingDescription) {
+    return null;
+  }
   return (
     <TestResultCard test={test}>
       <View className="flex flex-col">

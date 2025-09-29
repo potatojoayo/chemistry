@@ -31,23 +31,35 @@ export default function Home() {
         {tests.some((test) => test.result) && (
           <View className="flex flex-col">
             <View className="border-t border-foreground my-4 flex flex-row items-center"></View>
-            <View className="flex flex-col gap-3">
-              <View className="flex flex-row gap-3">
-                <Big5ResultCard
-                  test={tests.find((test) => test.id === "big-5")!}
-                />
-                <EnneagramResultCard
-                  test={tests.find((test) => test.id === "enneagram")!}
-                ></EnneagramResultCard>
-              </View>
-              <View className="flex flex-row gap-3">
-                <DiscResultCard
-                  test={tests.find((test) => test.id === "disc")!}
-                />
-                <AttachmentResultCard
-                  test={tests.find((test) => test.id === "attachment")!}
-                />
-              </View>
+            <View className="flex flex-row flex-wrap gap-3">
+              {tests.find((test) => test.id === "big-5")?.result && (
+                <View className="flex-1 min-w-0" style={{ maxWidth: "48%" }}>
+                  <Big5ResultCard
+                    test={tests.find((test) => test.id === "big-5")!}
+                  />
+                </View>
+              )}
+              {tests.find((test) => test.id === "enneagram")?.result && (
+                <View className="flex-1 min-w-0" style={{ maxWidth: "48%" }}>
+                  <EnneagramResultCard
+                    test={tests.find((test) => test.id === "enneagram")!}
+                  />
+                </View>
+              )}
+              {tests.find((test) => test.id === "disc")?.result && (
+                <View className="flex-1 min-w-0" style={{ maxWidth: "48%" }}>
+                  <DiscResultCard
+                    test={tests.find((test) => test.id === "disc")!}
+                  />
+                </View>
+              )}
+              {tests.find((test) => test.id === "attachment")?.result && (
+                <View className="flex-1 min-w-0" style={{ maxWidth: "48%" }}>
+                  <AttachmentResultCard
+                    test={tests.find((test) => test.id === "attachment")!}
+                  />
+                </View>
+              )}
             </View>
           </View>
         )}

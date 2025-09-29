@@ -4,7 +4,11 @@ import {
 } from "@/lib/scorerer/attachment";
 import { big5Questions, Big5Scorer } from "@/lib/scorerer/big-5";
 import { discQuestions, DiscScorer } from "@/lib/scorerer/disc";
-import { enneagramQuestions, EnneagramScorer } from "@/lib/scorerer/enneagram";
+import {
+  enneagramQuestions,
+  EnneagramScorer,
+  sampleResult as enneaSampleResult,
+} from "@/lib/scorerer/enneagram";
 import { Test } from "@/lib/types";
 import { create } from "zustand";
 
@@ -54,7 +58,7 @@ export const useTestStore = create<TestStore>((set) => ({
       questions: enneagramQuestions,
       currentQuestionIndex: 0,
       progressIndex: 0,
-      // result: enneaSampleResult,
+      result: enneaSampleResult,
     },
     {
       id: "disc",
