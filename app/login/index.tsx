@@ -145,6 +145,7 @@ export default function Login() {
               nativeControls={false}
               allowsFullscreen={false}
               allowsPictureInPicture={false}
+              playsInline
               style={{
                 width: "100%",
                 height: "100%",
