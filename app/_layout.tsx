@@ -1,9 +1,14 @@
 import * as Sentry from "@sentry/react-native";
 import { useFonts } from "expo-font";
-import { SplashScreen, Stack } from "expo-router";
+import { Slot, SplashScreen, useSegments } from "expo-router";
 import { useEffect } from "react";
+import { Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import "react-native-reanimated";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 import "../global.css";
 
 Sentry.init({
@@ -28,7 +33,10 @@ Sentry.init({
   // spotlight: __DEV__,
 });
 
-export default Sentry.wrap(function Layout() {
+export default Sentry.wrap(function RootLayout() {
+  const segments = useSegments();
+  const progress = useSharedValue(0);
+
   const [loaded, error] = useFonts({
     Light: require("../assets/fonts/NotoSansKR-Light.ttf"),
     Regular: require("../assets/fonts/NotoSansKR-Regular.ttf"),
@@ -37,23 +45,32 @@ export default Sentry.wrap(function Layout() {
     Bold: require("../assets/fonts/NotoSansKR-Bold.ttf"),
     ExtraBold: require("../assets/fonts/NotoSansKR-ExtraBold.ttf"),
   });
+
   useEffect(() => {
     if (loaded || error) SplashScreen.hideAsync();
   }, [loaded, error]);
 
-  if (!loaded) return null; // 로딩 중에는 렌더하지 않음(스플래시 유지)j
+  useEffect(() => {
+    progress.value = 0.5;
+    progress.value = withTiming(1, { duration: 300 }); // 300ms 전환
+  }, [segments, progress]);
+
+  const style = useAnimatedStyle(() => ({
+    opacity: progress.value,
+    transform: [{ translateY: (1 - progress.value) * 16 }], // 오른쪽에서 슬라이드 인
+  }));
+
+  if (!loaded) return null; // 로딩 중에는 렌더하지 않음(스플래시 유지)
 
   return (
     <GestureHandlerRootView className="flex-1">
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: "#222" },
-        }}
-      >
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="login/index" />
-      </Stack>
+      {Platform.OS === "web" ? (
+        <Animated.View style={[{ height: "100%" }, style]}>
+          <Slot />
+        </Animated.View>
+      ) : (
+        <Slot />
+      )}
     </GestureHandlerRootView>
   );
 });

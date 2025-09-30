@@ -35,7 +35,7 @@ export default function QuestionCardStack({ test }: { test: Test }) {
       }
       if (currentQuestionIndex === t.questions.length && t.result) {
         setTimeout(() => {
-          router.replace(`/tests/${t.id}/result` as RelativePathString);
+          router.replace(`/${t.id}/result` as RelativePathString);
         }, 2000);
       }
     });

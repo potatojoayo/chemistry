@@ -1,3 +1,4 @@
+import { supabase } from "@/lib/supabase";
 import { useAudioPlayer } from "expo-audio";
 import { useVideoPlayer, VideoView } from "expo-video";
 import { useEffect, useState } from "react";
@@ -36,6 +37,16 @@ export default function Login() {
       }
     }
   );
+
+  const handleLogin = async () => {
+    const { data, error } = await supabase.auth.signInWithOtp({
+      phone: "+821032523069",
+    });
+    if (error) {
+      console.error(error);
+    }
+    console.log(data);
+  };
 
   useEffect(() => {
     audioPlayer.loop = true;
@@ -135,8 +146,8 @@ export default function Login() {
   ]);
 
   return (
-    <View className="flex-1 bg-black">
-      <View className="flex-1 relative bg-black max-w-5xl mx-auto w-full text-foreground">
+    <View className="flex-1 bg-background">
+      <View className="flex-1 relative bg-background max-w-5xl mx-auto w-full text-foreground">
         {/* 비디오 배경 */}
         <TouchableWithoutFeedback>
           <Animated.View style={{ opacity: fadeAnim, flex: 1 }}>
@@ -198,11 +209,14 @@ export default function Login() {
           >
             <Animated.View style={{ opacity: buttonFadeAnim }}>
               <View className="w-full px-4">
-                <TouchableOpacity className="w-full bg-foreground py-4 px-16 rounded-full">
+                <TouchableOpacity
+                  className="w-full bg-foreground py-4 px-16 rounded-full"
+                  onPress={handleLogin}
+                >
                   <Text
                     className={`text-center text-background font-bold ${Platform.OS === "web" ? "text-base" : "text-xl"}`}
                   >
-                    카카오로 시작하기
+                    휴대폰으로 시작하기
                   </Text>
                 </TouchableOpacity>
               </View>

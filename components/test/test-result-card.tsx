@@ -25,7 +25,7 @@ export default function TestResultCard({
       style={{ backgroundColor: test.color }}
       activeOpacity={0.9}
       onPress={() => {
-        router.push(`/tests/${test.id}/result` as RelativePathString);
+        router.push(`/${test.id}/result` as RelativePathString);
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       }}
     >

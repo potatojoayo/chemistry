@@ -19,7 +19,7 @@ export default function TestPageContent({
     >
       <TestProgress test={test}></TestProgress>
       <QuestionCardStack test={test}></QuestionCardStack>
-      <View className="h-20"></View>
+      <View className="h-4"></View>
     </View>
   );
 }
