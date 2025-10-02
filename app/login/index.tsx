@@ -1,5 +1,5 @@
-import { supabase } from "@/lib/supabase";
 import { useAudioPlayer } from "expo-audio";
+import { router } from "expo-router";
 import { useVideoPlayer, VideoView } from "expo-video";
 import { useEffect, useState } from "react";
 import {
@@ -39,13 +39,8 @@ export default function Login() {
   );
 
   const handleLogin = async () => {
-    const { data, error } = await supabase.auth.signInWithOtp({
-      phone: "+821032523069",
-    });
-    if (error) {
-      console.error(error);
-    }
-    console.log(data);
+    audioPlayer.pause();
+    router.push("/login/register");
   };
 
   useEffect(() => {
@@ -212,11 +207,12 @@ export default function Login() {
                 <TouchableOpacity
                   className="w-full bg-foreground py-4 px-16 rounded-full"
                   onPress={handleLogin}
+                  activeOpacity={0.8}
                 >
                   <Text
                     className={`text-center text-background font-bold ${Platform.OS === "web" ? "text-base" : "text-xl"}`}
                   >
-                    휴대폰으로 시작하기
+                    전화번호로 계속하기
                   </Text>
                 </TouchableOpacity>
               </View>

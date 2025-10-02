@@ -9,14 +9,6 @@ export default function TestsLayout() {
   const { top } = useSafeAreaInsets();
   const { clearAnswers } = useTestStore();
 
-  // useEffect(() => {
-  //   supabase.auth.getUser().then(({ data: { user } }) => {
-  //     if (!user) {
-  //       router.replace("/login");
-  //     }
-  //   });
-  // }, []);
-
   return (
     <Stack
       screenOptions={{

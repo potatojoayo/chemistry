@@ -6,9 +6,9 @@ import { Text, TouchableOpacity, View } from "react-native";
 export default function Settings() {
   return (
     <TabPageWrapper>
-      <View className="h-[200vh] pt-14 px-4">
+      <View className="flex-1 flex-col justify-center mt-20 px-4">
         <TouchableOpacity
-          className="bg-foreground rounded-full p-4"
+          className="bg-foreground rounded-full py-4"
           activeOpacity={0.9}
           onPress={() => {
             router.push("/login");

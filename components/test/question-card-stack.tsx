@@ -3,13 +3,7 @@ import { useTestStore } from "@/stores/test-store";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { RelativePathString, router } from "expo-router";
 import { useEffect } from "react";
-import {
-  ActivityIndicator,
-  Platform,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -54,9 +48,7 @@ export default function QuestionCardStack({ test }: { test: Test }) {
 
   return (
     <View className="flex flex-col justify-center items-center relative mb-16 w-[90vw] max-w-[480px]">
-      <View
-        className={`${Platform.OS === "web" ? "h-[360px]" : "h-[300px]"} w-full flex flex-row items-center`}
-      >
+      <View className={`h-[20rem] w-full flex flex-row items-center`}>
         {test.questions.map((question, index) => {
           return (
             <QuestionCard

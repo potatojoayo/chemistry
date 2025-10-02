@@ -67,7 +67,7 @@ export default function QuestionCard({
   return (
     // <GestureDetector gesture={pan}>
     <Animated.View
-      className={`w-full rounded-2xl bg-foreground p-4 absolute h-[280px] border`}
+      className={`w-full rounded-2xl bg-foreground p-4 absolute h-[18rem] border`}
       style={animatedStyle}
     >
       <Text className="text-background font-semibold">{test.name}</Text>
