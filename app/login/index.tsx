@@ -64,7 +64,7 @@ export default function Login() {
         Animated.timing(fadeAnim, {
           toValue: 1,
           duration: 1000, // 1초 동안 fade-in
-          useNativeDriver: false,
+          useNativeDriver: true,
           easing: Easing.inOut(Easing.ease),
         }).start();
         // 이미지 애니메이션 시작 (처음에만) - fade, slide, scale 동시 실행
@@ -73,7 +73,7 @@ export default function Login() {
             toValue: 1,
             duration: 1000,
             delay: 500,
-            useNativeDriver: false,
+            useNativeDriver: true,
             easing: Easing.inOut(Easing.ease),
           }),
 
@@ -81,21 +81,21 @@ export default function Login() {
             toValue: 0, // 제자리로 이동
             delay: 500,
             duration: 2000,
-            useNativeDriver: false,
+            useNativeDriver: true,
             easing: Easing.inOut(Easing.ease),
           }),
           Animated.timing(imageScale, {
             toValue: 1, // 원래 크기로
             delay: 500,
             duration: 2000,
-            useNativeDriver: false,
+            useNativeDriver: true,
             easing: Easing.inOut(Easing.ease),
           }),
           Animated.timing(buttonFadeAnim, {
             toValue: 1,
             duration: 1000,
             delay: 2000,
-            useNativeDriver: false,
+            useNativeDriver: true,
             easing: Easing.inOut(Easing.ease),
           }),
         ]).start();
@@ -108,7 +108,7 @@ export default function Login() {
       Animated.timing(fadeAnim, {
         toValue: 0,
         duration: 500, // 0.5초 동안 fade-out
-        useNativeDriver: false,
+        useNativeDriver: true,
         easing: Easing.inOut(Easing.ease),
       }).start(() => {
         // fade-out 완료 후 1초 대기
@@ -119,7 +119,7 @@ export default function Login() {
           Animated.timing(fadeAnim, {
             toValue: 1,
             duration: 500, // 0.5초 동안 fade-in
-            useNativeDriver: false,
+            useNativeDriver: true,
             easing: Easing.inOut(Easing.ease),
           }).start();
         }, 200); // 0.2초 대기
@@ -149,7 +149,9 @@ export default function Login() {
             <VideoView
               player={player}
               nativeControls={false}
-              allowsFullscreen={false}
+              fullscreenOptions={{
+                enable: false,
+              }}
               allowsPictureInPicture={false}
               playsInline
               style={{
@@ -181,15 +183,18 @@ export default function Login() {
               style={{ width: 320, height: 48 }}
             />
             <Text
-              className={`text-foreground text-center mt-12 leading-snug max-w-lg w-full font-bold ${Platform.OS === "web" ? "text-2xl" : "text-3xl"}`}
+              className={`text-foreground text-center mt-12 leading-snug max-w-lg w/full font-bold ${
+                Platform.OS === "web" ? "text-2xl" : "text-3xl"
+              }`}
             >
-              “자신을 아는 것이{"\n"}
-              모든 지혜의 시작이다”
+              “인간의 모든 문제는{"\n"}관계의 문제다.”
             </Text>
             <Text
-              className={`text-foreground mt-1 text-center font-regular ${Platform.OS === "web" ? "text-base" : "text-xl"}`}
+              className={`text-foreground mt-1 text-center font-regular ${
+                Platform.OS === "web" ? "text-base" : "text-xl"
+              }`}
             >
-              - 아리스토텔레스
+              — 알프레드 아들러
             </Text>
           </Animated.View>
           <View

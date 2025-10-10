@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Animated, Platform, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface AnimatedPageWrapperProps {
   children: React.ReactNode;
@@ -20,6 +21,7 @@ export default function AnimatedPageWrapper({
       fromDirection === "right" ? 10 : fromDirection === "left" ? -10 : 4
     )
   ).current;
+  const { top, bottom } = useSafeAreaInsets();
 
   useEffect(() => {
     // 웹에서만 애니메이션 실행
@@ -38,12 +40,20 @@ export default function AnimatedPageWrapper({
           useNativeDriver: true,
         }),
       ]).start();
-    } else {
-      // 모바일에서는 즉시 최종 상태로 설정
-      fadeAnim.setValue(1);
-      translateAnim.setValue(0);
     }
   }, [fadeAnim, translateAnim, duration, delay]);
+
+  // 모바일에서는 바로 children 반환
+  if (Platform.OS !== "web") {
+    return (
+      <View
+        className="flex-1 bg-background"
+        style={{ paddingTop: top, paddingBottom: bottom }}
+      >
+        {children}
+      </View>
+    );
+  }
 
   return (
     <View className="flex-1 bg-background">
@@ -51,6 +61,8 @@ export default function AnimatedPageWrapper({
         style={{
           height: "100%",
           opacity: fadeAnim,
+          paddingTop: top,
+          paddingBottom: bottom,
           transform: [
             fromDirection === "bottom"
               ? { translateY: translateAnim }

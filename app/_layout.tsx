@@ -2,8 +2,8 @@ import * as Sentry from "@sentry/react-native";
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack } from "expo-router";
 import { useEffect } from "react";
-import { Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { KeyboardProvider } from "react-native-keyboard-controller";
 import { PaperProvider } from "react-native-paper";
 import "react-native-reanimated";
 import "../global.css";
@@ -46,17 +46,17 @@ export default Sentry.wrap(function Layout() {
   if (!loaded) return null; // 로딩 중에는 렌더하지 않음(스플래시 유지)j
 
   return (
-    <PaperProvider theme={{ dark: true }}>
-      <GestureHandlerRootView className="flex-1">
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            contentStyle: { backgroundColor: "#222" },
-            animation: Platform.OS === "web" ? "fade" : "slide_from_right",
-            animationDuration: 300,
-          }}
-        ></Stack>
-      </GestureHandlerRootView>
-    </PaperProvider>
+    <KeyboardProvider>
+      <PaperProvider theme={{ dark: true }}>
+        <GestureHandlerRootView className="flex-1">
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              contentStyle: { backgroundColor: "#222" },
+            }}
+          ></Stack>
+        </GestureHandlerRootView>
+      </PaperProvider>
+    </KeyboardProvider>
   );
 });

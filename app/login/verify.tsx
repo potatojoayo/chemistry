@@ -7,12 +7,19 @@ import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Pressable,
+  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from "react-native";
+import { useKeyboardHandler } from "react-native-keyboard-controller";
 import { Snackbar } from "react-native-paper";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+} from "react-native-reanimated";
 
 export default function Verify() {
   const searchParams = useSearchParams();
@@ -22,6 +29,7 @@ export default function Verify() {
   const [timeLeft, setTimeLeft] = useState(300); // 5분 = 300초
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const inputRef = useRef<TextInput>(null);
+  const translateY = useSharedValue(0);
 
   // 카운트다운 타이머
   useEffect(() => {
@@ -74,70 +82,112 @@ export default function Verify() {
     setLoading(false);
   };
 
+  useKeyboardHandler({
+    onStart: (e) => {
+      "worklet";
+      translateY.value = -e.height;
+    },
+    onMove: (e) => {
+      "worklet";
+      translateY.value = -e.height;
+    },
+    onEnd: (e) => {
+      "worklet";
+      translateY.value = -e.height;
+    },
+  });
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      paddingBottom: -translateY.value - 48,
+    };
+  });
+
   return (
     <AnimatedPageWrapper>
-      <View className="flex flex-col p-3 flex-1">
-        <Pressable onPress={() => router.back()}>
-          <FontAwesome6 name="chevron-left" size={20} color="#ECEEDF" />
-        </Pressable>
-
-        <Text className="text-foreground text-2xl font-bold mt-4">
-          {formatPhoneNumber(phone || "")}
-        </Text>
-        <Text className="text-foreground text-xl font-semibold mt-1">
-          전송된 인증번호를 입력해주세요
-        </Text>
-
-        {/* 6개의 인증번호 입력 박스 */}
-        <View className="flex-row justify-center mt-10 gap-3">
-          {Array.from({ length: 6 }, (_, index) => (
-            <Pressable
-              key={index}
-              className={`w-12 h-12 rounded-xl border-2 items-center justify-center ${
-                index === token.length
-                  ? "border-blue bg-blue/10"
-                  : "border-gray bg-gray/10"
-              }`}
-              onPress={() => inputRef.current?.focus()}
-            >
-              <Text className="text-foreground text-xl font-bold">
-                {token[index] || ""}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
-
-        {/* 숨겨진 TextInput */}
-        <TextInput
-          ref={inputRef}
-          value={token}
-          onChangeText={handleCodeChange}
-          keyboardType="number-pad"
-          maxLength={6}
-          autoFocus
-          className="absolute w-0 h-0 opacity-0"
-        />
-
-        {/* 카운트다운 타이머 */}
-        <Text className="text-gray text-sm mt-6 text-center">
-          {formatTime(timeLeft)}
-        </Text>
-
-        {/* 인증번호를 받지 못하셨나요? 버튼 */}
-        <TouchableOpacity
-          className="mt-auto mb-8 self-center"
-          onPress={handleResendCode}
-          disabled={loading}
-          activeOpacity={0.8}
+      <View className="flex-1">
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1 }}
+          keyboardShouldPersistTaps="handled"
+          scrollEnabled={false}
         >
-          {loading ? (
-            <ActivityIndicator color="#ECEEDF" />
-          ) : (
-            <Text className="text-gray text-sm">
-              인증번호를 받지 못하셨나요?
-            </Text>
-          )}
-        </TouchableOpacity>
+          <TouchableWithoutFeedback>
+            <View className="flex flex-col p-3 flex-1">
+              <Pressable onPress={() => router.back()}>
+                <FontAwesome6 name="chevron-left" size={20} color="#ECEEDF" />
+              </Pressable>
+
+              <Text className="text-foreground  text-3xl font-semibold mt-4">
+                인증번호를 입력해주세요
+              </Text>
+              <Text className="text-gray font-medium text-lg mt-1">
+                {formatPhoneNumber(phone || "")}로 전송했어요
+              </Text>
+
+              {/* 6개의 인증번호 입력 박스 */}
+              <View className="flex-row justify-center mt-10 gap-3">
+                {Array.from({ length: 6 }, (_, index) => (
+                  <Pressable
+                    key={index}
+                    className={`w-12 h-14 rounded-xl border-2 items-center justify-center ${
+                      index === token.length
+                        ? "border-blue bg-blue/10"
+                        : "border-gray bg-gray/10"
+                    }`}
+                    onPress={() => inputRef.current?.focus()}
+                  >
+                    <Text className="text-foreground text-xl font-bold">
+                      {token[index] || ""}
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
+
+              {/* 숨겨진 TextInput */}
+              <TextInput
+                ref={inputRef}
+                value={token}
+                onChangeText={handleCodeChange}
+                keyboardType="number-pad"
+                maxLength={6}
+                autoFocus
+                className="absolute w-0 h-0 opacity-0"
+                selectionColor="#ECEEDF"
+              />
+
+              {/* 카운트다운 타이머 */}
+              <Text className="text-gray text-base mt-6 text-center">
+                {formatTime(timeLeft)}
+              </Text>
+
+              {/* 인증번호를 받지 못하셨나요? 버튼 */}
+              <Animated.View
+                style={[
+                  {
+                    marginTop: "auto",
+                    marginBottom: 32,
+                    alignSelf: "center",
+                  },
+                  animatedStyle,
+                ]}
+              >
+                <TouchableOpacity
+                  onPress={handleResendCode}
+                  disabled={loading}
+                  activeOpacity={0.8}
+                >
+                  {loading ? (
+                    <ActivityIndicator color="#ECEEDF" />
+                  ) : (
+                    <Text className="text-gray ">
+                      인증번호를 받지 못하셨나요?
+                    </Text>
+                  )}
+                </TouchableOpacity>
+              </Animated.View>
+            </View>
+          </TouchableWithoutFeedback>
+        </ScrollView>
       </View>
       <Snackbar
         visible={snackbarVisible}
