@@ -1,22 +1,12 @@
 import BlurHeader from "@/components/common/blur-header";
-import { supabase } from "@/lib/supabase";
 import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import { Tabs } from "expo-router";
-import { useEffect } from "react";
 import { Platform } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function TabLayout() {
   const { bottom } = useSafeAreaInsets();
-
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      // if (!user) {
-      //   router.replace("/login");
-      // }
-    });
-  }, []);
 
   return (
     <Tabs
@@ -24,7 +14,6 @@ export default function TabLayout() {
         tabBarActiveTintColor: "#ECEEDF",
         tabBarInactiveTintColor: "#666",
         tabBarLabelPosition: "below-icon",
-        animation: "shift",
         tabBarStyle: {
           position: "absolute",
           borderTopColor: "transparent",

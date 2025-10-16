@@ -7,6 +7,7 @@ import { KeyboardProvider } from "react-native-keyboard-controller";
 import { PaperProvider } from "react-native-paper";
 import "react-native-reanimated";
 import "../global.css";
+import { useAuthStore } from "../stores/auth-store";
 
 Sentry.init({
   dsn: "https://0260d38c5ecf94138de7278c21eae8fb@o4510069231845376.ingest.us.sentry.io/4510069233090560",
@@ -39,9 +40,16 @@ export default Sentry.wrap(function Layout() {
     Bold: require("../assets/fonts/NotoSansKR-Bold.ttf"),
     ExtraBold: require("../assets/fonts/NotoSansKR-ExtraBold.ttf"),
   });
+
+  const initialize = useAuthStore((state) => state.initialize);
+
   useEffect(() => {
     if (loaded || error) SplashScreen.hideAsync();
   }, [loaded, error]);
+
+  useEffect(() => {
+    initialize();
+  }, [initialize]);
 
   if (!loaded) return null; // 로딩 중에는 렌더하지 않음(스플래시 유지)j
 

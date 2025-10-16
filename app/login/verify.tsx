@@ -1,5 +1,6 @@
 import AnimatedPageWrapper from "@/components/common/animated-page-wrapper";
 import { formatPhoneNumber } from "@/lib/formatters";
+import { supabase } from "@/lib/supabase";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useSearchParams } from "expo-router/build/hooks";
@@ -7,19 +8,14 @@ import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Pressable,
-  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import { useKeyboardHandler } from "react-native-keyboard-controller";
 import { Snackbar } from "react-native-paper";
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-} from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 export default function Verify() {
   const searchParams = useSearchParams();
@@ -28,8 +24,8 @@ export default function Verify() {
   const [token, setToken] = useState("");
   const [timeLeft, setTimeLeft] = useState(300); // 5분 = 300초
   const [snackbarVisible, setSnackbarVisible] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
   const inputRef = useRef<TextInput>(null);
-  const translateY = useSharedValue(0);
 
   // 카운트다운 타이머
   useEffect(() => {
@@ -42,6 +38,37 @@ export default function Verify() {
     return () => clearInterval(timer);
   }, [timeLeft]);
 
+  // 6자리 입력 완료 시 자동 인증
+  useEffect(() => {
+    const handleVerify = async () => {
+      if (loading) return;
+      if (!phone) return;
+      setLoading(true);
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.verifyOtp({
+        phone: "+82" + phone.slice(1).replaceAll("-", ""),
+        token,
+        type: "sms",
+      });
+      if (error) {
+        console.log(error);
+        setSnackbarMessage("인증번호가 올바르지 않습니다.");
+        setSnackbarVisible(true);
+        setLoading(false);
+        setToken("");
+        return;
+      }
+      if (session) {
+        router.push("/(app)" as any);
+      }
+    };
+    if (token.length === 6 && !loading) {
+      handleVerify();
+    }
+  }, [token, loading, phone]);
+
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
@@ -52,75 +79,42 @@ export default function Verify() {
     const numbersOnly = text.replace(/[^0-9]/g, "");
     const newToken = numbersOnly.slice(0, 6); // 6자리로 제한
     setToken(newToken);
-
-    // 6자리가 모두 입력되면 자동으로 인증 시도
-    if (newToken.length === 6) {
-      handleVerify();
-    }
-  };
-
-  const handleVerify = async () => {
-    if (loading) return;
-    if (!phone) return;
-    setLoading(true);
-    // await supabase.auth.verifyOtp({
-    //   phone,
-    //   token,
-    //   type: "sms",
-    // });
   };
 
   const handleResendCode = async () => {
     if (loading) return;
     if (!phone) return;
     setLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    // await supabase.auth.signInWithOtp({
-    //   phone,
-    // });
-    setSnackbarVisible(true);
+    try {
+      await supabase.auth.signInWithOtp({
+        phone: "+82" + phone.slice(1).replaceAll("-", ""),
+      });
+      setSnackbarMessage("인증번호가 재전송되었어요.");
+      setSnackbarVisible(true);
+      setTimeLeft(300); // 타이머 리셋
+    } catch (error) {
+      console.log(error);
+      setSnackbarMessage("인증번호 전송에 실패했습니다.");
+      setSnackbarVisible(true);
+    }
     setLoading(false);
   };
-
-  useKeyboardHandler({
-    onStart: (e) => {
-      "worklet";
-      translateY.value = -e.height;
-    },
-    onMove: (e) => {
-      "worklet";
-      translateY.value = -e.height;
-    },
-    onEnd: (e) => {
-      "worklet";
-      translateY.value = -e.height;
-    },
-  });
-
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      paddingBottom: -translateY.value - 48,
-    };
-  });
 
   return (
     <AnimatedPageWrapper>
       <View className="flex-1">
-        <ScrollView
-          contentContainerStyle={{ flexGrow: 1 }}
-          keyboardShouldPersistTaps="handled"
-          scrollEnabled={false}
-        >
-          <TouchableWithoutFeedback>
-            <View className="flex flex-col p-3 flex-1">
-              <Pressable onPress={() => router.back()}>
+        <TouchableWithoutFeedback>
+          <View className="flex-1 flex-col">
+            <View className="flex flex-row justify-between h-12">
+              <Pressable onPress={() => router.back()} className="p-3 w-fit">
                 <FontAwesome6 name="chevron-left" size={20} color="#ECEEDF" />
               </Pressable>
-
-              <Text className="text-foreground  text-3xl font-semibold mt-4">
+            </View>
+            <View className="flex flex-col p-3 pt-0">
+              <Text className="text-foreground  text-2xl font-semibold">
                 인증번호를 입력해주세요
               </Text>
-              <Text className="text-gray font-medium text-lg mt-1">
+              <Text className="text-pastel-gray font-medium text-base mt-1">
                 {formatPhoneNumber(phone || "")}로 전송했어요
               </Text>
 
@@ -131,8 +125,8 @@ export default function Verify() {
                     key={index}
                     className={`w-12 h-14 rounded-xl border-2 items-center justify-center ${
                       index === token.length
-                        ? "border-blue bg-blue/10"
-                        : "border-gray bg-gray/10"
+                        ? "border-pastel-blue bg-pastel-blue/10"
+                        : "border-pastel-gray bg-pastel-gray/10"
                     }`}
                     onPress={() => inputRef.current?.focus()}
                   >
@@ -151,12 +145,24 @@ export default function Verify() {
                 keyboardType="number-pad"
                 maxLength={6}
                 autoFocus
-                className="absolute w-0 h-0 opacity-0"
+                onBlur={() => {
+                  // focus가 해제되면 즉시 다시 focus
+                  setTimeout(() => {
+                    inputRef.current?.focus();
+                  }, 0);
+                  console.log("blur");
+                }}
+                style={{
+                  position: "absolute",
+                  width: 1,
+                  height: 1,
+                  opacity: 0,
+                }}
                 selectionColor="#ECEEDF"
               />
 
               {/* 카운트다운 타이머 */}
-              <Text className="text-gray text-base mt-6 text-center">
+              <Text className="text-pastel-gray text-base mt-6 text-center">
                 {formatTime(timeLeft)}
               </Text>
 
@@ -164,11 +170,10 @@ export default function Verify() {
               <Animated.View
                 style={[
                   {
-                    marginTop: "auto",
+                    marginTop: 20,
                     marginBottom: 32,
                     alignSelf: "center",
                   },
-                  animatedStyle,
                 ]}
               >
                 <TouchableOpacity
@@ -179,15 +184,15 @@ export default function Verify() {
                   {loading ? (
                     <ActivityIndicator color="#ECEEDF" />
                   ) : (
-                    <Text className="text-gray ">
+                    <Text className="text-pastel-gray ">
                       인증번호를 받지 못하셨나요?
                     </Text>
                   )}
                 </TouchableOpacity>
               </Animated.View>
             </View>
-          </TouchableWithoutFeedback>
-        </ScrollView>
+          </View>
+        </TouchableWithoutFeedback>
       </View>
       <Snackbar
         visible={snackbarVisible}
@@ -197,7 +202,7 @@ export default function Verify() {
       >
         <View className="flex flex-row items-center justify-between">
           <Text className="text-foreground text-sm font-medium">
-            인증번호가 재전송되었어요.
+            {snackbarMessage}
           </Text>
           <Pressable
             onPress={() => setSnackbarVisible(false)}

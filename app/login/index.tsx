@@ -215,14 +215,14 @@ export default function Login() {
                   activeOpacity={0.8}
                 >
                   <Text
-                    className={`text-center text-background font-bold ${Platform.OS === "web" ? "text-base" : "text-xl"}`}
+                    className={`text-center text-background font-bold text-base`}
                   >
                     전화번호로 계속하기
                   </Text>
                 </TouchableOpacity>
               </View>
               <Text
-                className={`text-center font-regular text-foreground text-lg  mt-8 px-10 ${Platform.OS === "web" ? "text-sm" : "text-lg"}`}
+                className={`text-center font-regular text-foreground mt-8 px-10 text-sm`}
               >
                 회원가입 시{" "}
                 <Text
