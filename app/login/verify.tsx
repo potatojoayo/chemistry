@@ -61,7 +61,16 @@ export default function Verify() {
         return;
       }
       if (session) {
-        router.push("/(app)" as any);
+        const profile = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("user_id", session.user.id)
+          .single();
+        if (profile.data) {
+          router.push("/(app)");
+        } else {
+          router.push("/login/profile");
+        }
       }
     };
     if (token.length === 6 && !loading) {
