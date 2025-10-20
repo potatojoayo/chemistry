@@ -23,9 +23,11 @@ export default function Login() {
   const buttonFadeAnim = useState(new Animated.Value(0))[0];
   const { bottom } = useSafeAreaInsets();
 
-  const audioPlayer = useAudioPlayer(require("../../assets/audio/space.mp3"));
+  const audioPlayer = useAudioPlayer(
+    require("../../../assets/audio/space.mp3")
+  );
   const player = useVideoPlayer(
-    require("../../assets/videos/star4.mp4"),
+    require("../../../assets/videos/star4.mp4"),
     (player) => {
       player.loop = false;
       player.muted = true; // 음소거로 자동재생 보장
@@ -38,14 +40,14 @@ export default function Login() {
     }
   );
 
-  const handleLogin = async () => {
+  const handleLogin = () => {
     audioPlayer.pause();
-    router.push("/login/register");
+    router.push("/login/mobile");
   };
 
   useEffect(() => {
     audioPlayer.loop = true;
-    audioPlayer.play();
+    // audioPlayer.play();
     return () => {
       if (Platform.OS === "web") {
         audioPlayer.pause();
@@ -177,7 +179,7 @@ export default function Login() {
             }}
           >
             <Image
-              source={require("../../assets/images/logo-foreground.png")}
+              source={require("../../../assets/images/logo-foreground.png")}
               resizeMode="contain"
               className="mx-auto"
               style={{ width: 320, height: 48 }}

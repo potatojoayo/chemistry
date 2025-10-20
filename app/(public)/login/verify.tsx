@@ -1,6 +1,7 @@
 import AnimatedPageWrapper from "@/components/common/animated-page-wrapper";
 import { formatPhoneNumber } from "@/lib/formatters";
 import { supabase } from "@/lib/supabase";
+import { useAuthStore } from "@/stores/auth-store";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useSearchParams } from "expo-router/build/hooks";
@@ -25,7 +26,10 @@ export default function Verify() {
   const [timeLeft, setTimeLeft] = useState(300); // 5분 = 300초
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [verified, setVerified] = useState(false);
   const inputRef = useRef<TextInput>(null);
+
+  const { profile, user } = useAuthStore();
 
   // 카운트다운 타이머
   useEffect(() => {
@@ -44,10 +48,7 @@ export default function Verify() {
       if (loading) return;
       if (!phone) return;
       setLoading(true);
-      const {
-        data: { session },
-        error,
-      } = await supabase.auth.verifyOtp({
+      const { error } = await supabase.auth.verifyOtp({
         phone: "+82" + phone.slice(1).replaceAll("-", ""),
         token,
         type: "sms",
@@ -60,23 +61,39 @@ export default function Verify() {
         setToken("");
         return;
       }
-      if (session) {
-        const profile = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("user_id", session.user.id)
-          .single();
-        if (profile.data) {
-          router.push("/(app)");
-        } else {
-          router.push("/login/profile");
-        }
-      }
+      setVerified(true);
+      // if (user) {
+      //   const profileQuery = await supabase
+      //     .from("profiles")
+      //     .select("*")
+      //     .eq("user_id", user.id)
+      //     .single();
+      //   if (profileQuery.data) {
+      //     const profile: Profile = profileQuery.data;
+      //     if (profile.test_completed) {
+      //       router.push("/(protected)/(app)");
+      //     } else {
+      //       router.push("/(protected)/test/intro");
+      //     }
+      //   } else {
+      //     router.push("/(public)/login/profile");
+      //   }
+      // }
     };
     if (token.length === 6 && !loading) {
       handleVerify();
     }
   }, [token, loading, phone]);
+
+  useEffect(() => {
+    if (user && profile && verified) {
+      if (profile.test_completed) {
+        router.replace("/");
+      } else {
+        router.replace("/test/intro");
+      }
+    }
+  }, [profile, user, verified]);
 
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);

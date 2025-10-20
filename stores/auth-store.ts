@@ -1,41 +1,162 @@
 import { supabase } from "@/lib/supabase";
-import { User } from "@supabase/supabase-js";
+import { Profile } from "@/models/profile";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { RealtimeChannel, User } from "@supabase/supabase-js";
 import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 interface AuthState {
   user: User | null;
+  profile: Profile | null;
   loading: boolean;
+  profileSubscription: RealtimeChannel | null;
+  authSubscription: any;
   setUser: (user: User | null) => void;
+  setProfile: (profile: Profile | null) => void;
   setLoading: (loading: boolean) => void;
+  setProfileSubscription: (subscription: RealtimeChannel | null) => void;
+  loadProfile: (userId: string) => Promise<void>;
+  cleanup: () => void;
   signOut: () => Promise<void>;
   initialize: () => void;
 }
 
-export const useAuthStore = create<AuthState>((set, get) => ({
-  user: null,
-  loading: true,
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set, get) => ({
+      user: null,
+      profile: null,
+      loading: true,
+      profileSubscription: null,
+      authSubscription: null,
+      setUser: (user) => set({ user }),
+      setProfile: (profile) => set({ profile }),
+      setLoading: (loading) => set({ loading }),
+      setProfileSubscription: (subscription) =>
+        set({ profileSubscription: subscription }),
+      loadProfile: async (userId: string) => {
+        try {
+          const { data: profile, error } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("user_id", userId)
+            .maybeSingle();
 
-  setUser: (user) => set({ user }),
-  setLoading: (loading) => set({ loading }),
+          if (error) {
+            console.error("Error loading profile:", error);
+            return;
+          }
 
-  signOut: async () => {
-    await supabase.auth.signOut();
-  },
+          set({ profile: profile ?? null });
+        } catch (error) {
+          console.error("Unexpected error loading profile:", error);
+        }
+      },
 
-  initialize: () => {
-    // 초기 사용자 상태 가져오기
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      set({ user, loading: false });
-    });
+      cleanup: () => {
+        const { profileSubscription, authSubscription } = get();
+        if (profileSubscription) {
+          profileSubscription.unsubscribe();
+          set({ profileSubscription: null });
+        }
+        if (authSubscription) {
+          authSubscription.unsubscribe();
+          set({ authSubscription: null });
+        }
+      },
 
-    // 인증 상태 변화 감지
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      set({ user: session?.user ?? null, loading: false });
-    });
+      signOut: async () => {
+        try {
+          await supabase.auth.signOut();
+          // 상태 정리
+          set({ user: null, profile: null, loading: false });
+          get().cleanup();
+        } catch (error) {
+          console.error("Error signing out:", error);
+        }
+      },
 
-    // cleanup 함수를 store에 저장 (필요시 사용)
-    return () => subscription.unsubscribe();
-  },
-}));
+      initialize: () => {
+        // 이미 초기화된 경우 중복 방지
+        const { authSubscription } = get();
+        if (authSubscription) {
+          console.warn("Auth store already initialized");
+          return;
+        }
+
+        // 초기 로딩 상태 설정
+        set({ loading: true });
+
+        // 초기 사용자 상태 가져오기
+        supabase.auth.getUser().then(({ data: { user }, error }) => {
+          if (error) {
+            console.error("Error getting user:", error);
+            set({ loading: false });
+            return;
+          }
+
+          set({ user, loading: false });
+          if (user) {
+            get().loadProfile(user.id);
+          }
+        });
+
+        // 인증 상태 변화 감지
+        const {
+          data: { subscription },
+        } = supabase.auth.onAuthStateChange(async (event, session) => {
+          set({ user: session?.user ?? null, loading: false });
+
+          // 기존 프로필 구독 해제
+          const { profileSubscription } = get();
+          if (profileSubscription) {
+            profileSubscription.unsubscribe();
+            set({ profileSubscription: null });
+          }
+
+          if (session?.user) {
+            // 프로필 로드
+            await get().loadProfile(session.user.id);
+
+            // 프로필 realtime 구독 (user_id 필터 사용)
+            const newProfileSubscription = supabase
+              .channel(`profile-changes-${session.user.id}`)
+              .on(
+                "postgres_changes",
+                {
+                  event: "*",
+                  schema: "public",
+                  table: "profiles",
+                  filter: `user_id=eq.${session.user.id}`,
+                },
+                (payload) => {
+                  console.log("Profile changed:", payload);
+                  if (payload.eventType === "DELETE") {
+                    set({ profile: null });
+                  } else {
+                    set({ profile: payload.new as Profile });
+                  }
+                }
+              )
+              .subscribe();
+
+            set({ profileSubscription: newProfileSubscription });
+          } else {
+            set({ profile: null });
+          }
+        });
+
+        // auth 구독 핸들 저장
+        set({ authSubscription: subscription });
+      },
+    }),
+    {
+      name: "auth-store",
+      storage: createJSONStorage(() => AsyncStorage),
+      partialize: (state) => ({
+        user: state.user,
+        profile: state.profile,
+      }),
+    }
+  )
+);

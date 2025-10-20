@@ -11,7 +11,7 @@ export default function QuestionSelection({
 }: {
   label: string;
   color: "positive" | "negative" | "neutral";
-  size: "sm" | "md" | "lg";
+  size: "sm" | "md" | "lg" | "xl";
   onPress: () => void;
   selected: boolean;
 }) {
@@ -28,18 +28,18 @@ export default function QuestionSelection({
     >
       <View className="h-9 items-center justify-center flex">
         <View
-          className={`rounded-full  ${size === "lg" ? "h-9 w-9 p-1.5" : size === "md" ? "h-7 w-7 p-1" : "h-6 w-6 p-1"} border-2 ${color === "positive" ? "border-green" : color === "negative" ? "border-red" : "border-gray"}`}
+          className={`rounded-full  ${size === "xl" ? "h-9 w-9 p-1.5" : size === "lg" ? "h-8 w-8 p-1.5" : size === "md" ? "h-7 w-7 p-1" : "h-6 w-6 p-1"} border-2 ${color === "positive" ? "border-green-600" : color === "negative" ? "border-red-500" : "border-pastel-gray"}`}
         >
           {selected && (
             <View
-              className={`rounded-full ${color === "positive" ? "bg-green" : color === "negative" ? "bg-red" : "bg-gray"} w-full h-full`}
+              className={`rounded-full ${color === "positive" ? "bg-green-500" : color === "negative" ? "bg-red-500" : "bg-pastel-gray"} w-full h-full`}
             ></View>
           )}
         </View>
       </View>
       <View className="h-6 justify-center flex flex-row">
         <Text
-          className={`${color === "positive" ? "text-green" : color === "negative" ? "text-red" : "text-gray"} text-center text-xs font-medium`}
+          className={`${color === "positive" ? "text-green-600" : color === "negative" ? "text-red-500" : "text-pastel-gray"} text-center text-xs font-medium`}
         >
           {displayLabel}
         </Text>

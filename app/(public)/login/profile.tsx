@@ -43,7 +43,6 @@ export default function Profile() {
 
       // MIME 타입에서 확장자 추출
       const mimeType = asset.mimeType || asset.type || "image/png";
-      console.log("mimeType", mimeType);
       let fileExt = "png"; // 기본값
 
       if (mimeType.includes("jpeg") || mimeType.includes("jpg")) {
@@ -55,8 +54,6 @@ export default function Profile() {
       }
 
       setAvatarType(fileExt);
-      console.log("Selected image mimeType:", mimeType);
-      console.log("Extracted file extension:", fileExt);
     }
   };
 
@@ -107,7 +104,6 @@ export default function Profile() {
       }
 
       let avatarPath = null;
-      console.log("avatarUri", avatarUri);
       if (avatarUri) {
         avatarPath = await uploadAvatar(avatarUri);
       }
@@ -123,7 +119,7 @@ export default function Profile() {
         return;
       }
 
-      router.replace("/(app)");
+      router.replace("/test/intro");
     } catch (error) {
       console.error("Profile creation error:", error);
     } finally {

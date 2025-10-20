@@ -41,7 +41,7 @@ export default Sentry.wrap(function Layout() {
     ExtraBold: require("../assets/fonts/NotoSansKR-ExtraBold.ttf"),
   });
 
-  const initialize = useAuthStore((state) => state.initialize);
+  const { initialize } = useAuthStore();
 
   useEffect(() => {
     if (loaded || error) SplashScreen.hideAsync();

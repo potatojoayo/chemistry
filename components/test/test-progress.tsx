@@ -1,4 +1,5 @@
-import { Test } from "@/lib/types";
+import { Question } from "@/models/question";
+import { useTestStore } from "@/stores/test-store";
 import { useEffect } from "react";
 import { Platform, Text, View } from "react-native";
 import Animated, {
@@ -7,10 +8,9 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-export default function TestProgress({ test }: { test: Test }) {
-  const progress = Math.round(
-    (test.currentQuestionIndex / test.questions.length) * 100
-  );
+export default function TestProgress({ questions }: { questions: Question[] }) {
+  const { currentIndex } = useTestStore();
+  const progress = Math.round((currentIndex / questions.length) * 100);
   const animatedProgress = useSharedValue(progress);
 
   useEffect(() => {
@@ -24,17 +24,17 @@ export default function TestProgress({ test }: { test: Test }) {
   });
 
   return (
-    <View className="px-6 w-full">
+    <View className="w-full">
       {/* 퍼센트 텍스트와 진행률 바 */}
       <View className="flex-row items-center gap-3">
         <Text
-          className={`${test.currentQuestionIndex === 0 ? "text-foreground" : "text-green"} font-semibold ${Platform.OS === "web" ? "text-base" : "text-lg"}`}
+          className={`${currentIndex === 0 ? "text-foreground" : "text-green-600"} font-semibold ${Platform.OS === "web" ? "text-base" : "text-lg"}`}
         >
           {progress}%
         </Text>
         <View className="flex-1 h-2 bg-foreground rounded-full overflow-hidden">
           <Animated.View
-            className="h-full  rounded-full bg-green"
+            className="h-full  rounded-full bg-green-600"
             style={animatedStyle}
           />
         </View>

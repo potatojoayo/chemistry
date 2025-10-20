@@ -1,4 +1,6 @@
-import { Test } from "@/lib/types";
+import { Answer } from "@/models/answer";
+import { Question } from "@/models/question";
+import { useAuthStore } from "@/stores/auth-store";
 import { useTestStore } from "@/stores/test-store";
 import { useCallback } from "react";
 import { Text, useWindowDimensions, View } from "react-native";
@@ -11,27 +13,33 @@ import Animated, {
 import QuestionSelection from "./question-selection";
 
 export default function QuestionCard({
-  test,
+  question,
+  totalCount,
+  answer,
   index,
   animatedCurrentQuestionIndex,
 }: {
-  test: Test;
+  question: Question;
+  totalCount: number;
+  answer?: Answer;
   index: number;
   animatedCurrentQuestionIndex: SharedValue<number>;
 }) {
+  const { width } = useWindowDimensions();
   const { answerToQuestion } = useTestStore();
+  const { profile } = useAuthStore();
 
   const handleAnswer = useCallback(
     (answer: number) => {
+      if (!profile?.id) return;
       answerToQuestion({
-        id: test.id,
-        index,
+        question_id: question.id,
         answer,
+        profile_id: profile.id,
       });
     },
-    [answerToQuestion, index, test.id]
+    [profile?.id, question.id, answerToQuestion]
   );
-  const { width } = useWindowDimensions();
 
   const animatedStyle = useAnimatedStyle(() => {
     const diff = animatedCurrentQuestionIndex.value - index;
@@ -40,9 +48,9 @@ export default function QuestionCard({
     // diff < 0: 뒤 카드
     // diff > 0: 앞 카드
 
-    const translateY = interpolate(diff, [-1, 0], [-20, 0]);
+    const translateY = interpolate(diff, [-1, 0], [-24, 0]);
     const scale = interpolate(diff, [-1, 0], [0.9, 1]);
-    const zIndex = test.questions.length - index;
+    const zIndex = totalCount - index;
     const opacity = interpolate(diff, [-3, -2, -1, 0], [0, 1, 1, 1]);
     const translateX = interpolate(
       diff,
@@ -67,21 +75,21 @@ export default function QuestionCard({
   return (
     // <GestureDetector gesture={pan}>
     <Animated.View
-      className={`w-full rounded-2xl bg-foreground p-4 absolute h-[18rem] border`}
+      className={`w-full rounded-2xl bg-foreground p-4 absolute h-[17rem] border`}
       style={animatedStyle}
     >
-      <Text className="text-background font-semibold">{test.name}</Text>
-      <View className="border-t border-background w-full mt-1"></View>
-      <View className=" h-32 items-center justify-center flex flex-row px-6">
-        <Text className="text-background text-xl text-center font-medium">
-          {test.questions[index].content}
+      {/* <Text className="text-background font-semibold">{test.name}</Text> */}
+      {/* <View className="border-t border-background w-full mt-1"></View> */}
+      <View className=" h-32 items-center justify-center flex flex-row px-3">
+        <Text className="text-background text-lg text-center font-medium">
+          {question.content}
         </Text>
       </View>
       <View className=" flex flex-row items-center justify-around ">
         <QuestionSelection
           label="전혀\n아니다"
           color="negative"
-          selected={test.questions[index].answer === 1}
+          selected={answer?.answer === 1}
           size="lg"
           onPress={() => {
             handleAnswer(1);
@@ -90,7 +98,7 @@ export default function QuestionCard({
         <QuestionSelection
           label="아니다"
           color="negative"
-          selected={test.questions[index].answer === 2}
+          selected={answer?.answer === 2}
           size="md"
           onPress={() => {
             handleAnswer(2);
@@ -99,7 +107,7 @@ export default function QuestionCard({
         <QuestionSelection
           label="보통이다"
           color="neutral"
-          selected={test.questions[index].answer === 3}
+          selected={answer?.answer === 3}
           size="sm"
           onPress={() => {
             handleAnswer(3);
@@ -108,7 +116,7 @@ export default function QuestionCard({
         <QuestionSelection
           label="그렇다"
           color="positive"
-          selected={test.questions[index].answer === 4}
+          selected={answer?.answer === 4}
           size="md"
           onPress={() => {
             handleAnswer(4);
@@ -117,7 +125,7 @@ export default function QuestionCard({
         <QuestionSelection
           label="매우\n그렇다"
           color="positive"
-          selected={test.questions[index].answer === 5}
+          selected={answer?.answer === 5}
           size="lg"
           onPress={() => {
             handleAnswer(5);

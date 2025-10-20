@@ -8,12 +8,12 @@ module.exports = {
       colors: {
         background: "#222",
         foreground: "#ECEEDF",
-        green: "#26B066",
-        red: "#F58476",
-        yellow: "#ffd54f",
+        "pastel-green": "#26B066",
+        "pastel-red": "#F58476",
+        "pastel-yellow": "#ffd54f",
         "pastel-blue": "#5AAEFF",
         "pastel-gray": "#888",
-        muted: "#666",
+        "pastel-muted": "#666",
       },
       fontFamily: {
         light: ["Light", "sans-serif"],
