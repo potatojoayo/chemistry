@@ -1,12 +1,19 @@
 import BlurHeader from "@/components/common/blur-header";
+import { useAuthStore } from "@/stores/auth-store";
 import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
-import { Tabs } from "expo-router";
+import { Redirect, Tabs } from "expo-router";
 import { Platform } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function TabLayout() {
   const { bottom } = useSafeAreaInsets();
+
+  const { profile } = useAuthStore();
+
+  if (!profile?.test_completed) {
+    return <Redirect href="/test/intro" />;
+  }
 
   return (
     <Tabs

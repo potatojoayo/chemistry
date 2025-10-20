@@ -1,6 +1,5 @@
-import { useAudioPlayer } from "expo-audio";
 import { router } from "expo-router";
-import { useVideoPlayer, VideoView } from "expo-video";
+import { useVideoPlayer } from "expo-video";
 import { useEffect, useState } from "react";
 import {
   Animated,
@@ -10,7 +9,6 @@ import {
   Platform,
   Text,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -23,9 +21,9 @@ export default function Login() {
   const buttonFadeAnim = useState(new Animated.Value(0))[0];
   const { bottom } = useSafeAreaInsets();
 
-  const audioPlayer = useAudioPlayer(
-    require("../../../assets/audio/space.mp3")
-  );
+  // const audioPlayer = useAudioPlayer(
+  //   require("../../../assets/audio/space.mp3")
+  // );
   const player = useVideoPlayer(
     require("../../../assets/videos/star4.mp4"),
     (player) => {
@@ -41,132 +39,55 @@ export default function Login() {
   );
 
   const handleLogin = () => {
-    audioPlayer.pause();
+    // audioPlayer.pause();
     router.push("/login/mobile");
   };
 
+  // useEffect(() => {
+  //   audioPlayer.loop = true;
+  //   audioPlayer.play();
+  //   return () => {
+  //     if (Platform.OS === "web") {
+  //       audioPlayer.pause();
+  //     }
+  //   };
+  // }, [audioPlayer]);
+
+  // 즉시 UI 표시를 위한 초기 애니메이션
   useEffect(() => {
-    audioPlayer.loop = true;
-    // audioPlayer.play();
-    return () => {
-      if (Platform.OS === "web") {
-        audioPlayer.pause();
-      }
-    };
-  }, [audioPlayer]);
-
-  useEffect(() => {
-    // 비디오가 준비되면 자동 재생
-
-    const statusSubscription = player.addListener("statusChange", (event) => {
-      if (event.status === "readyToPlay") {
-        player.play();
-
-        // 비디오 Fade-in 애니메이션 시작
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 1000, // 1초 동안 fade-in
-          useNativeDriver: true,
-          easing: Easing.inOut(Easing.ease),
-        }).start();
-        // 이미지 애니메이션 시작 (처음에만) - fade, slide, scale 동시 실행
-        Animated.parallel([
-          Animated.timing(imageFadeAnim, {
-            toValue: 1,
-            duration: 1000,
-            delay: 500,
-            useNativeDriver: true,
-            easing: Easing.inOut(Easing.ease),
-          }),
-
-          Animated.timing(imageTranslateY, {
-            toValue: 0, // 제자리로 이동
-            delay: 500,
-            duration: 2000,
-            useNativeDriver: true,
-            easing: Easing.inOut(Easing.ease),
-          }),
-          Animated.timing(imageScale, {
-            toValue: 1, // 원래 크기로
-            delay: 500,
-            duration: 2000,
-            useNativeDriver: true,
-            easing: Easing.inOut(Easing.ease),
-          }),
-          Animated.timing(buttonFadeAnim, {
-            toValue: 1,
-            duration: 1000,
-            delay: 2000,
-            useNativeDriver: true,
-            easing: Easing.inOut(Easing.ease),
-          }),
-        ]).start();
-      }
-    });
-
-    // 15초마다 fade-out 후 replay
-    const timer = setInterval(() => {
-      // Fade-out 애니메이션
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 500, // 0.5초 동안 fade-out
+    // 즉시 이미지와 버튼을 표시
+    Animated.parallel([
+      Animated.timing(imageFadeAnim, {
+        toValue: 1,
+        duration: 800,
         useNativeDriver: true,
         easing: Easing.inOut(Easing.ease),
-      }).start(() => {
-        // fade-out 완료 후 1초 대기
-        setTimeout(() => {
-          // 비디오를 처음으로 되돌리고 재생
-          (player as any).replay();
-          // 비디오만 Fade-in 애니메이션 (이미지는 그대로 유지)
-          Animated.timing(fadeAnim, {
-            toValue: 1,
-            duration: 500, // 0.5초 동안 fade-in
-            useNativeDriver: true,
-            easing: Easing.inOut(Easing.ease),
-          }).start();
-        }, 200); // 0.2초 대기
-      });
-    }, 15500); // 15초마다 실행
-
-    return () => {
-      statusSubscription?.remove();
-      clearInterval(timer);
-    };
-  }, [
-    player,
-    fadeAnim,
-    imageFadeAnim,
-    imageTranslateY,
-    imageScale,
-    buttonFadeAnim,
-    audioPlayer,
-  ]);
+      }),
+      Animated.timing(imageTranslateY, {
+        toValue: 0,
+        duration: 1000,
+        useNativeDriver: true,
+        easing: Easing.inOut(Easing.ease),
+      }),
+      Animated.timing(imageScale, {
+        toValue: 1,
+        duration: 1000,
+        useNativeDriver: true,
+        easing: Easing.inOut(Easing.ease),
+      }),
+      Animated.timing(buttonFadeAnim, {
+        toValue: 1,
+        duration: 800,
+        delay: 300,
+        useNativeDriver: true,
+        easing: Easing.inOut(Easing.ease),
+      }),
+    ]).start();
+  }, [imageFadeAnim, imageTranslateY, imageScale, buttonFadeAnim]);
 
   return (
     <View className="flex-1 bg-background">
       <View className="flex-1 relative bg-background max-w-5xl mx-auto w-full text-foreground">
-        {/* 비디오 배경 */}
-        <TouchableWithoutFeedback>
-          <Animated.View style={{ opacity: fadeAnim, flex: 1 }}>
-            <VideoView
-              player={player}
-              nativeControls={false}
-              fullscreenOptions={{
-                enable: false,
-              }}
-              allowsPictureInPicture={false}
-              playsInline
-              style={{
-                width: "100%",
-                height: "100%",
-                pointerEvents: "none", // 터치 이벤트 차단
-              }}
-              contentFit="cover"
-            />
-          </Animated.View>
-        </TouchableWithoutFeedback>
-
-        {/* 이미지 오버레이 */}
         <View className="absolute inset-0 flex flex-col items-center mt-40 ">
           <Animated.View
             className="flex flex-col items-center justify-center px-4"

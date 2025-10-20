@@ -5,6 +5,7 @@ import { Question } from "@/models/question";
 import { useAuthStore } from "@/stores/auth-store";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { Image } from "expo-image";
+import { router } from "expo-router";
 // import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Animated, Pressable, Text, View } from "react-native";
@@ -14,9 +15,18 @@ import Reanimated, {
   withTiming,
 } from "react-native-reanimated";
 
+// Simple UUID generator for React Native
+const generateUUID = () => {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+    const r = (Math.random() * 16) | 0;
+    const v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+};
+
 export default function TestPage() {
   const { profile } = useAuthStore();
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(profile?.test_index ?? 0);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<Answer[]>([]);
 
@@ -40,12 +50,6 @@ export default function TestPage() {
       setLoading(false);
     });
   }, [profile?.id, setQuestions, setAnswers, setLoading]);
-
-  useEffect(() => {
-    if (profile?.test_index) {
-      setCurrentIndex(profile.test_index);
-    }
-  }, [profile?.test_index]);
 
   // 로딩이 끝나면 애니메이션 시작
   useEffect(() => {
@@ -139,8 +143,41 @@ export default function TestPage() {
       Animated.sequence(steps).start(() => resolve());
     });
 
+  const saveAnswer = async (
+    profileId: string,
+    questionId: string,
+    value: number,
+    nextIndex: number
+  ) => {
+    const { data: newAnswer, error } = await supabase
+      .from("answers")
+      .upsert(
+        {
+          question_id: questionId,
+          answer: value,
+          profile_id: profileId,
+        },
+        { onConflict: "profile_id,question_id" }
+      )
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    await supabase
+      .from("profiles")
+      .update({ test_index: nextIndex })
+      .eq("id", profileId)
+      .lt("test_index", nextIndex);
+
+    return newAnswer;
+  };
+
   const handleBack = async () => {
-    if (currentIndex <= 0) return;
+    if (currentIndex <= 0) {
+      router.back();
+      return;
+    }
     await animateOut();
     setCurrentIndex((i) => Math.max(0, i - 1));
     await animateIn();
@@ -148,43 +185,49 @@ export default function TestPage() {
 
   const handleSelect = async (value: number) => {
     if (!profile?.id) return;
-    setPendingValue(value);
     const q = questions[currentIndex];
-    const { data: newAnswer, error } = await supabase
-      .from("answers")
-      .upsert(
+    setPendingValue(value);
+    setAnswers((prev) => {
+      const idx = prev.findIndex((a) => a.question_id === q.id);
+      if (idx >= 0) {
+        const copy = [...prev];
+        copy[idx] = {
+          id: prev[idx].id,
+          profile_id: prev[idx].profile_id,
+          question_id: prev[idx].question_id,
+          answer: value,
+        };
+        return copy;
+      }
+      return [
+        ...prev,
         {
+          id: generateUUID(),
+          profile_id: profile.id,
           question_id: q.id,
           answer: value,
-          profile_id: profile.id,
         },
-        { onConflict: "profile_id,question_id" }
-      )
-      .select()
-      .single();
-    if (!error && newAnswer) {
+      ];
+    });
+
+    saveAnswer(profile.id, q.id, value, currentIndex + 1).then((saved) => {
       setAnswers((prev) => {
         const idx = prev.findIndex((a) => a.question_id === q.id);
         if (idx >= 0) {
           const copy = [...prev];
-          copy[idx] = newAnswer;
+          copy[idx] = saved;
           return copy;
         }
-        return [...prev, newAnswer];
+        return [...prev, saved];
       });
-      await Promise.all([
-        supabase
-          .from("profiles")
-          .update({ test_index: currentIndex + 1 })
-          .eq("id", profile.id),
-        blink(2),
-      ]);
-      await animateOut();
-      setCurrentIndex((i) => i + 1);
-      await animateIn();
-      blinkOpacity.setValue(1);
-      setPendingValue(null);
-    }
+    });
+    // UI transitions proceed independently
+    await blink(2);
+    await animateOut();
+    setCurrentIndex((i) => Math.min(i + 1, questions.length - 1));
+    await animateIn();
+    blinkOpacity.setValue(1);
+    setPendingValue(null);
   };
 
   if (loading || !profile) {
@@ -200,7 +243,7 @@ export default function TestPage() {
             className="p-3 flex flex-row items-center gap-2 w-20"
           >
             <FontAwesome6
-              name="chevron-left"
+              name="arrow-left-long"
               size={20}
               color="#ECEEDF"
               style={{ outerWidth: 20, outerHeight: 20 }}
@@ -214,7 +257,7 @@ export default function TestPage() {
             style={{ height: "100%", width: 100 }}
             contentFit="contain"
           />
-          <Text className="text-foreground my-auto p-3 text-sm font-semibold w-20 text-end">
+          <Text className="text-foreground my-auto p-3 text-xs font-semibold w-20 text-end">
             {currentIndex + 1} / {questions.length}
           </Text>
         </View>
@@ -232,7 +275,7 @@ export default function TestPage() {
           }}
           className="flex flex-col"
         >
-          <Text className="text-foreground font-semibold text-xl mt-6 text-center p-3">
+          <Text className="text-foreground font-medium text-xl mt-6 text-center p-6">
             {questions[currentIndex].content}
           </Text>
           <View className="flex flex-col items-stretch justify-center px-3 mt-6 gap-3">
@@ -272,22 +315,26 @@ export default function TestPage() {
                     }
                   >
                     <Pressable
-                      className={`w-full rounded-lg border p-3 ${
+                      className={`w-full rounded-lg border p-3 flex justify-between flex-row items-center  ${
                         isSelected
-                          ? "bg-foreground border-foreground"
+                          ? " border-foreground bg-foreground/10"
                           : "border-foreground/30"
                       }`}
                       onPress={() => handleSelect(value)}
                     >
                       <Text
-                        className={`text-base ${
-                          isSelected
-                            ? "text-background font-medium"
-                            : "text-foreground font-medium"
-                        }`}
+                        className={`text-base text-foreground font-medium" }`}
                       >
                         {label}
                       </Text>
+                      {isSelected && (
+                        <FontAwesome6
+                          name="check"
+                          size={16}
+                          color="#ECEEDF"
+                          style={{ marginLeft: "auto" }}
+                        />
+                      )}
                     </Pressable>
                   </Animated.View>
                 );
