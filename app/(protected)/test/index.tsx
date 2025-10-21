@@ -1,4 +1,5 @@
 import AnimatedPageWrapper from "@/components/common/animated-page-wrapper";
+import { computeAndSaveProfileScores } from "@/lib/scorerer";
 import { supabase } from "@/lib/supabase";
 import { Answer } from "@/models/answer";
 import { Question } from "@/models/question";
@@ -9,6 +10,7 @@ import { router } from "expo-router";
 // import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
+  ActivityIndicator,
   Animated,
   Pressable,
   Text,
@@ -35,7 +37,6 @@ export default function TestPage() {
   const [currentIndex, setCurrentIndex] = useState(profile?.test_index ?? 0);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<Answer[]>([]);
-
   const [loading, setLoading] = useState(true);
 
   // AnimatedPageWrapper와 동일한 애니메이션
@@ -238,7 +239,18 @@ export default function TestPage() {
     setPendingValue(null);
   };
 
-  const handleCompleteTest = () => {};
+  const handleCompleteTest = async () => {
+    if (loading) return;
+    if (!profile?.id) return;
+    setLoading(true);
+    try {
+      await computeAndSaveProfileScores(profile.id);
+      router.replace("/(protected)/test/result");
+    } catch (error) {
+      console.error("Error computing and saving profile scores:", error);
+      setLoading(false);
+    }
+  };
 
   if (loading || !profile || questions.length === 0) {
     return <View></View>;
@@ -327,15 +339,19 @@ export default function TestPage() {
                       contentFit="contain"
                     />
                     <TouchableOpacity
-                      className="w-full bg-foreground py-4 px-16 rounded-full mt-8"
+                      className="w-full bg-foreground px-16 rounded-full mt-8 h-14 items-center justify-center"
                       onPress={handleCompleteTest}
                       activeOpacity={0.8}
                     >
-                      <Text
-                        className={`text-center text-background font-semibold text-base`}
-                      >
-                        결과 확인하기
-                      </Text>
+                      {loading ? (
+                        <ActivityIndicator size="small" color="#222" />
+                      ) : (
+                        <Text
+                          className={`text-center text-background font-semibold text-base`}
+                        >
+                          결과 확인하기
+                        </Text>
+                      )}
                     </TouchableOpacity>
                   </View>
                 );
