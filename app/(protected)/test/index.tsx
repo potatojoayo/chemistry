@@ -8,7 +8,13 @@ import { Image } from "expo-image";
 import { router } from "expo-router";
 // import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { Animated, Pressable, Text, View } from "react-native";
+import {
+  Animated,
+  Pressable,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import Reanimated, {
   useAnimatedStyle,
   useSharedValue,
@@ -70,7 +76,9 @@ export default function TestPage() {
   }, [loading, fadeAnim, translateAnim]);
 
   const progress = useSharedValue(0);
+
   useEffect(() => {
+    if (questions.length === 0) return;
     const pct =
       questions.length > 0 ? (currentIndex / questions.length) * 100 : 0;
     progress.value = withTiming(pct, { duration: 300 });
@@ -184,7 +192,7 @@ export default function TestPage() {
   };
 
   const handleSelect = async (value: number) => {
-    if (!profile?.id) return;
+    if (!profile?.id || !questions[currentIndex]) return;
     const q = questions[currentIndex];
     setPendingValue(value);
     setAnswers((prev) => {
@@ -224,13 +232,15 @@ export default function TestPage() {
     // UI transitions proceed independently
     await blink(2);
     await animateOut();
-    setCurrentIndex((i) => Math.min(i + 1, questions.length - 1));
+    setCurrentIndex((i) => i + 1);
     await animateIn();
     blinkOpacity.setValue(1);
     setPendingValue(null);
   };
 
-  if (loading || !profile) {
+  const handleCompleteTest = () => {};
+
+  if (loading || !profile || questions.length === 0) {
     return <View></View>;
   }
 
@@ -257,9 +267,13 @@ export default function TestPage() {
             style={{ height: "100%", width: 100 }}
             contentFit="contain"
           />
-          <Text className="text-foreground my-auto p-3 text-xs font-semibold w-20 text-end">
-            {currentIndex + 1} / {questions.length}
-          </Text>
+          {currentIndex < questions.length ? (
+            <Text className="text-foreground my-auto p-3 text-xs font-semibold w-20 text-end">
+              {currentIndex + 1} / {questions.length}
+            </Text>
+          ) : (
+            <View className="w-20"></View>
+          )}
         </View>
         {/* 퍼센트 텍스트와 진행률 바 */}
         <View className="h-1.5 bg-foreground overflow-hidden w-full flex">
@@ -275,11 +289,57 @@ export default function TestPage() {
           }}
           className="flex flex-col"
         >
-          <Text className="text-foreground font-medium text-xl mt-6 text-center p-6">
-            {questions[currentIndex].content}
+          <Text
+            className="text-foreground font-medium text-xl text-center p-6"
+            style={{
+              marginTop: currentIndex >= questions.length ? 0 : 24,
+              paddingTop: currentIndex >= questions.length ? 0 : 24,
+            }}
+          >
+            {questions[currentIndex]?.content ?? ""}
           </Text>
-          <View className="flex flex-col items-stretch justify-center px-3 mt-6 gap-3">
+          <View
+            className="flex flex-col items-stretch justify-center px-3 gap-3"
+            style={{
+              marginTop: currentIndex >= questions.length ? 0 : 24,
+            }}
+          >
             {(() => {
+              if (currentIndex >= questions.length) {
+                return (
+                  <View className="flex flex-col flex-1">
+                    <Text className="text-foreground text-2xl font-semibold">
+                      테스트 완료!
+                    </Text>
+                    <Text className="mt-3 text-pastel-gray font-medium leading-5">
+                      성격, 애착, 안정성 데이터를 바탕으로 당신의 연애 패턴을
+                      분석했어요. 지금 결과를 확인하고, 상대에게 공유해 두
+                      사람의 케미스트리를 확인해보세요.
+                    </Text>
+                    <Image
+                      source={require("../../../assets/images/test-done.png")}
+                      style={{
+                        width: 280,
+                        height: 280,
+                        marginTop: 24,
+                        marginHorizontal: "auto",
+                      }}
+                      contentFit="contain"
+                    />
+                    <TouchableOpacity
+                      className="w-full bg-foreground py-4 px-16 rounded-full mt-8"
+                      onPress={handleCompleteTest}
+                      activeOpacity={0.8}
+                    >
+                      <Text
+                        className={`text-center text-background font-semibold text-base`}
+                      >
+                        결과 확인하기
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                );
+              }
               const q = questions[currentIndex];
               const selectedAnswer = answers.find(
                 (a) => a.question_id === q.id

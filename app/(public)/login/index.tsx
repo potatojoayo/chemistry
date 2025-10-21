@@ -138,7 +138,7 @@ export default function Login() {
                   activeOpacity={0.8}
                 >
                   <Text
-                    className={`text-center text-background font-bold text-base`}
+                    className={`text-center text-background font-semibold text-base`}
                   >
                     전화번호로 계속하기
                   </Text>
