@@ -62,23 +62,6 @@ export default function Verify() {
         return;
       }
       setVerified(true);
-      // if (user) {
-      //   const profileQuery = await supabase
-      //     .from("profiles")
-      //     .select("*")
-      //     .eq("user_id", user.id)
-      //     .single();
-      //   if (profileQuery.data) {
-      //     const profile: Profile = profileQuery.data;
-      //     if (profile.test_completed) {
-      //       router.push("/(protected)/(app)");
-      //     } else {
-      //       router.push("/(protected)/test/intro");
-      //     }
-      //   } else {
-      //     router.push("/(public)/login/profile");
-      //   }
-      // }
     };
     if (token.length === 6 && !loading) {
       handleVerify();
@@ -86,11 +69,18 @@ export default function Verify() {
   }, [token, loading, phone]);
 
   useEffect(() => {
-    if (user && profile && verified) {
-      if (profile.test_completed) {
-        router.replace("/");
+    console.log("user", user);
+    console.log("verified", verified);
+    console.log("profile", profile);
+    if (user && verified) {
+      if (profile) {
+        if (profile.test_completed) {
+          router.replace("/");
+        } else {
+          router.replace("/test/intro");
+        }
       } else {
-        router.replace("/test/intro");
+        router.replace("/login/profile");
       }
     }
   }, [profile, user, verified]);
@@ -176,7 +166,6 @@ export default function Verify() {
                   setTimeout(() => {
                     inputRef.current?.focus();
                   }, 0);
-                  console.log("blur");
                 }}
                 style={{
                   position: "absolute",

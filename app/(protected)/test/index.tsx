@@ -87,6 +87,8 @@ export default function TestPage() {
   const progressStyle = useAnimatedStyle(() => {
     return {
       width: `${progress.value}%`,
+      borderBottomRightRadius: progress.value >= 100 ? 0 : 4,
+      borderTopRightRadius: progress.value >= 100 ? 0 : 4,
     };
   });
 
@@ -290,7 +292,7 @@ export default function TestPage() {
         {/* 퍼센트 텍스트와 진행률 바 */}
         <View className="h-1.5 bg-foreground overflow-hidden w-full flex">
           <Reanimated.View
-            className="h-full rounded-r-full bg-green-600"
+            className="h-full bg-green-600"
             style={progressStyle}
           />
         </View>
@@ -308,7 +310,7 @@ export default function TestPage() {
               paddingTop: currentIndex >= questions.length ? 0 : 24,
             }}
           >
-            {questions[currentIndex]?.content ?? ""}
+            {(questions[currentIndex]?.content ?? "").replace(/\.$/, "")}
           </Text>
           <View
             className="flex flex-col items-stretch justify-center px-3 gap-3"
@@ -333,13 +335,13 @@ export default function TestPage() {
                       style={{
                         width: 280,
                         height: 280,
-                        marginTop: 24,
+                        marginTop: 64,
                         marginHorizontal: "auto",
                       }}
                       contentFit="contain"
                     />
                     <TouchableOpacity
-                      className="w-full bg-foreground px-16 rounded-full mt-8 h-14 items-center justify-center"
+                      className="w-full bg-foreground px-16 rounded-full mt-16 h-14 items-center justify-center"
                       onPress={handleCompleteTest}
                       activeOpacity={0.8}
                     >
@@ -396,7 +398,10 @@ export default function TestPage() {
                           ? " border-foreground bg-foreground/10"
                           : "border-foreground/30"
                       }`}
-                      onPress={() => handleSelect(value)}
+                      onPress={() =>
+                        pendingValue ? null : handleSelect(value)
+                      }
+                      disabled={!!pendingValue}
                     >
                       <Text
                         className={`text-base text-foreground font-medium" }`}

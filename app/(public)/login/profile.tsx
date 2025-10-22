@@ -1,9 +1,10 @@
 import AnimatedPageWrapper from "@/components/common/animated-page-wrapper";
 import { supabase } from "@/lib/supabase";
+import { useAuthStore } from "@/stores/auth-store";
 import { FontAwesome6 } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -21,7 +22,9 @@ export default function Profile() {
   const [avatarUri, setAvatarUri] = useState<string | null>(null);
   const [avatarType, setAvatarType] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [success, setSuccess] = useState(false);
   const inputRef = useRef<TextInput>(null);
+  const { profile } = useAuthStore();
 
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -111,7 +114,7 @@ export default function Profile() {
       const { error } = await supabase.from("profiles").insert({
         user_id: user.id,
         nickname,
-        avatar_url: avatarPath,
+        avatar_url: avatarPath ?? undefined,
       });
 
       if (error) {
@@ -119,13 +122,19 @@ export default function Profile() {
         return;
       }
 
-      router.replace("/test/intro");
+      setSuccess(true);
     } catch (error) {
       console.error("Profile creation error:", error);
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (success && profile) {
+      router.replace("/test/intro");
+    }
+  }, [success, profile]);
 
   return (
     <AnimatedPageWrapper>
