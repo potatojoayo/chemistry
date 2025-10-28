@@ -1,5 +1,5 @@
+import { useAuthStore } from "@/stores/auth-store";
 import { router } from "expo-router";
-import { useVideoPlayer } from "expo-video";
 import { useEffect, useState } from "react";
 import {
   Animated,
@@ -14,44 +14,20 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function Login() {
-  const fadeAnim = useState(new Animated.Value(0))[0];
   const imageFadeAnim = useState(new Animated.Value(0))[0];
   const imageTranslateY = useState(new Animated.Value(16))[0]; // 오른쪽에서 시작
   const imageScale = useState(new Animated.Value(0.8))[0]; // 작게 시작
   const buttonFadeAnim = useState(new Animated.Value(0))[0];
   const { bottom } = useSafeAreaInsets();
-
-  // const audioPlayer = useAudioPlayer(
-  //   require("../../../assets/audio/space.mp3")
-  // );
-  const player = useVideoPlayer(
-    require("../../../assets/videos/star4.mp4"),
-    (player) => {
-      player.loop = false;
-      player.muted = true; // 음소거로 자동재생 보장
-      player.playbackRate = 0.5; // 재생속도 조절 (1.0 = 정상속도, 0.5 = 절반속도, 2.0 = 2배속)
-      // iOS Safari 설정
-      if (Platform.OS === "web") {
-        (player as any).allowsExternalPlayback = false;
-        (player as any).allowsPictureInPicturePlayback = false;
-      }
-    }
-  );
+  const { redirectPath } = useAuthStore();
 
   const handleLogin = () => {
-    // audioPlayer.pause();
     router.push("/login/mobile");
   };
 
-  // useEffect(() => {
-  //   audioPlayer.loop = true;
-  //   audioPlayer.play();
-  //   return () => {
-  //     if (Platform.OS === "web") {
-  //       audioPlayer.pause();
-  //     }
-  //   };
-  // }, [audioPlayer]);
+  useEffect(() => {
+    console.log("redirectPath", redirectPath);
+  }, [redirectPath]);
 
   // 즉시 UI 표시를 위한 초기 애니메이션
   useEffect(() => {

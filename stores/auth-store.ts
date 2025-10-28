@@ -9,11 +9,13 @@ interface AuthState {
   user: User | null;
   profile: Profile | null;
   loading: boolean;
+  redirectPath: string | null;
   profileSubscription: RealtimeChannel | null;
   authSubscription: any;
   setUser: (user: User | null) => void;
   setProfile: (profile: Profile | null) => void;
   setLoading: (loading: boolean) => void;
+  setRedirectPath: (path: string | null) => void;
   setProfileSubscription: (subscription: RealtimeChannel | null) => void;
   loadProfile: (userId: string) => Promise<void>;
   cleanup: () => void;
@@ -27,11 +29,13 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       profile: null,
       loading: true,
+      redirectPath: null,
       profileSubscription: null,
       authSubscription: null,
       setUser: (user) => set({ user }),
       setProfile: (profile) => set({ profile }),
       setLoading: (loading) => set({ loading }),
+      setRedirectPath: (path) => set({ redirectPath: path }),
       setProfileSubscription: (subscription) =>
         set({ profileSubscription: subscription }),
       loadProfile: async (userId: string) => {
@@ -78,11 +82,11 @@ export const useAuthStore = create<AuthState>()(
 
       initialize: () => {
         // 이미 초기화된 경우 중복 방지
-        const { authSubscription } = get();
-        if (authSubscription) {
-          console.warn("Auth store already initialized");
-          return;
-        }
+        // const { authSubscription } = get();
+        // if (authSubscription) {
+        //   authSubscription.unsubscribe();
+        //   set({ authSubscription: null });
+        // }
 
         // 초기 로딩 상태 설정
         set({ loading: true });
@@ -91,13 +95,16 @@ export const useAuthStore = create<AuthState>()(
         supabase.auth.getUser().then(({ data: { user }, error }) => {
           if (error) {
             console.error("Error getting user:", error);
-            set({ loading: false });
+            set({ loading: false, user: null });
             return;
           }
 
-          set({ user, loading: false });
+          console.log("user", user);
           if (user) {
             get().loadProfile(user.id);
+            set({ user, loading: false });
+          } else {
+            set({ loading: false, user: null });
           }
         });
 
@@ -142,7 +149,7 @@ export const useAuthStore = create<AuthState>()(
 
             set({ profileSubscription: newProfileSubscription });
           } else {
-            set({ profile: null });
+            set({ profile: null, user: null });
           }
         });
 

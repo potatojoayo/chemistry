@@ -3,7 +3,7 @@ import { formatPhoneNumber } from "@/lib/formatters";
 import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/stores/auth-store";
 import { FontAwesome6 } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { RelativePathString, router } from "expo-router";
 import { useSearchParams } from "expo-router/build/hooks";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -29,7 +29,7 @@ export default function Verify() {
   const [verified, setVerified] = useState(false);
   const inputRef = useRef<TextInput>(null);
 
-  const { profile, user } = useAuthStore();
+  const { profile, user, redirectPath, setRedirectPath } = useAuthStore();
 
   // 카운트다운 타이머
   useEffect(() => {
@@ -72,9 +72,14 @@ export default function Verify() {
     console.log("user", user);
     console.log("verified", verified);
     console.log("profile", profile);
+    console.log("redirectPath", redirectPath);
     if (user && verified) {
       if (profile) {
-        if (profile.test_completed) {
+        if (redirectPath) {
+          console.log("redirectPath", redirectPath);
+          router.replace(redirectPath as RelativePathString);
+          setRedirectPath(null); // 리다이렉트 경로 초기화
+        } else if (profile.test_completed) {
           router.replace("/");
         } else {
           router.replace("/test/intro");
@@ -83,7 +88,8 @@ export default function Verify() {
         router.replace("/login/profile");
       }
     }
-  }, [profile, user, verified]);
+    setVerified(false);
+  }, [profile, user, verified, redirectPath, setRedirectPath]);
 
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
