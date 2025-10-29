@@ -1,4 +1,3 @@
-import { useAuthStore } from "@/stores/auth-store";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -19,15 +18,10 @@ export default function Login() {
   const imageScale = useState(new Animated.Value(0.8))[0]; // 작게 시작
   const buttonFadeAnim = useState(new Animated.Value(0))[0];
   const { bottom } = useSafeAreaInsets();
-  const { redirectPath } = useAuthStore();
 
   const handleLogin = () => {
     router.push("/login/mobile");
   };
-
-  useEffect(() => {
-    console.log("redirectPath", redirectPath);
-  }, [redirectPath]);
 
   // 즉시 UI 표시를 위한 초기 애니메이션
   useEffect(() => {

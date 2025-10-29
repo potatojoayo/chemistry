@@ -1,9 +1,9 @@
 import { supabase } from "@/lib/supabase";
 import { Profile } from "@/models/profile";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { RealtimeChannel, User } from "@supabase/supabase-js";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { getWebStorage } from "./get-web-storage";
 
 interface AuthState {
   user: User | null;
@@ -159,7 +159,7 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: "auth-store",
-      storage: createJSONStorage(() => AsyncStorage),
+      storage: createJSONStorage(() => getWebStorage()),
       partialize: (state) => ({
         user: state.user,
         profile: state.profile,

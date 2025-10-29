@@ -1,5 +1,4 @@
 import AnimatedPageWrapper from "@/components/common/animated-page-wrapper";
-import SupabaseImage from "@/components/common/supabase-image";
 import { supabase } from "@/lib/supabase";
 import { Profile } from "@/models/profile";
 import { useAuthStore } from "@/stores/auth-store";
@@ -114,9 +113,8 @@ export default function Test() {
               </Pressable> */}
             </View>
             <View className="flex flex-col p-3  flex-1">
-              <SupabaseImage
-                path={requesterProfile.avatar_url}
-                bucket="images"
+              <Image
+                source={{ uri: requesterProfile.avatar_url }}
                 style={{
                   width: 80,
                   height: 80,

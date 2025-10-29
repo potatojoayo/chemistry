@@ -1,8 +1,11 @@
 import { BlurView } from "expo-blur";
-import { Image } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-export default function BlurHeader() {
+export default function BlurHeader({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const insets = useSafeAreaInsets();
 
   return (
@@ -17,11 +20,7 @@ export default function BlurHeader() {
         paddingHorizontal: 12,
       }}
     >
-      <Image
-        source={require("../../assets/images/logo-foreground.png")}
-        style={{ width: 132 }}
-        resizeMode="contain"
-      />
+      {children}
     </BlurView>
   );
 }

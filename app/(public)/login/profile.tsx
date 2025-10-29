@@ -111,10 +111,19 @@ export default function Profile() {
         avatarPath = await uploadAvatar(avatarUri);
       }
 
+      // Supabase storage에서 public URL 가져오기
+      let avatarUrl = null;
+      if (avatarPath) {
+        const {
+          data: { publicUrl },
+        } = supabase.storage.from("images").getPublicUrl(avatarPath);
+        avatarUrl = publicUrl;
+      }
+
       const { error } = await supabase.from("profiles").insert({
         user_id: user.id,
         nickname,
-        avatar_url: avatarPath ?? undefined,
+        avatar_url: avatarUrl ?? undefined,
       });
 
       if (error) {

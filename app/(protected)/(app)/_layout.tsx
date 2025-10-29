@@ -3,6 +3,7 @@ import { useAuthStore } from "@/stores/auth-store";
 import { Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import { Redirect, Tabs } from "expo-router";
+import { Image, Text } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function TabLayout() {
@@ -39,7 +40,6 @@ export default function TabLayout() {
           fontFamily: "bold",
           fontSize: 10,
         },
-        header: () => <BlurHeader />,
       }}
     >
       <Tabs.Screen
@@ -48,6 +48,15 @@ export default function TabLayout() {
           title: "케미스트리",
           tabBarIcon: ({ color }) => (
             <Entypo size={20} name="lab-flask" color={color} />
+          ),
+          header: () => (
+            <BlurHeader>
+              <Image
+                source={require("../../../assets/images/logo-foreground.png")}
+                style={{ width: 132 }}
+                resizeMode="contain"
+              />
+            </BlurHeader>
           ),
         }}
       />
@@ -62,6 +71,13 @@ export default function TabLayout() {
               color={color}
             />
           ),
+          header: () => (
+            <BlurHeader>
+              <Text className="text-foreground font-semibold text-2xl mb-2">
+                차트
+              </Text>
+            </BlurHeader>
+          ),
         }}
       />
       <Tabs.Screen
@@ -70,6 +86,13 @@ export default function TabLayout() {
           title: "설정",
           tabBarIcon: ({ color }) => (
             <Entypo size={20} name="cog" color={color} />
+          ),
+          header: () => (
+            <BlurHeader>
+              <Text className="text-foreground font-semibold text-2xl mb-2">
+                설정
+              </Text>
+            </BlurHeader>
           ),
         }}
       />

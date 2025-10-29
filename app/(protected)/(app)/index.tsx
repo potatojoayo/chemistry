@@ -1,4 +1,3 @@
-import SupabaseImage from "@/components/common/supabase-image";
 import TabPageWrapper from "@/components/common/tab-page-wrapper";
 import { useKakao } from "@/lib/kakao-web";
 import { supabase } from "@/lib/supabase";
@@ -70,14 +69,11 @@ export default function Home() {
             activeOpacity={0.7}
             onPress={handleInvite}
           >
-            <View className="w-9">
-              <SupabaseImage
-                path={profile.avatar_url}
-                bucket="images"
-                style={{ width: 36, height: 36, borderRadius: 40 }}
-                resizeMode="cover"
-              />
-            </View>
+            <Image
+              source={{ uri: profile.avatar_url }}
+              style={{ width: 36, height: 36, borderRadius: 40 }}
+              contentFit="cover"
+            />
             <View className="flex flex-col">
               <Text className="text-foreground font-semibold">
                 {profile.nickname}

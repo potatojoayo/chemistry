@@ -1,3 +1,4 @@
+import { getWebStorage } from "@/stores/get-web-storage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createClient, processLock } from "@supabase/supabase-js";
 import { Platform } from "react-native";
@@ -8,7 +9,9 @@ export const supabase = createClient(
   process.env.EXPO_PUBLIC_SUPABASE_KEY!,
   {
     auth: {
-      ...(Platform.OS !== "web" ? { storage: AsyncStorage } : {}),
+      ...(Platform.OS !== "web"
+        ? { storage: AsyncStorage }
+        : { storage: getWebStorage() }),
       autoRefreshToken: true,
       persistSession: true,
       detectSessionInUrl: false,
