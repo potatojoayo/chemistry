@@ -31,8 +31,12 @@ export default function Home() {
     setShowInviteModal(true);
   };
 
+    const inviteLink = `${Platform.OS === "web" ? window.location.origin : process.env.EXPO_PUBLIC_APP_URL}/invite/${profile?.id}`;
+
   const handleCopyLink = async () => {
-    const inviteLink = `test`;
+    if(!profile){
+      return;
+    }
 
     try {
       await Clipboard.setStringAsync(inviteLink);
@@ -191,8 +195,8 @@ export default function Home() {
                     description: "우리의 케미를 확인해보세요!",
                     imageUrl: "https://example.com/thumbnail.png",
                     link: {
-                      webUrl: "https://chemistry.app/invite/abc",
-                      mobileWebUrl: "https://chemistry.app/invite/abc",
+                      webUrl: inviteLink,
+                      mobileWebUrl: inviteLink,
                     },
                   },
                 });

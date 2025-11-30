@@ -133,11 +133,6 @@ export default function Test() {
                 <br />
                 그동안 잘 몰랐던 서로의 마음을 가까이 느낄 수 있을 거예요.
               </Text>
-              {/* <Image
-                source={require("../../../assets/images/curious.png")}
-                style={{ width: 280, height: 280, margin: "auto" }}
-                resizeMode="contain"
-              /> */}
 
               <Animated.View
                 style={[

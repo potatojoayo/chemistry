@@ -33,4 +33,12 @@ export interface Profile {
   z_anxiety: number | null;
   z_humor: number | null;
   z_conflict: number | null;
+
+  // New Calculated Fields
+  big_5_type: number | null;
+  emotional_stability_percentage: number | null;
+  emotional_stability_level: number | null;
+  attachment_type: string | null;
+  flexibility_percentage: number | null;
+  flexibility_level: number | null;
 }
