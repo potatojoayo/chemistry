@@ -9,7 +9,11 @@ import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 
 export default function Chart() {
   const { profile } = useAuthStore();
@@ -17,6 +21,21 @@ export default function Chart() {
   const [aasReport, setAasReport] = useState<ReportAAS | null>(null);
   const [flexibilityReport, setFlexibilityReport] =
     useState<ReportFlexibility | null>(null);
+
+  const opacity = useSharedValue(0);
+  const translateY = useSharedValue(8);
+
+  useEffect(() => {
+    if (!loading) {
+      opacity.value = withTiming(1, { duration: 300 });
+      translateY.value = withTiming(0, { duration: 300 });
+    }
+  }, [loading]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+    transform: [{ translateY: translateY.value }],
+  }));
 
   useEffect(() => {
     async function fetchReports() {
@@ -98,9 +117,9 @@ export default function Chart() {
   return (
     <TabPageWrapper>
       <ScrollView className="flex flex-col">
-        <Animated.View entering={FadeInDown.springify().duration(300)} className="p-3 pt-1">
+        <Animated.View style={animatedStyle} className="p-3 pt-1">
           <View className="flex flex-row gap-3">
-            <View className="flex flex-col p-5 rounded-2xl bg-foreground flex-1 shadow-lg">
+            <View className="flex flex-col p-5 rounded-2xl bg-foreground flex-1 shadow">
               <View className="w-full border-t"></View>
               <Text className="text-xs">BIG 5</Text>
               <View className="flex items-center justify-center mt-4">

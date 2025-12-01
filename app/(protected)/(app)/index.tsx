@@ -87,7 +87,7 @@ export default function Home() {
           <View className="my-3 border-t border-pastel-gray/20"></View>
           <TouchableOpacity
             activeOpacity={0.7}
-            className="py-2 flex flex-row items-center gap-3"
+            className="flex flex-row items-center gap-3"
             onPress={handleInvite}
           >
             <View className="rounded-xl w-9 h-9 bg-foreground flex items-center justify-center">
