@@ -57,11 +57,13 @@ function nz(value: number | null, name: string): number {
   return value;
 }
 
+
+
 /**
  * 두 프로필로부터 AAS(애착 안정), Big5, 정서적 유연성 점수와
  * 최종 chemistry_index(LLUBB)를 계산
  */
-export function computeChemistryIndex(
+export function calculateChemistryIndex(
   a: Profile,
   b: Profile
 ): ChemistryIndex {
@@ -168,5 +170,90 @@ export function computeChemistryIndex(
     flexibilityScore,
     flexibilityLevel,
     chemistryIndex,
+  };
+}
+
+// 표준정규분포 CDF
+function cdf(z: number): number {
+  return 0.5 * (1 + erf(z / Math.SQRT2));
+}
+
+// erf 함수 구현
+function erf(x: number): number {
+  // Abramowitz & Stegun approximation
+  const a1 = 0.254829592;
+  const a2 = -0.284496736;
+  const a3 = 1.421413741;
+  const a4 = -1.453152027;
+  const a5 = 1.061405429;
+  const p = 0.3275911;
+
+  const sign = x < 0 ? -1 : 1;
+  x = Math.abs(x);
+
+  const t = 1 / (1 + p * x);
+  const y =
+    1 -
+    (((((a5 * t + a4) * t + a3) * t + a2) * t + a1) * t) *
+      Math.exp(-x * x);
+
+  return sign * y;
+}
+
+
+interface TikitakaResult {
+  totalDifficulty: number;
+  tikitakaIndex: number;
+  penalty_stability: number;
+  penalty_interaction: number;
+}
+
+/**
+ * Tikitaka Index calculation
+ * @param male Profile
+ * @param female Profile
+ */
+export function calculateTikitakaIndex(
+  male: Profile,
+  female: Profile
+): TikitakaResult {
+  const k1 = 0.3;
+  const k2 = 0.3;
+
+  // S = 불안정성 점수 = 100 - stability%
+  const S_M = 100 - (male.emotional_stability_percentage ?? 50);
+  const S_F = 100 - (female.emotional_stability_percentage ?? 50);
+
+  // 1) Stability penalty
+  const Stab_M = 100 - S_M;
+  const Stab_F = 100 - S_F;
+  const penalty_stability = k1 * (100 - Math.min(Stab_M, Stab_F));
+
+  // 2) Interaction penalty
+  const Z_anxM = male.z_anxiety ?? 0;
+  const Z_avoidF = female.z_avoidance ?? 0;
+  const Z_anxF = female.z_anxiety ?? 0;
+  const Z_avoidM = male.z_avoidance ?? 0;
+
+  const interactionTerm =
+    cdf(Z_anxM) * cdf(Z_avoidF) +
+    cdf(Z_anxF) * cdf(Z_avoidM);
+
+  const penalty_interaction = k2 * interactionTerm;
+
+  // Total penalty
+  const C_penalty = penalty_stability + penalty_interaction;
+
+  // 3) Total Difficulty = (0.5 * SM + 0.5 * SF) + C_penalty
+  const difficulty = 0.5 * S_M + 0.5 * S_F + C_penalty;
+
+  // 4) Final Tikitaka Index
+  const tikitaka = 100 - difficulty;
+
+  return {
+    totalDifficulty: difficulty,
+    tikitakaIndex: tikitaka,
+    penalty_stability,
+    penalty_interaction,
   };
 }
