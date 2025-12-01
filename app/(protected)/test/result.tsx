@@ -1,9 +1,9 @@
 import AnimatedPageWrapper from "@/components/common/animated-page-wrapper";
 import ReportCard from "@/components/test/report-card";
 import { supabase } from "@/lib/supabase";
+import { Profile } from "@/models/profile";
 import { ReportAAS } from "@/models/report_aas";
 import { ReportFlexibility } from "@/models/report_flexibility";
-import { useAuthStore } from "@/stores/auth-store";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -15,7 +15,7 @@ import {
 } from "react-native";
 
 export default function TestResult() {
-  const { profile } = useAuthStore();
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [report, setReport] = useState<ReportAAS | null>(null);
   const [flexibilityReport, setFlexibilityReport] =
@@ -25,45 +25,67 @@ export default function TestResult() {
   useEffect(() => {
     async function fetchResult() {
       try {
-        if (!profile) {
-          setError("User not found");
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        if (!user) {
+          setError("사용자 정보를 찾을 수 없습니다.");
           setLoading(false);
           return;
         }
 
+        const { data: profileData, error: profileError } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("user_id", user.id)
+          .single();
+
+        if (profileError || !profileData) {
+          console.error("Error fetching profile:", profileError);
+          setError("프로필을 불러오는데 실패했습니다.");
+          setLoading(false);
+          return;
+        }
+
+        setProfile(profileData);
+
         if (
-          !profile.emotional_stability_level ||
-          !profile.attachment_type ||
-          !profile.flexibility_level
+          !profileData.emotional_stability_level ||
+          !profileData.attachment_type ||
+          !profileData.flexibility_level
         ) {
-          setError("Incomplete test results");
+          setError("테스트 결과가 완전하지 않습니다.");
           setLoading(false);
           return;
         }
 
         console.log("Querying reports with:", {
-          level: profile.emotional_stability_level,
-          type: profile.attachment_type,
-          flexibility: profile.flexibility_level,
+          level: profileData.emotional_stability_level,
+          type: profileData.attachment_type,
+          flexibility: profileData.flexibility_level,
         });
 
         const [aasResult, flexibilityResult] = await Promise.all([
           supabase
             .from("report_aas")
             .select("*")
-            .eq("emotional_stability_level", profile.emotional_stability_level)
-            .eq("type", profile.attachment_type)
+            .eq(
+              "emotional_stability_level",
+              profileData.emotional_stability_level
+            )
+            .eq("type", profileData.attachment_type)
             .single(),
           supabase
             .from("report_flexibility")
             .select("*")
-            .eq("flexibility_level", profile.flexibility_level)
+            .eq("flexibility_level", profileData.flexibility_level)
             .single(),
         ]);
 
         if (aasResult.error) {
           console.error("Error fetching AAS report:", aasResult.error);
-          setError("Failed to load AAS report");
+          setError("애착 유형 보고서를 불러오는데 실패했습니다.");
           return;
         }
 
@@ -72,7 +94,7 @@ export default function TestResult() {
             "Error fetching flexibility report:",
             flexibilityResult.error
           );
-          setError("Failed to load flexibility report");
+          setError("유연성 보고서를 불러오는데 실패했습니다.");
           return;
         }
 
@@ -80,14 +102,14 @@ export default function TestResult() {
         setFlexibilityReport(flexibilityResult.data as ReportFlexibility);
       } catch (e) {
         console.error("Unexpected error:", e);
-        setError("An unexpected error occurred");
+        setError("알 수 없는 오류가 발생했습니다.");
       } finally {
         setLoading(false);
       }
     }
 
     fetchResult();
-  }, [profile]);
+  }, []);
 
   if (loading) {
     return (
@@ -100,7 +122,7 @@ export default function TestResult() {
   if (error || !report || !flexibilityReport) {
     return (
       <View className="flex-1 justify-center items-center bg-background">
-        <Text className="text-foreground">{error || "No report found"}</Text>
+        <Text className="text-foreground">{error || "보고서를 찾을 수 없습니다."}</Text>
         <TouchableOpacity
           className="mt-4 bg-foreground px-6 py-3 rounded-full"
           onPress={() => router.back()}
@@ -122,7 +144,7 @@ export default function TestResult() {
         </View>
 
         <ScrollView
-          contentContainerStyle={{ padding: 24, paddingBottom: 40 }}
+          contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
           className="flex-1"
         >
           <ReportCard

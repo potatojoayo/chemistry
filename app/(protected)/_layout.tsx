@@ -13,6 +13,7 @@ export default function ProtectedLayout() {
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="(app)" />
       <Stack.Screen name="report/[type]" />
+      <Stack.Screen name="test" />
     </Stack>
   );
 }

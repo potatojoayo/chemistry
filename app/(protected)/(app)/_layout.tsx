@@ -12,6 +12,9 @@ export default function TabLayout() {
   const { profile } = useAuthStore();
 
   if (!profile?.test_completed) {
+    if(profile?.test_index===55){
+    return <Redirect href="/test" />;
+    }
     return <Redirect href="/test/intro" />;
   }
 

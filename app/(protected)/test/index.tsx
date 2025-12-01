@@ -255,7 +255,7 @@ export default function TestPage() {
   };
 
   if (loading || !profile || questions.length === 0) {
-    return <View></View>;
+    return <View className="flex-1 bg-background"></View>;
   }
 
   return (
