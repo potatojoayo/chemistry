@@ -130,7 +130,7 @@ export default function Chart() {
           <View className="flex flex-row gap-3 mt-3">
             {aasReport && (
               <SummaryCard
-                label="애착 유형"
+                label="성인 애착 유형"
                 value={aasReport.type_text}
                 subValue={"마음평온도: " + aasReport.emotional_stability_text}
                 colorClass="bg-foreground/5"
