@@ -74,7 +74,13 @@ export const useAuthStore = create<AuthState>()(
           await supabase.auth.signOut();
           // 상태 정리
           set({ user: null, profile: null, loading: false });
-          get().cleanup();
+          
+          // Only cleanup profile subscription
+          const { profileSubscription } = get();
+          if (profileSubscription) {
+            profileSubscription.unsubscribe();
+            set({ profileSubscription: null });
+          }
         } catch (error) {
           console.error("Error signing out:", error);
         }

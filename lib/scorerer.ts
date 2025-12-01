@@ -271,6 +271,76 @@ export async function computeAndSaveProfileScores(profileId: string) {
       1;
   }
 
+  const normalCdf = (z: number): number => {
+    const sign = z < 0 ? -1 : 1;
+    const x = Math.abs(z) / Math.SQRT2;
+
+    const a1 = 0.254829592;
+    const a2 = -0.284496736;
+    const a3 = 1.421413741;
+    const a4 = -1.453152027;
+    const a5 = 1.061405429;
+    const p = 0.3275911;
+
+    const t = 1 / (1 + p * x);
+    const y =
+      1 -
+      (((((a5 * t + a4) * t + a3) * t + a2) * t + a1) * t * Math.exp(-x * x));
+
+    return 0.5 * (1 + sign * y);
+  };
+
+  // Passion Index Calculation
+  let passionIndex: number | undefined;
+  let passionLevel: number | undefined;
+  let passionType: "COLD" | "COOL" | "MILD" | "WARM" | "HOT" | undefined;
+
+  if (
+    zAnx != null &&
+    zAvoid != null &&
+    zAgree != null &&
+    zOpen != null
+  ) {
+    // Z_erc = 0.79 * Z_anx - 0.21 * Z_avoid
+    const zErc = 0.79 * zAnx - 0.21 * zAvoid;
+
+    // Z_big = 0.44 * Z_anx - 0.31 * Z_agreeableness - 0.25 * Z_openness
+    const zBig = 0.44 * zAnx - 0.31 * zAgree - 0.25 * zOpen;
+
+    // Relationship Passion Index = (0.5 * Phi(Z_erc) + 0.5 * Phi(Z_big)) * 100
+    const phiErc = normalCdf(zErc);
+    const phiBig = normalCdf(zBig);
+    
+    const index = (0.5 * phiErc + 0.5 * phiBig) * 100;
+    passionIndex = Math.max(0, Math.min(100, index));
+
+    // Calculate Level (1-5) based on quintiles
+    if (passionIndex < 20) passionLevel = 1;
+    else if (passionIndex < 40) passionLevel = 2;
+    else if (passionIndex < 60) passionLevel = 3;
+    else if (passionIndex < 80) passionLevel = 4;
+    else passionLevel = 5;
+
+    // Determine Type based on Level
+    switch (passionLevel) {
+      case 1:
+        passionType = "COLD";
+        break;
+      case 2:
+        passionType = "COOL";
+        break;
+      case 3:
+        passionType = "MILD";
+        break;
+      case 4:
+        passionType = "WARM";
+        break;
+      case 5:
+        passionType = "HOT";
+        break;
+    }
+  }
+
   // 4) 업데이트 payload 구성(정의된 것만 보냄)
   const patch: Partial<Profile> = {
     // raw means
@@ -321,6 +391,9 @@ export async function computeAndSaveProfileScores(profileId: string) {
     ...(flexibilityLevel != null
       ? { flexibility_level: flexibilityLevel }
       : {}),
+    ...(passionIndex != null ? { passion_index: passionIndex } : {}),
+    ...(passionLevel != null ? { passion_level: passionLevel } : {}),
+    ...(passionType != null ? { passion_type: passionType } : {}),
     updated_at: new Date().toISOString(),
   };
 
@@ -363,6 +436,9 @@ export async function computeAndSaveProfileScores(profileId: string) {
       attachment_type: attachmentType,
       flexibility_percentage: flexibilityPercentage,
       flexibility_level: flexibilityLevel,
+      passion_index: passionIndex,
+      passion_level: passionLevel,
+      passion_type: passionType,
     },
   };
 }

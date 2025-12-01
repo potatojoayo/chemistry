@@ -1,7 +1,7 @@
 import TabPageWrapper from "@/components/common/tab-page-wrapper";
 import { useKakao } from "@/lib/kakao-web";
 import { supabase } from "@/lib/supabase";
-import { Relation } from "@/models/relation";
+import { Relationship } from "@/models/relationship";
 import { useAuthStore } from "@/stores/auth-store";
 import { FontAwesome6 } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
@@ -33,7 +33,7 @@ export default function Home() {
   const { profile } = useAuthStore();
   useKakao();
 
-  const [relations, setRelations] = useState<Relation[]>([]);
+  const [relationships, setRelationships] = useState<Relationship[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -89,11 +89,11 @@ export default function Home() {
     if (!profile?.id) return;
     setLoading(true);
     supabase
-      .from("relations")
+      .from("relationships")
       .select("*")
       .or(`requester_id.eq.${profile.id},target_id.eq.${profile.id}`)
       .then((response) => {
-        setRelations(response.data ?? []);
+        setRelationships(response.data ?? []);
         setLoading(false);
       });
   }, [profile?.id]);
@@ -153,7 +153,7 @@ export default function Home() {
             </View>
           </TouchableOpacity>
           <View className="my-3 border-t border-pastel-gray/20"></View>
-          {relations.length === 0 && !loading ? (
+          {relationships.length === 0 && !loading ? (
             <View className="mt-6 flex flex-col items-center">
               <Image
                 source={require("../../../assets/images/empty.png")}

@@ -41,4 +41,9 @@ export interface Profile {
   attachment_type: string | null;
   flexibility_percentage: number | null;
   flexibility_level: number | null;
+
+  passion_index:number| null;
+  passion_level: number | null;
+  passion_type: 
+  'COLD' | 'COOL' | 'MILD' | 'WARM' | 'HOT' | null;
 }

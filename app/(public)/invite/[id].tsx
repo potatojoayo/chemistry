@@ -1,4 +1,5 @@
 import AnimatedPageWrapper from "@/components/common/animated-page-wrapper";
+import { createRelationship } from "@/lib/create-relationship";
 import { supabase } from "@/lib/supabase";
 import { Profile } from "@/models/profile";
 import { useAuthStore } from "@/stores/auth-store";
@@ -57,28 +58,14 @@ export default function Test() {
       return;
     }
 
-    setLoading(true);
 
-    const { error } = await supabase.from("relations").upsert(
-      {
-        requester_id: requesterProfile.id,
-        target_id: profile.id,
-        status: "accepted",
-        accepted_at: new Date().toISOString(),
-        relation_type: "couple",
-      },
-      { onConflict: "requester_id,target_id" }
-    );
-
-    if (error) {
-      console.error(error);
-      setSnackbarMessage("초대 수락에 실패했습니다. 다시 시도해주세요.");
-      setSnackbarVisible(true);
-      setLoading(false);
-      return;
-    }
 
     if (profile.test_completed) {
+    setLoading(true);
+    await createRelationship({
+      invitingProfile: requesterProfile,
+      invitedProfile: profile,
+    })
       router.push(`/`);
       return;
     }
