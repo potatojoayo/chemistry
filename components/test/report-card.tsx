@@ -23,15 +23,17 @@ export default function ReportCard({
 
   return (
     <View className="mb-12">
-      <Text className="text-pastel-gray text-sm font-medium mb-2">{test}</Text>
-      <View className="bg-foreground/5 rounded-3xl p-6 border border-foreground/10">
+      <View className="bg-foreground/5 rounded-3xl p-6 ">
+        <View className="self-start bg-foreground px-3 py-2 rounded-full mb-3">
+          <Text className="text-background font-semibold">{test}</Text>
+        </View>
         <Text className="text-2xl font-bold text-foreground mb-4">{title}</Text>
 
         <View className="flex flex-row flex-wrap items-center gap-2 mb-8">
           {badges.map((badge, index) => (
             <View
               key={index}
-              className="bg-foreground/10 px-3 py-1 rounded-full"
+              className="bg-foreground/10 px-3 py-2 rounded-full"
             >
               <Text className="text-foreground font-medium text-sm">
                 {badge}
@@ -44,7 +46,7 @@ export default function ReportCard({
           <Text className="text-xl font-bold text-foreground mb-3">
             종합 평가
           </Text>
-          <Text className="text-pastel-gray text-base leading-7">
+          <Text className="text-foreground text-base leading-7">
             {formatContent(overallEvaluation)}
           </Text>
         </View>
@@ -53,14 +55,14 @@ export default function ReportCard({
           <Text className="text-xl font-bold text-foreground mb-3">
             세부 평가
           </Text>
-          <Text className="text-pastel-gray text-base leading-7">
+          <Text className="text-foreground text-base leading-7">
             {formatContent(detailEvaluations)}
           </Text>
         </View>
 
         <View>
           <Text className="text-xl font-bold text-foreground mb-3">조언</Text>
-          <Text className="text-pastel-gray text-base leading-7">
+          <Text className="text-foreground text-base leading-7">
             {formatContent(counselingText)}
           </Text>
         </View>
