@@ -207,13 +207,13 @@ export default function Home() {
               className="bg-background rounded-t-3xl overflow-hidden h-[85%]"
             >
               <View className="flex flex-row justify-between items-center p-4 border-b border-pastel-gray/20">
-                <TouchableOpacity onPress={closeModal} className="w-10">
-                  <FontAwesome6 name="xmark" size={20} color="#ECEEDF" />
-                </TouchableOpacity>
+                <View style={{ width: 40 }} />
                 <Text className="text-foreground font-semibold text-lg">
                   케미스트리 초대하기
                 </Text>
-                <View style={{ width: 40 }} />
+                <TouchableOpacity onPress={closeModal} className="w-10 flex flex-row justify-end pr-2">
+                  <FontAwesome6 name="xmark" size={20} color="#ECEEDF" />
+                </TouchableOpacity>
               </View>
 
               <View className="flex-1 px-6 mt-32">
@@ -282,7 +282,7 @@ export default function Home() {
         duration={3000}
         wrapperStyle={{
           position: "absolute",
-          bottom: 40,
+          bottom: 24,
           left: 0,
           right: 0,
         }}
