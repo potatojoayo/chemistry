@@ -13,39 +13,75 @@ import {
   Pressable,
   Text,
   TouchableOpacity,
-  View,
+  TouchableWithoutFeedback,
+  View
 } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
+import {
+  Gesture,
+  GestureDetector,
+  ScrollView,
+} from "react-native-gesture-handler";
 import { Snackbar } from "react-native-paper";
+import Animated, {
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 
 export default function Home() {
   const { profile } = useAuthStore();
   useKakao();
 
   const [relations, setRelations] = useState<Relation[]>([]);
-  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const handleInvite = () => {
-    setShowInviteModal(true);
+  const overlayOpacity = useSharedValue(0);
+  const contentTranslateY = useSharedValue(1000);
+
+  const openModal = () => {
+    setModalVisible(true);
+    // Wait for render
+    setTimeout(() => {
+      overlayOpacity.value = withTiming(1, { duration: 300 });
+      contentTranslateY.value = withTiming(0, { duration: 300 });
+    }, 0);
   };
 
-    const inviteLink = `${Platform.OS === "web" ? window.location.origin : process.env.EXPO_PUBLIC_APP_URL}/invite/${profile?.id}`;
+  const closeModal = () => {
+    overlayOpacity.value = withTiming(0, { duration: 300 });
+    contentTranslateY.value = withTiming(1000, { duration: 300 }, (finished) => {
+      if (finished) {
+        runOnJS(setModalVisible)(false);
+      }
+    });
+  };
+
+  const overlayStyle = useAnimatedStyle(() => ({
+    opacity: overlayOpacity.value,
+  }));
+
+  const contentStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: contentTranslateY.value }],
+  }));
+
+  const inviteLink = `${Platform.OS === "web" ? window.location.origin : process.env.EXPO_PUBLIC_APP_URL}/invite/${profile?.id}`;
 
   const handleCopyLink = async () => {
-    if(!profile){
+    if (!profile) {
       return;
     }
 
     try {
       await Clipboard.setStringAsync(inviteLink);
       setSnackbarVisible(true);
-      setShowInviteModal(false);
+      closeModal();
     } catch (error) {
       console.error("클립보드 복사 실패:", error);
       // 모든 방법 실패 시 사용자에게 알림
-      setShowInviteModal(false);
+      closeModal();
     }
   };
 
@@ -62,6 +98,20 @@ export default function Home() {
       });
   }, [profile?.id]);
 
+  const gesture = Gesture.Pan()
+    .onChange((event) => {
+      if (event.translationY > 0) {
+        contentTranslateY.value = event.translationY;
+      }
+    })
+    .onEnd((event) => {
+      if (event.translationY > 150 || event.velocityY > 1000) {
+        runOnJS(closeModal)();
+      } else {
+        contentTranslateY.value = withTiming(0, { duration: 300 });
+      }
+    });
+
   if (!profile) return null;
 
   return (
@@ -71,7 +121,7 @@ export default function Home() {
           <TouchableOpacity
             className="flex flex-row items-center gap-3 h-12"
             activeOpacity={0.7}
-            onPress={handleInvite}
+            onPress={openModal}
           >
             <Image
               source={{ uri: profile.avatar_url }}
@@ -88,7 +138,7 @@ export default function Home() {
           <TouchableOpacity
             activeOpacity={0.7}
             className="flex flex-row items-center gap-3"
-            onPress={handleInvite}
+            onPress={openModal}
           >
             <View className="rounded-xl w-9 h-9 bg-foreground flex items-center justify-center">
               <FontAwesome6 name="plus" size={16} color="#222" />
@@ -120,7 +170,7 @@ export default function Home() {
               <TouchableOpacity
                 className="bg-foreground rounded-full px-16 py-4 mt-6"
                 activeOpacity={0.7}
-                onPress={handleInvite}
+                onPress={openModal}
               >
                 <Text className="text-background font-semibold text-base">
                   썸·연인 초대하기
@@ -134,80 +184,95 @@ export default function Home() {
       </ScrollView>
 
       <Modal
-        visible={showInviteModal}
-        animationType="slide"
-        presentationStyle="pageSheet"
-        onRequestClose={() => setShowInviteModal(false)}
+        visible={modalVisible}
+        transparent={true}
+        animationType="none"
+        onRequestClose={closeModal}
       >
-        <View className="flex-1 bg-background">
-          <View className="flex flex-row justify-between items-center p-4 border-b border-pastel-gray/20">
-            <TouchableOpacity
-              onPress={() => setShowInviteModal(false)}
-              className="w-10"
+        <View className="flex-1 justify-end">
+          {/* Overlay */}
+          <Animated.View
+            style={overlayStyle}
+            className="absolute inset-0 bg-black/50"
+          >
+            <TouchableWithoutFeedback onPress={closeModal}>
+              <View className="flex-1" />
+            </TouchableWithoutFeedback>
+          </Animated.View>
+
+          {/* Modal Content */}
+          <GestureDetector gesture={gesture}>
+            <Animated.View
+              style={contentStyle}
+              className="bg-background rounded-t-3xl overflow-hidden h-[85%]"
             >
-              <FontAwesome6 name="xmark" size={20} color="#ECEEDF" />
-            </TouchableOpacity>
-            <Text className="text-foreground font-semibold text-lg">
-              케미스트리 초대하기
-            </Text>
-            <View style={{ width: 40 }} />
-          </View>
+              <View className="flex flex-row justify-between items-center p-4 border-b border-pastel-gray/20">
+                <TouchableOpacity onPress={closeModal} className="w-10">
+                  <FontAwesome6 name="xmark" size={20} color="#ECEEDF" />
+                </TouchableOpacity>
+                <Text className="text-foreground font-semibold text-lg">
+                  케미스트리 초대하기
+                </Text>
+                <View style={{ width: 40 }} />
+              </View>
 
-          <View className="flex-1 px-6 mt-32">
-            <FontAwesome6
-              name="envelope"
-              solid
-              size={40}
-              color="#ECEEDF"
-              style={{ marginHorizontal: "auto" }}
-            />
-            <Text className="text-foreground font-medium text-lg  text-center mt-4">
-              썸·연인에게 초대 링크를 보내고
-              <br />
-              함께 서로의 케미를 확인해보세요!
-            </Text>
+              <View className="flex-1 px-6 mt-32">
+                <FontAwesome6
+                  name="envelope"
+                  solid
+                  size={40}
+                  color="#ECEEDF"
+                  style={{ marginHorizontal: "auto" }}
+                />
+                <Text className="text-foreground font-medium text-lg  text-center mt-4">
+                  썸·연인에게 초대 링크를 보내고
+                  <br />
+                  함께 서로의 케미를 확인해보세요!
+                </Text>
 
-            <TouchableOpacity
-              className="bg-foreground rounded-full px-6 py-4 mb-4 mt-10"
-              activeOpacity={0.7}
-              onPress={handleCopyLink}
-            >
-              <Text className="text-background font-semibold text-center">
-                초대 링크 복사하기
-              </Text>
-            </TouchableOpacity>
+                <TouchableOpacity
+                  className="bg-foreground rounded-full px-6 py-4 mb-4 mt-10"
+                  activeOpacity={0.7}
+                  onPress={handleCopyLink}
+                >
+                  <Text className="text-background font-semibold text-center">
+                    초대 링크 복사하기
+                  </Text>
+                </TouchableOpacity>
 
-            <TouchableOpacity
-              className="border border-foreground rounded-full px-6 py-4"
-              activeOpacity={0.7}
-              onPress={() => {
-                if (Platform.OS !== "web") return;
-                const Kakao = (window as any).Kakao;
-                if (!Kakao) {
-                  alert("Kakao SDK not loaded yet!");
-                  return;
-                }
+                <TouchableOpacity
+                  className="border border-foreground rounded-full px-6 py-4"
+                  activeOpacity={0.7}
+                  onPress={() => {
+                    if (Platform.OS !== "web") return;
+                    const Kakao = (window as any).Kakao;
+                    if (!Kakao) {
+                      alert("Kakao SDK not loaded yet!");
+                      return;
+                    }
 
-                Kakao.Share.sendDefault({
-                  objectType: "feed",
-                  content: {
-                    title: "케미스트리 초대하기 💞",
-                    description: "우리의 케미를 확인해보세요!",
-                    imageUrl: "https://example.com/thumbnail.png",
-                    link: {
-                      webUrl: inviteLink,
-                      mobileWebUrl: inviteLink,
-                    },
-                  },
-                });
-                setShowInviteModal(false);
-              }}
-            >
-              <Text className="text-foreground font-semibold text-center">
-                카카오톡 공유하기
-              </Text>
-            </TouchableOpacity>
-          </View>
+                    Kakao.Share.sendDefault({
+                      objectType: "feed",
+                      content: {
+                        title: "케미스트리 초대하기 💞",
+                        description: "우리의 케미를 확인해보세요!",
+                        imageUrl: "https://example.com/thumbnail.png",
+                        link: {
+                          webUrl: inviteLink,
+                          mobileWebUrl: inviteLink,
+                        },
+                      },
+                    });
+                    closeModal();
+                  }}
+                >
+                  <Text className="text-foreground font-semibold text-center">
+                    카카오톡으로 공유하기
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </Animated.View>
+          </GestureDetector>
         </View>
       </Modal>
 

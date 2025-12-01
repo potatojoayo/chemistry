@@ -92,7 +92,7 @@ export const useAuthStore = create<AuthState>()(
         set({ loading: true });
 
         // 초기 사용자 상태 가져오기
-        supabase.auth.getUser().then(({ data: { user }, error }) => {
+        supabase.auth.getUser().then(async ({ data: { user }, error }) => {
           if (error) {
             console.error("Error getting user:", error);
             set({ loading: false, user: null });
@@ -101,7 +101,7 @@ export const useAuthStore = create<AuthState>()(
 
           console.log("user", user);
           if (user) {
-            get().loadProfile(user.id);
+            await get().loadProfile(user.id);
             set({ user, loading: false });
           } else {
             set({ loading: false, user: null });
@@ -112,8 +112,6 @@ export const useAuthStore = create<AuthState>()(
         const {
           data: { subscription },
         } = supabase.auth.onAuthStateChange(async (event, session) => {
-          set({ user: session?.user ?? null, loading: false });
-
           // 기존 프로필 구독 해제
           const { profileSubscription } = get();
           if (profileSubscription) {
@@ -122,8 +120,10 @@ export const useAuthStore = create<AuthState>()(
           }
 
           if (session?.user) {
+            set({ user: session.user });
             // 프로필 로드
             await get().loadProfile(session.user.id);
+            set({ loading: false });
 
             // 프로필 realtime 구독 (user_id 필터 사용)
             const newProfileSubscription = supabase
@@ -149,7 +149,7 @@ export const useAuthStore = create<AuthState>()(
 
             set({ profileSubscription: newProfileSubscription });
           } else {
-            set({ profile: null, user: null });
+            set({ profile: null, user: null, loading: false });
           }
         });
 
