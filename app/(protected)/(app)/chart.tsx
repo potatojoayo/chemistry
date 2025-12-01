@@ -1,12 +1,71 @@
 import RadarChart from "@/components/chart/radar-chart";
+import SummaryCard from "@/components/chart/summary-card";
 import TabPageWrapper from "@/components/common/tab-page-wrapper";
+import { supabase } from "@/lib/supabase";
+import { ReportAAS } from "@/models/report_aas";
+import { ReportFlexibility } from "@/models/report_flexibility";
 import { useAuthStore } from "@/stores/auth-store";
-import { Text, View } from "react-native";
+import { router } from "expo-router";
+import { useEffect, useState } from "react";
+import { ActivityIndicator, Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
+import Animated, { FadeInDown } from "react-native-reanimated";
+
 export default function Chart() {
   const { profile } = useAuthStore();
+  const [loading, setLoading] = useState(true);
+  const [aasReport, setAasReport] = useState<ReportAAS | null>(null);
+  const [flexibilityReport, setFlexibilityReport] =
+    useState<ReportFlexibility | null>(null);
+
+  useEffect(() => {
+    async function fetchReports() {
+      if (
+        !profile?.emotional_stability_level ||
+        !profile?.attachment_type ||
+        !profile?.flexibility_level
+      ) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const [aasResult, flexibilityResult] = await Promise.all([
+          supabase
+            .from("report_aas")
+            .select("*")
+            .eq("emotional_stability_level", profile.emotional_stability_level)
+            .eq("type", profile.attachment_type)
+            .single(),
+          supabase
+            .from("report_flexibility")
+            .select("*")
+            .eq("flexibility_level", profile.flexibility_level)
+            .single(),
+        ]);
+
+        if (aasResult.data) setAasReport(aasResult.data as ReportAAS);
+        if (flexibilityResult.data)
+          setFlexibilityReport(flexibilityResult.data as ReportFlexibility);
+      } catch (error) {
+        console.error("Error fetching reports:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchReports();
+  }, [profile]);
 
   if (!profile) return null;
+
+  if (loading) {
+    return (
+      <View className="flex-1 justify-center items-center bg-background">
+        <ActivityIndicator size="large" color="#ECEEDF" />
+      </View>
+    );
+  }
 
   const big5Data = [
     {
@@ -39,7 +98,7 @@ export default function Chart() {
   return (
     <TabPageWrapper>
       <ScrollView className="flex flex-col">
-        <View className="p-3 pt-1">
+        <Animated.View entering={FadeInDown.springify().duration(300)} className="p-3 pt-1">
           <View className="flex flex-row gap-3">
             <View className="flex flex-col p-5 rounded-2xl bg-foreground flex-1 shadow-lg">
               <View className="w-full border-t"></View>
@@ -50,20 +109,30 @@ export default function Chart() {
             </View>
           </View>
           <View className="flex flex-row gap-3 mt-3">
-            <View className="flex flex-col p-5 rounded-2xl bg-pastel-green flex-1 shadow-lg">
-              <View className="w-full border-t"></View>
-              <Text className="text-xs">애착 유형</Text>
-              <Text className="text-xl font-medium mt-6">안정형</Text>
-              <Text className="text-[11px] mt-1">맑게 겐 하늘</Text>
-            </View>
-            <View className="flex flex-col p-5 rounded-2xl bg-yellow-300 flex-1 shadow-lg">
-              <View className="w-full border-t"></View>
-              <Text className="text-xs">정서적 유연성</Text>
-              <Text className="text-xl font-medium mt-6">마음의 정원사</Text>
-              <Text className="text-[11px] mt-1 ">사랑에 물을 주는</Text>
-            </View>
+            {aasReport && (
+              <SummaryCard
+                label="애착 유형"
+                value={aasReport.type_text}
+                subValue={"마음평온도: " + aasReport.emotional_stability_text}
+                colorClass="bg-foreground/5"
+                onPress={() => router.push("/report/aas")}
+              />
+            )}
+            {flexibilityReport && (
+              <SummaryCard
+                label="정서적 유연성"
+                value={flexibilityReport.flexibility_label}
+                subValue={
+                  "유연성: " +
+                  profile.flexibility_percentage?.toFixed(1) +
+                  "%"
+                }
+                colorClass="bg-foreground/5"
+                onPress={() => router.push("/report/flexibility")}
+              />
+            )}
           </View>
-        </View>
+        </Animated.View>
       </ScrollView>
     </TabPageWrapper>
   );

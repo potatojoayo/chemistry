@@ -1,5 +1,5 @@
 import { useAuthStore } from "@/stores/auth-store";
-import { Redirect, Slot, usePathname } from "expo-router";
+import { Redirect, Stack, usePathname } from "expo-router";
 export default function ProtectedLayout() {
   const { profile, user, setRedirectPath } = useAuthStore();
   const pathname = usePathname();
@@ -9,5 +9,10 @@ export default function ProtectedLayout() {
     setRedirectPath(pathname);
     return <Redirect href="/login" />;
   }
-  return <Slot />;
+  return (
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="(app)" />
+      <Stack.Screen name="report/[type]" />
+    </Stack>
+  );
 }
