@@ -1,9 +1,9 @@
 import AnimatedPageWrapper from "@/components/common/animated-page-wrapper";
 import ReportCard from "@/components/test/report-card";
 import { supabase } from "@/lib/supabase";
-import { Profile } from "@/models/profile";
 import { ReportAAS } from "@/models/report_aas";
 import { ReportFlexibility } from "@/models/report_flexibility";
+import { useAuthStore } from "@/stores/auth-store";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -15,7 +15,7 @@ import {
 } from "react-native";
 
 export default function TestResult() {
-  const [profile, setProfile] = useState<Profile | null>(null);
+  const { profile } = useAuthStore();
   const [loading, setLoading] = useState(true);
   const [report, setReport] = useState<ReportAAS | null>(null);
   const [flexibilityReport, setFlexibilityReport] =
@@ -23,37 +23,14 @@ export default function TestResult() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchResult() {
+    async function fetchReports() {
+      if (!profile) return;
+
       try {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-
-        if (!user) {
-          setError("사용자 정보를 찾을 수 없습니다.");
-          setLoading(false);
-          return;
-        }
-
-        const { data: profileData, error: profileError } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("user_id", user.id)
-          .single();
-
-        if (profileError || !profileData) {
-          console.error("Error fetching profile:", profileError);
-          setError("프로필을 불러오는데 실패했습니다.");
-          setLoading(false);
-          return;
-        }
-
-        setProfile(profileData);
-
         if (
-          !profileData.emotional_stability_level ||
-          !profileData.attachment_type ||
-          !profileData.flexibility_level
+          !profile.emotional_stability_level ||
+          !profile.attachment_type ||
+          !profile.flexibility_level
         ) {
           setError("테스트 결과가 완전하지 않습니다.");
           setLoading(false);
@@ -61,9 +38,9 @@ export default function TestResult() {
         }
 
         console.log("Querying reports with:", {
-          level: profileData.emotional_stability_level,
-          type: profileData.attachment_type,
-          flexibility: profileData.flexibility_level,
+          level: profile.emotional_stability_level,
+          type: profile.attachment_type,
+          flexibility: profile.flexibility_level,
         });
 
         const [aasResult, flexibilityResult] = await Promise.all([
@@ -72,14 +49,14 @@ export default function TestResult() {
             .select("*")
             .eq(
               "emotional_stability_level",
-              profileData.emotional_stability_level
+              profile.emotional_stability_level
             )
-            .eq("type", profileData.attachment_type)
+            .eq("type", profile.attachment_type)
             .single(),
           supabase
             .from("report_flexibility")
             .select("*")
-            .eq("flexibility_level", profileData.flexibility_level)
+            .eq("flexibility_level", profile.flexibility_level)
             .single(),
         ]);
 
@@ -108,8 +85,8 @@ export default function TestResult() {
       }
     }
 
-    fetchResult();
-  }, []);
+    fetchReports();
+  }, [profile]);
 
   if (loading) {
     return (

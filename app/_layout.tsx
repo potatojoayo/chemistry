@@ -41,15 +41,15 @@ export default Sentry.wrap(function Layout() {
     ExtraBold: require("../assets/fonts/NotoSansKR-ExtraBold.ttf"),
   });
 
-  const { initialize } = useAuthStore();
+  const { init } = useAuthStore();
 
   useEffect(() => {
     if (loaded || error) SplashScreen.hideAsync();
   }, [loaded, error]);
 
   useEffect(() => {
-    initialize();
-  }, [initialize]);
+    init();
+  }, [init]);
 
   if (!loaded) return null; // 로딩 중에는 렌더하지 않음(스플래시 유지)j
 

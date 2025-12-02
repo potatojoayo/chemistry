@@ -7,6 +7,7 @@ export interface Profile {
   updated_at: string;
   test_index: number;
   test_completed: boolean;
+  gender: "male" | "female";
 
   // Big 5 Personality Traits
   openness: number | null;

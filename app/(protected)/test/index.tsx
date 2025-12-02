@@ -38,6 +38,7 @@ export default function TestPage() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [loading, setLoading] = useState(true);
+  const {fetchProfile} = useAuthStore();
 
   // AnimatedPageWrapper와 동일한 애니메이션
   const fadeAnim = useRef(new Animated.Value(0.5)).current;
@@ -247,7 +248,8 @@ export default function TestPage() {
     setLoading(true);
     try {
       await computeAndSaveProfileScores(profile.id);
-      router.replace("/(protected)/test/result");
+      await fetchProfile();
+      router.replace("/test/result");
     } catch (error) {
       console.error("Error computing and saving profile scores:", error);
       setLoading(false);

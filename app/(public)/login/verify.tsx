@@ -29,7 +29,7 @@ export default function Verify() {
   const [verified, setVerified] = useState(false);
   const inputRef = useRef<TextInput>(null);
 
-  const { profile, user, redirectPath, setRedirectPath } = useAuthStore();
+  const { profile, fetchProfile, user, redirectPath, setRedirectPath } = useAuthStore();
 
   // 카운트다운 타이머
   useEffect(() => {
@@ -61,6 +61,7 @@ export default function Verify() {
         setToken("");
         return;
       }
+      await fetchProfile();
       setVerified(true);
     };
     if (token.length === 6 && !loading) {

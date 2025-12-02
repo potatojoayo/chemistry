@@ -11,6 +11,8 @@ export interface Relationship {
   aas_level: number;
   big_5_score: number;
   big_5_level: number;
+  flexibility_score: number;
+  flexibility_level: number;
   passion_type_number: number;
   passion_index: number;
 }

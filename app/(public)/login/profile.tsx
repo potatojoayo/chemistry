@@ -14,6 +14,7 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
+import { Snackbar } from "react-native-paper";
 import Animated from "react-native-reanimated";
 
 export default function Profile() {
@@ -24,7 +25,11 @@ export default function Profile() {
   const [uploading, setUploading] = useState(false);
   const [success, setSuccess] = useState(false);
   const inputRef = useRef<TextInput>(null);
-  const { profile } = useAuthStore();
+  const { profile, fetchProfile } = useAuthStore();
+  const [gender, setGender] = useState<"male" | "female" | null>(null);
+  const [avatarMimeType, setAvatarMimeType] = useState<string | null>(null);
+  const [snackbarVisible, setSnackbarVisible] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -57,6 +62,7 @@ export default function Profile() {
       }
 
       setAvatarType(fileExt);
+      setAvatarMimeType(mimeType);
     }
   };
 
@@ -69,33 +75,38 @@ export default function Profile() {
       if (!user) return;
 
       const response = await fetch(uri);
-      const blob = await response.blob();
+      const arrayBuffer = await response.arrayBuffer();
 
       const fileName = `avatar.${avatarType || "png"}`;
       const filePath = `profiles/${user.id}/${fileName}`;
 
       const { error } = await supabase.storage
         .from("images")
-        .upload(filePath, blob, {
+        .upload(filePath, arrayBuffer, {
           upsert: true,
+          contentType: avatarMimeType || "image/png",
         });
 
       if (error) {
         console.error("Avatar upload error:", error);
-        return;
+        setSnackbarMessage("이미지 업로드 중 오류가 발생했습니다.");
+        setSnackbarVisible(true);
+        return null;
       }
 
       return filePath;
     } catch (error) {
       console.error("Avatar upload error:", error);
-      throw error;
+      setSnackbarMessage("이미지 업로드 중 오류가 발생했습니다.");
+      setSnackbarVisible(true);
+      return null;
     } finally {
       setUploading(false);
     }
   };
 
   const handleComplete = async () => {
-    if (loading || nickname.length < 2) return;
+    if (loading || nickname.length < 2 || !gender) return;
     setLoading(true);
 
     try {
@@ -109,6 +120,10 @@ export default function Profile() {
       let avatarPath = null;
       if (avatarUri) {
         avatarPath = await uploadAvatar(avatarUri);
+        if (!avatarPath) {
+          setLoading(false);
+          return;
+        }
       }
 
       // Supabase storage에서 public URL 가져오기
@@ -123,17 +138,23 @@ export default function Profile() {
       const { error } = await supabase.from("profiles").insert({
         user_id: user.id,
         nickname,
+        gender,
         avatar_url: avatarUrl ?? undefined,
       });
 
       if (error) {
         console.error("Profile creation error:", error);
+        setSnackbarMessage("프로필 생성 중 오류가 발생했습니다.");
+        setSnackbarVisible(true);
         return;
       }
 
+      await fetchProfile();
       setSuccess(true);
     } catch (error) {
       console.error("Profile creation error:", error);
+      setSnackbarMessage("알 수 없는 오류가 발생했습니다.");
+      setSnackbarVisible(true);
     } finally {
       setLoading(false);
     }
@@ -160,7 +181,7 @@ export default function Profile() {
 
               <Pressable
                 className="p-3 w-fit"
-                disabled={nickname.length < 2 || loading}
+                disabled={nickname.length < 2 || !gender || loading}
                 onPress={handleComplete}
               >
                 {loading ? (
@@ -168,7 +189,7 @@ export default function Profile() {
                 ) : (
                   <Text
                     className={`font-medium text-lg ${
-                      nickname.length >= 2
+                      nickname.length >= 2 && gender
                         ? "text-blue-500"
                         : "text-blue-500/50"
                     }`}
@@ -183,7 +204,7 @@ export default function Profile() {
                 프로필을 설정해주세요
               </Text>
               <Text className="mt-1 text-pastel-gray font-medium ">
-                언제든 바꿀 수 있어요
+                사진과 닉네임은 언제든 바꿀 수 있어요
               </Text>
 
               {/* Avatar */}
@@ -193,7 +214,7 @@ export default function Profile() {
                   disabled={uploading}
                   className="relative"
                 >
-                  <View className="w-24 h-24 rounded-full overflow-hidden border-2 border-pastel-gray">
+                  <View className="w-32 h-32 rounded-full overflow-hidden border-2 border-pastel-gray">
                     {avatarUri ? (
                       <Image
                         source={{ uri: avatarUri }}
@@ -218,12 +239,47 @@ export default function Profile() {
                   </View>
                 </Pressable>
               </View>
+              {/* Gender Selection */}
+              <View className="mt-12 flex-row gap-4">
+                <Pressable
+                  onPress={() => setGender("male")}
+                  className={`flex-1 py-4 rounded-2xl border-2 items-center justify-center ${
+                    gender === "male"
+                      ? "bg-blue-500/20 border-blue-500"
+                      : "border-white/10 bg-white/5"
+                  }`}
+                >
+                  <Text
+                    className={`text-lg font-semibold ${
+                      gender === "male" ? "text-blue-500" : "text-gray-400"
+                    }`}
+                  >
+                    남성
+                  </Text>
+                </Pressable>
+                <Pressable
+                  onPress={() => setGender("female")}
+                  className={`flex-1 py-4 rounded-2xl border-2 items-center justify-center ${
+                    gender === "female"
+                      ? "bg-red-500/20 border-red-500"
+                      : "border-white/10 bg-white/5"
+                  }`}
+                >
+                  <Text
+                    className={`text-lg font-semibold ${
+                      gender === "female" ? "text-red-500" : "text-gray-400"
+                    }`}
+                  >
+                    여성
+                  </Text>
+                </Pressable>
+              </View>
 
               <View className="mt-10">
                 <TextInput
                   ref={inputRef}
                   value={nickname}
-                  onChangeText={setNickname}
+                  onChangeText={(text) => setNickname(text.slice(0, 10))}
                   placeholder="닉네임"
                   style={{
                     fontSize: 32,
@@ -245,7 +301,11 @@ export default function Profile() {
                   selectionColor="#ECEEDF"
                   underlineColorAndroid="transparent"
                 />
+                <Text className="text-right text-pastel-gray mt-2">
+                  {nickname.length}/10
+                </Text>
               </View>
+
               <Animated.View
                 style={[
                   {
@@ -274,24 +334,27 @@ export default function Profile() {
           </View>
         </TouchableWithoutFeedback>
       </View>
-      {/* <Snackbar
+
+      <Snackbar
         visible={snackbarVisible}
         onDismiss={() => {
           setSnackbarVisible(false);
         }}
+        duration={3000}
+        style={{ backgroundColor: "#333" }}
       >
         <View className="flex flex-row items-center justify-between">
-          <Text className="text-foreground text-sm font-medium">
+          <Text className="text-white text-sm font-medium">
             {snackbarMessage}
           </Text>
           <Pressable
             onPress={() => setSnackbarVisible(false)}
-            className="bg-foreground rounded-full px-4 py-2"
+            className="bg-white/20 rounded-full px-3 py-1 ml-4"
           >
-            <Text className="text-background text-xs font-semibold">확인</Text>
+            <Text className="text-white text-xs font-semibold">확인</Text>
           </Pressable>
         </View>
-      </Snackbar> */}
+      </Snackbar>
     </AnimatedPageWrapper>
   );
 }
