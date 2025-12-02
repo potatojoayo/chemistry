@@ -40,45 +40,40 @@ function calculateChemistryIndex({
   male: Profile;
   female: Profile;
 }): ChemistryIndex {
-  // ----- 상수 (문서 기준) -----
-  const alpha = 0.5; // E 가중치
-  const beta = 0.2;  // B 가중치
-  const gamma = 0.3; // L 가중치
-  const kappa = 20;  // P_trap 가중치
-  const delta = 0.3; // B, L에서 차이 패널티
+  const alpha = 0.5;
+  const beta = 0.2;
+  const gamma = 0.3;
+  const kappa = 20;
+  const delta = 0.3;
 
-  // ===== 1) E: 애착 안정 지수 (AAS) =====
+  // ===== 1) E: 애착 안정 지수 =====
   const zAnxA = nz(male.z_anxiety, "z_anxiety(A)");
   const zAnxB = nz(female.z_anxiety, "z_anxiety(B)");
   const zAvoidA = nz(male.z_avoidance, "z_avoidance(A)");
   const zAvoidB = nz(female.z_avoidance, "z_avoidance(B)");
 
-  const zErcA = 0.57 * zAnxA + 0.15 * zAvoidA;
-  const zErcB = 0.57 * zAnxB + 0.15 * zAvoidB;
+  // 🔥 수정된 공식
+  const zErcA = 0.7 * zAnxA + 0.3 * zAvoidA;
+  const zErcB = 0.7 * zAnxB + 0.3 * zAvoidB;
 
   const phiErcA = phiPct(zErcA);
   const phiErcB = phiPct(zErcB);
-
   const avgErc = (phiErcA + phiErcB) / 2;
 
-  // 애착 함정 지표 P_trap
   const phiAnxA = phiPct(zAnxA);
   const phiAnxB = phiPct(zAnxB);
   const phiAvoidA = phiPct(zAvoidA);
   const phiAvoidB = phiPct(zAvoidB);
 
-  // percent(0~100) 기준 공식:
-  // P_trap = (Φ(AnxA)*Φ(AvoidB) + Φ(AnxB)*Φ(AvoidA)) / 10000
   const pTrap =
     (phiAnxA * phiAvoidB + phiAnxB * phiAvoidA) / 10000;
 
   let E = 100 - avgErc - kappa * pTrap;
   E = Math.max(0, Math.min(100, E));
-
   const aasScore = E;
   const aasLevel = scoreToLevel(aasScore);
 
-  // ===== 2) B: Big-5 성격성향 지수 =====
+  // ===== 2) B: Big-5 지수 =====
   const zAgreeA = nz(male.z_agreeableness, "z_agreeableness(A)");
   const zAgreeB = nz(female.z_agreeableness, "z_agreeableness(B)");
   const zConsA = nz(male.z_conscientiousness, "z_conscientiousness(A)");
@@ -88,14 +83,19 @@ function calculateChemistryIndex({
   const zOpenA = nz(male.z_openness, "z_openness(A)");
   const zOpenB = nz(female.z_openness, "z_openness(B)");
 
+  // 🔥 Anxiety → Neuroticism 으로 변경
+  const zNeuroA = nz(male.z_neuroticism, "z_neuroticism(A)");
+  const zNeuroB = nz(female.z_neuroticism, "z_neuroticism(B)");
+
   const zBigA =
-    -0.42 * zAnxA +
+    -0.42 * zNeuroA +
     0.37 * zAgreeA +
     0.3 * zConsA +
     0.08 * zExtraA +
     0.02 * zOpenA;
+
   const zBigB =
-    -0.42 * zAnxB +
+    -0.42 * zNeuroB +
     0.37 * zAgreeB +
     0.3 * zConsB +
     0.08 * zExtraB +
@@ -103,6 +103,7 @@ function calculateChemistryIndex({
 
   const phiBigA = phiPct(zBigA);
   const phiBigB = phiPct(zBigB);
+
   const avgBig = (phiBigA + phiBigB) / 2;
   const diffBig = Math.abs(phiBigA - phiBigB);
 
@@ -112,7 +113,7 @@ function calculateChemistryIndex({
   const big5Score = B;
   const big5Level = scoreToLevel(big5Score);
 
-  // ===== 3) L: 롱텀 성향(정서적 유연성) 지수 =====
+  // ===== 3) L: 정서적 유연성 =====
   const zConflictA = nz(male.z_conflict, "z_conflict(A)");
   const zConflictB = nz(female.z_conflict, "z_conflict(B)");
   const zHumorA = nz(male.z_humor, "z_humor(A)");
@@ -123,6 +124,7 @@ function calculateChemistryIndex({
 
   const phiLongA = phiPct(zLongA);
   const phiLongB = phiPct(zLongB);
+
   const avgLong = (phiLongA + phiLongB) / 2;
   const diffLong = Math.abs(phiLongA - phiLongB);
 
@@ -132,7 +134,7 @@ function calculateChemistryIndex({
   const flexibilityScore = L;
   const flexibilityLevel = scoreToLevel(flexibilityScore);
 
-  // ===== 4) 최종 Chemistry Index (LLUBB) =====
+  // ===== 4) Final =====
   const chemistryIndex = alpha * E + beta * B + gamma * L;
 
   return {

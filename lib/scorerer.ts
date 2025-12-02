@@ -281,13 +281,14 @@ export async function computeAndSaveProfileScores(profileId: string) {
     zAnx != null &&
     zAvoid != null &&
     zAgree != null &&
-    zOpen != null
+    zOpen != null &&
+    zNeuro != null
   ) {
     // Z_erc = 0.79 * Z_anx - 0.21 * Z_avoid
     const zErc = 0.79 * zAnx - 0.21 * zAvoid;
 
-    // Z_big = 0.44 * Z_anx - 0.31 * Z_agreeableness - 0.25 * Z_openness
-    const zBig = 0.44 * zAnx - 0.31 * zAgree - 0.25 * zOpen;
+    // Z_big = 0.44 * Z_neuroticism - 0.31 * Z_agreeableness - 0.25 * Z_openness
+    const zBig = 0.44 * zNeuro - 0.31 * zAgree - 0.25 * zOpen;
 
     // Relationship Passion Index = (0.5 * Phi(Z_erc) + 0.5 * Phi(Z_big)) * 100
     const phiErc = normalCdf(zErc);
