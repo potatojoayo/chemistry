@@ -1,0 +1,1 @@
+ALTER TABLE "report_passion" DROP COLUMN "emotional_flexibility_text";
