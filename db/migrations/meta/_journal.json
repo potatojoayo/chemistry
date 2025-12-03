@@ -57,6 +57,13 @@
       "when": 1764769582487,
       "tag": "0007_lucky_calypso",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1764770338713,
+      "tag": "0008_wonderful_micromacro",
+      "breakpoints": true
     }
   ]
 }

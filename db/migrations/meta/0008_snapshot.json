@@ -1,0 +1,1285 @@
+{
+  "id": "e5bd19e4-687d-47d3-aa01-6150392e58a7",
+  "prevId": "052be607-6283-4cda-bb80-92efe91c9527",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.answers": {
+      "name": "answers",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "profile_id": {
+          "name": "profile_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "question_id": {
+          "name": "question_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "answer": {
+          "name": "answer",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "answers_profile_id_profiles_id_fk": {
+          "name": "answers_profile_id_profiles_id_fk",
+          "tableFrom": "answers",
+          "tableTo": "profiles",
+          "columnsFrom": [
+            "profile_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "answers_question_id_questions_id_fk": {
+          "name": "answers_question_id_questions_id_fk",
+          "tableFrom": "answers",
+          "tableTo": "questions",
+          "columnsFrom": [
+            "question_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "answers_profile_id_question_id_key": {
+          "name": "answers_profile_id_question_id_key",
+          "nullsNotDistinct": false,
+          "columns": [
+            "profile_id",
+            "question_id"
+          ]
+        }
+      },
+      "policies": {
+        "users can manage their own answers": {
+          "name": "users can manage their own answers",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "authenticated"
+          ],
+          "using": "profile_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())",
+          "withCheck": "profile_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.profiles": {
+      "name": "profiles",
+      "schema": "",
+      "columns": {
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nickname": {
+          "name": "nickname",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "avatar_url": {
+          "name": "avatar_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'https://bsqlysekyircziilazvv.supabase.co/storage/v1/object/public/images/profiles/default-avatar.png'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "test_index": {
+          "name": "test_index",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "openness": {
+          "name": "openness",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "conscientiousness": {
+          "name": "conscientiousness",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "extraversion": {
+          "name": "extraversion",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "agreeableness": {
+          "name": "agreeableness",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "neuroticism": {
+          "name": "neuroticism",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "avoidance": {
+          "name": "avoidance",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "anxiety": {
+          "name": "anxiety",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "humor": {
+          "name": "humor",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "conflict": {
+          "name": "conflict",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "z_openness": {
+          "name": "z_openness",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "z_conscientiousness": {
+          "name": "z_conscientiousness",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "z_extraversion": {
+          "name": "z_extraversion",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "z_agreeableness": {
+          "name": "z_agreeableness",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "z_neuroticism": {
+          "name": "z_neuroticism",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "z_avoidance": {
+          "name": "z_avoidance",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "z_anxiety": {
+          "name": "z_anxiety",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "z_humor": {
+          "name": "z_humor",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "z_conflict": {
+          "name": "z_conflict",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "test_completed": {
+          "name": "test_completed",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "emotional_flexibility_percentage": {
+          "name": "emotional_flexibility_percentage",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "big_5_type": {
+          "name": "big_5_type",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "flexibility_percentage": {
+          "name": "flexibility_percentage",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "emotional_flexibility_level": {
+          "name": "emotional_flexibility_level",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "attachment_type": {
+          "name": "attachment_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "flexibility_level": {
+          "name": "flexibility_level",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "passion_level": {
+          "name": "passion_level",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "passion_type": {
+          "name": "passion_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "passion_index": {
+          "name": "passion_index",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gender": {
+          "name": "gender",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "profiles_user_id_users_id_fk": {
+          "name": "profiles_user_id_users_id_fk",
+          "tableFrom": "profiles",
+          "tableTo": "users",
+          "schemaTo": "auth",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "authenticated can view all profiles": {
+          "name": "authenticated can view all profiles",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "authenticated"
+          ],
+          "using": "true"
+        },
+        "users can insert their own profile": {
+          "name": "users can insert their own profile",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "authenticated"
+          ],
+          "withCheck": "user_id = auth.uid()"
+        },
+        "users can update their own profile": {
+          "name": "users can update their own profile",
+          "as": "PERMISSIVE",
+          "for": "UPDATE",
+          "to": [
+            "authenticated"
+          ],
+          "using": "user_id = auth.uid()",
+          "withCheck": "user_id = auth.uid()"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.questions": {
+      "name": "questions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "test_id": {
+          "name": "test_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'gen_random_uuid()'"
+        },
+        "domain": {
+          "name": "domain",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "content": {
+          "name": "content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "selection_count": {
+          "name": "selection_count",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 5
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "index": {
+          "name": "index",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "questions_test_id_tests_id_fk": {
+          "name": "questions_test_id_tests_id_fk",
+          "tableFrom": "questions",
+          "tableTo": "tests",
+          "columnsFrom": [
+            "test_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "public_read_access": {
+          "name": "public_read_access",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "true"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "public.relationships": {
+      "name": "relationships",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "inviter_profile_id": {
+          "name": "inviter_profile_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "invitee_profile_id": {
+          "name": "invitee_profile_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "relationship_type": {
+          "name": "relationship_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "tikitaka_index": {
+          "name": "tikitaka_index",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "chemistry_index": {
+          "name": "chemistry_index",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "aas_score": {
+          "name": "aas_score",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "aas_level": {
+          "name": "aas_level",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "big_5_score": {
+          "name": "big_5_score",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "big_5_level": {
+          "name": "big_5_level",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "passion_type_number": {
+          "name": "passion_type_number",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "passion_index": {
+          "name": "passion_index",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "flexibility_score": {
+          "name": "flexibility_score",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "flexibility_level": {
+          "name": "flexibility_level",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "idx_relations_requester": {
+          "name": "idx_relations_requester",
+          "columns": [
+            {
+              "expression": "inviter_profile_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_relations_target": {
+          "name": "idx_relations_target",
+          "columns": [
+            {
+              "expression": "invitee_profile_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "relationships_inviter_profile_id_profiles_id_fk": {
+          "name": "relationships_inviter_profile_id_profiles_id_fk",
+          "tableFrom": "relationships",
+          "tableTo": "profiles",
+          "columnsFrom": [
+            "inviter_profile_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "relationships_invitee_profile_id_profiles_id_fk": {
+          "name": "relationships_invitee_profile_id_profiles_id_fk",
+          "tableFrom": "relationships",
+          "tableTo": "profiles",
+          "columnsFrom": [
+            "invitee_profile_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "uq_relation_pair": {
+          "name": "uq_relation_pair",
+          "nullsNotDistinct": false,
+          "columns": [
+            "inviter_profile_id",
+            "invitee_profile_id"
+          ]
+        }
+      },
+      "policies": {
+        "users can manage their own relationships": {
+          "name": "users can manage their own relationships",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "authenticated"
+          ],
+          "using": "inviter_profile_id IN (SELECT id FROM profiles WHERE user_id = auth.uid()) OR invitee_profile_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())",
+          "withCheck": "inviter_profile_id IN (SELECT id FROM profiles WHERE user_id = auth.uid()) OR invitee_profile_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.report_aas": {
+      "name": "report_aas",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type_text": {
+          "name": "type_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "emotional_flexibility_level": {
+          "name": "emotional_flexibility_level",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "overall_evaluation": {
+          "name": "overall_evaluation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "detail_evaluations": {
+          "name": "detail_evaluations",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "counseling_text": {
+          "name": "counseling_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "emotional_flexibility_text": {
+          "name": "emotional_flexibility_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sequence": {
+          "name": "sequence",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "public_read_access": {
+          "name": "public_read_access",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "true"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.report_big_5": {
+      "name": "report_big_5",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "big_5_type": {
+          "name": "big_5_type",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sequence": {
+          "name": "sequence",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nickname": {
+          "name": "nickname",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "overall_evaluation": {
+          "name": "overall_evaluation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "detail_evaluations": {
+          "name": "detail_evaluations",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "counseling_text": {
+          "name": "counseling_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "report_big_5_big_5_type_key": {
+          "name": "report_big_5_big_5_type_key",
+          "nullsNotDistinct": false,
+          "columns": [
+            "big_5_type"
+          ]
+        }
+      },
+      "policies": {
+        "public_read_access": {
+          "name": "public_read_access",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "true"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.report_chemistry": {
+      "name": "report_chemistry",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "aas_level": {
+          "name": "aas_level",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "big_5_level": {
+          "name": "big_5_level",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "flexibility_level": {
+          "name": "flexibility_level",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "overall_evaluation": {
+          "name": "overall_evaluation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "detail_evaluations": {
+          "name": "detail_evaluations",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "counseling_text": {
+          "name": "counseling_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "emotional_flexibility_text": {
+          "name": "emotional_flexibility_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sequence": {
+          "name": "sequence",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "public_read_access": {
+          "name": "public_read_access",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "true"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.report_flexibility": {
+      "name": "report_flexibility",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "flexibility_level": {
+          "name": "flexibility_level",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "flexibility_label": {
+          "name": "flexibility_label",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "overall_evaluation": {
+          "name": "overall_evaluation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "detail_evaluation": {
+          "name": "detail_evaluation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "counseling_text": {
+          "name": "counseling_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "public_read_access": {
+          "name": "public_read_access",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "true"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.report_passion": {
+      "name": "report_passion",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "male_passion_level": {
+          "name": "male_passion_level",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "female_passion_level": {
+          "name": "female_passion_level",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "male_passion_type": {
+          "name": "male_passion_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "female_passion_type": {
+          "name": "female_passion_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "overall_evaluation": {
+          "name": "overall_evaluation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "detail_evaluations": {
+          "name": "detail_evaluations",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "counseling_text": {
+          "name": "counseling_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "emotional_flexibility_text": {
+          "name": "emotional_flexibility_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sequence": {
+          "name": "sequence",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type_number": {
+          "name": "type_number",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "public_read_access": {
+          "name": "public_read_access",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "true"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.report_tikitaka": {
+      "name": "report_tikitaka",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "min_index": {
+          "name": "min_index",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "max_index": {
+          "name": "max_index",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "overall_evaluation": {
+          "name": "overall_evaluation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "detail_evaluations": {
+          "name": "detail_evaluations",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "counseling_text": {
+          "name": "counseling_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sequence": {
+          "name": "sequence",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "public_read_access": {
+          "name": "public_read_access",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "true"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.tests": {
+      "name": "tests",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "public can view tests": {
+          "name": "public can view tests",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "public"
+          ],
+          "using": "true"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

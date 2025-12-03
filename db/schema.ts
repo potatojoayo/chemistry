@@ -2,7 +2,6 @@ import { sql } from "drizzle-orm";
 import {
   bigint,
   boolean,
-  doublePrecision,
   index,
   integer,
   pgPolicy,
@@ -352,7 +351,6 @@ export const reportPassion = pgTable(
       withTimezone: true,
       mode: "string",
     }).defaultNow(),
-    emotional_flexibility_text: text("emotional_flexibility_text").notNull(),
     title: text("title").notNull(),
     sequence: smallint("sequence").notNull(),
     type_number: smallint("type_number").notNull(),
@@ -370,10 +368,16 @@ export const reportTikitaka = pgTable(
   "report_tikitaka",
   {
     id: uuid("id").defaultRandom().primaryKey().notNull(),
-    tikitaka_index: doublePrecision("tikitaka_index").notNull(),
+
+    // 🔥 Tikitaka 점수 범위
+    min_index: integer("min_index").notNull(),
+    max_index: integer("max_index").notNull(),
+
+    // 🔥 텍스트 필드들
     overall_evaluation: text("overall_evaluation").notNull(),
     detail_evaluations: text("detail_evaluations").notNull(),
     counseling_text: text("counseling_text").notNull(),
+
     created_at: timestamp("created_at", { withTimezone: true, mode: "string" })
       .defaultNow()
       .notNull(),
@@ -381,6 +385,8 @@ export const reportTikitaka = pgTable(
       withTimezone: true,
       mode: "string",
     }).defaultNow(),
+
+    // UI 용 메타데이터
     title: text("title").notNull(),
     sequence: smallint("sequence").notNull(),
   },
