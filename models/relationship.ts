@@ -1,7 +1,7 @@
 export interface Relationship {
   id: string;
-  inviting_profile_id: string;
-  invited_profile_id: string;
+  inviter_profile_id: string;
+  invitee_profile_id: string;
   relationship_type: "couple" | "friend";
   created_at: string;
   updated_at: string;

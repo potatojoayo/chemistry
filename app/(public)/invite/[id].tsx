@@ -65,11 +65,7 @@ export default function Test() {
     }
   }, [profile, requesterProfile]);
 
-  const {
-    setInvitedProfileId,
-    setRedirectPath: setInvitationRedirectPath,
-    clearInvitation,
-  } = useInvitationStore();
+  const { setInviterProfileId, clearInvitation } = useInvitationStore();
 
   const handleStartTest = async () => {
     if (existingRelationship) {
@@ -85,8 +81,6 @@ export default function Test() {
     }
 
     if (!profile) {
-      setInvitationRedirectPath("/invite/" + id);
-      setInvitedProfileId(id as string);
       router.push("/login");
       return;
     }
@@ -123,7 +117,7 @@ export default function Test() {
       return;
     }
 
-    setInvitedProfileId(id as string);
+    setInviterProfileId(id as string);
     router.push(`/test/intro`);
   };
 

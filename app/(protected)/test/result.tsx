@@ -23,29 +23,29 @@ export default function TestResult() {
   const [flexibilityReport, setFlexibilityReport] =
     useState<ReportFlexibility | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const { invitedProfileId, clearInvitation } = useInvitationStore();
-  const [invitedProfile, setInvitedProfile] = useState<Profile | null>(null);
+  const { inviterProfileId, clearInvitation } = useInvitationStore();
+  const [inviterProfile, setInviterProfile] = useState<Profile | null>(null);
   const { authRedirectPath, setAuthRedirectPath } = useAuthStore();
 
   useEffect(() => {
-    if (invitedProfileId) {
+    if (inviterProfileId) {
       supabase
         .from("profiles")
         .select("*")
-        .eq("id", invitedProfileId)
+        .eq("id", inviterProfileId)
         .single()
         .then(({ data }) => {
           if (data) {
-            setInvitedProfile(data);
+            setInviterProfile(data);
           }
         });
     }
-  }, [invitedProfileId]);
+  }, [inviterProfileId]);
 
   const handleClickNext = () => {
-    if (invitedProfile) {
+    if (inviterProfile) {
       clearInvitation();
-      router.push("/");
+      router.push("/test/chemistry");
     } else {
       if (authRedirectPath) {
         router.push(authRedirectPath as RelativePathString);
@@ -186,8 +186,8 @@ export default function TestResult() {
             onPress={handleClickNext}
           >
             <Text className="text-background font-semibold text-base">
-              {invitedProfile
-                ? `${invitedProfile.nickname}님과의 케미스트리 확인하기`
+              {inviterProfile
+                ? `${inviterProfile.nickname}님과의 케미스트리 확인하기`
                 : "시작하기"}
             </Text>
           </TouchableOpacity>

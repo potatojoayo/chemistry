@@ -3,9 +3,9 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { getWebStorage } from "./get-web-storage";
 
 interface InvitationState {
-  invitedProfileId: string | null;
+  inviterProfileId: string | null;
   redirectPath: string | null;
-  setInvitedProfileId: (id: string | null) => void;
+  setInviterProfileId: (id: string | null) => void;
   setRedirectPath: (path: string | null) => void;
   clearInvitation: () => void;
 }
@@ -13,12 +13,12 @@ interface InvitationState {
 export const useInvitationStore = create<InvitationState>()(
   persist(
     (set) => ({
-      invitedProfileId: null,
+      inviterProfileId: null,
       redirectPath: null,
-      setInvitedProfileId: (id) => set({ invitedProfileId: id }),
+      setInviterProfileId: (id) => set({ inviterProfileId: id }),
       setRedirectPath: (path) => set({ redirectPath: path }),
       clearInvitation: () =>
-        set({ invitedProfileId: null, redirectPath: null }),
+        set({ inviterProfileId: null, redirectPath: null }),
     }),
     {
       name: "invitation-store",

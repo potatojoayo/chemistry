@@ -245,23 +245,23 @@ export default function TestPage() {
     setPendingValue(null);
   };
 
-  const { invitedProfileId } = useInvitationStore();
-  const [, setInvitedProfile] = useState<Profile | null>(null);
+  const { inviterProfileId } = useInvitationStore();
+  const [, setInviterProfile] = useState<Profile | null>(null);
 
   useEffect(() => {
-    if (invitedProfileId) {
+    if (inviterProfileId) {
       supabase
         .from("profiles")
         .select("*")
-        .eq("id", invitedProfileId)
+        .eq("id", inviterProfileId)
         .single()
         .then(({ data }) => {
           if (data) {
-            setInvitedProfile(data);
+            setInviterProfile(data);
           }
         });
     }
-  }, [invitedProfileId]);
+  }, [inviterProfileId]);
 
   const handleCompleteTest = async () => {
     if (loading) return;
@@ -274,11 +274,11 @@ export default function TestPage() {
       const updatedProfile = useAuthStore.getState().profile;
       if (!updatedProfile) return; // Keep this check
 
-      if (invitedProfileId) {
+      if (inviterProfileId) {
         const { data: inviter } = await supabase
           .from("profiles")
           .select("*")
-          .eq("id", invitedProfileId)
+          .eq("id", inviterProfileId)
           .single();
 
         if (inviter) {
