@@ -2,7 +2,6 @@ import AnimatedPageWrapper from "@/components/common/animated-page-wrapper";
 import { useAuthStore } from "@/stores/auth-store";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { useEffect } from "react";
 import {
   Image,
   Pressable,
@@ -14,15 +13,13 @@ import {
 import Animated from "react-native-reanimated";
 
 export default function Test() {
-  const { profile, signOut } = useAuthStore();
-
-  useEffect(() => {
-    if (profile?.test_completed) {
-      router.push("/(protected)/(app)");
-    }
-  }, [profile]);
+  const { signOut, profile } = useAuthStore();
 
   const handleStartTest = () => {
+    if (profile?.test_completed) {
+      router.push("/");
+      return;
+    }
     router.push(`/test`);
   };
 

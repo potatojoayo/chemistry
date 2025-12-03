@@ -1,6 +1,5 @@
 import AnimatedPageWrapper from "@/components/common/animated-page-wrapper";
 import ReportCard from "@/components/test/report-card";
-import { createRelationship } from "@/lib/create-relationship";
 import { supabase } from "@/lib/supabase";
 import { Profile } from "@/models/profile";
 import { ReportAAS } from "@/models/report_aas";
@@ -26,7 +25,6 @@ export default function TestResult() {
   const [error, setError] = useState<string | null>(null);
   const { invitedProfileId, clearInvitation } = useInvitationStore();
   const [invitedProfile, setInvitedProfile] = useState<Profile | null>(null);
-  const [creatingRelationship, setCreatingRelationship] = useState(false);
   const { authRedirectPath, setAuthRedirectPath } = useAuthStore();
 
   useEffect(() => {
@@ -46,7 +44,8 @@ export default function TestResult() {
 
   const handleClickNext = () => {
     if (invitedProfile) {
-      handleCreateRelationship();
+      clearInvitation();
+      router.push("/");
     } else {
       if (authRedirectPath) {
         router.push(authRedirectPath as RelativePathString);
@@ -55,36 +54,6 @@ export default function TestResult() {
       }
       router.push("/");
     }
-  };
-
-  const handleCreateRelationship = async () => {
-    if (!profile || !invitedProfile) return;
-    setCreatingRelationship(true);
-
-    let male = invitedProfile;
-    let female = profile;
-
-    if (invitedProfile.gender === "female" && profile.gender === "male") {
-      male = profile;
-      female = invitedProfile;
-    } else if (
-      invitedProfile.gender === "male" &&
-      profile.gender === "female"
-    ) {
-      male = invitedProfile;
-      female = profile;
-    } else {
-      // Should not happen if filtered correctly before, but safe fallback
-      setCreatingRelationship(false);
-      return;
-    }
-
-    await createRelationship({
-      male,
-      female,
-    });
-    clearInvitation();
-    router.push("/");
   };
 
   useEffect(() => {
@@ -216,15 +185,11 @@ export default function TestResult() {
             activeOpacity={0.8}
             onPress={handleClickNext}
           >
-            {creatingRelationship ? (
-              <ActivityIndicator color="#222" />
-            ) : (
-              <Text className="text-background font-semibold text-base">
-                {invitedProfile
-                  ? `${invitedProfile.nickname}님과의 케미스트리 확인하기`
-                  : "시작하기"}
-              </Text>
-            )}
+            <Text className="text-background font-semibold text-base">
+              {invitedProfile
+                ? `${invitedProfile.nickname}님과의 케미스트리 확인하기`
+                : "시작하기"}
+            </Text>
           </TouchableOpacity>
         </ScrollView>
       </View>

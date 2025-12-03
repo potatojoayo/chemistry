@@ -245,8 +245,8 @@ export default function TestPage() {
     setPendingValue(null);
   };
 
-  const { invitedProfileId, clearInvitation } = useInvitationStore();
-  const [invitedProfile, setInvitedProfile] = useState<Profile | null>(null);
+  const { invitedProfileId } = useInvitationStore();
+  const [, setInvitedProfile] = useState<Profile | null>(null);
 
   useEffect(() => {
     if (invitedProfileId) {
@@ -272,7 +272,7 @@ export default function TestPage() {
       await fetchProfile();
 
       const updatedProfile = useAuthStore.getState().profile;
-      if (!updatedProfile) return;
+      if (!updatedProfile) return; // Keep this check
 
       if (invitedProfileId) {
         const { data: inviter } = await supabase
