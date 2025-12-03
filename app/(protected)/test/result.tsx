@@ -1,10 +1,13 @@
 import AnimatedPageWrapper from "@/components/common/animated-page-wrapper";
 import ReportCard from "@/components/test/report-card";
+import { createRelationship } from "@/lib/create-relationship";
 import { supabase } from "@/lib/supabase";
+import { Profile } from "@/models/profile";
 import { ReportAAS } from "@/models/report_aas";
 import { ReportFlexibility } from "@/models/report_flexibility";
 import { useAuthStore } from "@/stores/auth-store";
-import { router } from "expo-router";
+import { useInvitationStore } from "@/stores/invitation-store";
+import { RelativePathString, router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -21,6 +24,68 @@ export default function TestResult() {
   const [flexibilityReport, setFlexibilityReport] =
     useState<ReportFlexibility | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const { invitedProfileId, clearInvitation } = useInvitationStore();
+  const [invitedProfile, setInvitedProfile] = useState<Profile | null>(null);
+  const [creatingRelationship, setCreatingRelationship] = useState(false);
+  const { authRedirectPath, setAuthRedirectPath } = useAuthStore();
+
+  useEffect(() => {
+    if (invitedProfileId) {
+      supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", invitedProfileId)
+        .single()
+        .then(({ data }) => {
+          if (data) {
+            setInvitedProfile(data);
+          }
+        });
+    }
+  }, [invitedProfileId]);
+
+  const handleClickNext = () => {
+    if (invitedProfile) {
+      handleCreateRelationship();
+    } else {
+      if (authRedirectPath) {
+        router.push(authRedirectPath as RelativePathString);
+        setAuthRedirectPath(null);
+        return;
+      }
+      router.push("/");
+    }
+  };
+
+  const handleCreateRelationship = async () => {
+    if (!profile || !invitedProfile) return;
+    setCreatingRelationship(true);
+
+    let male = invitedProfile;
+    let female = profile;
+
+    if (invitedProfile.gender === "female" && profile.gender === "male") {
+      male = profile;
+      female = invitedProfile;
+    } else if (
+      invitedProfile.gender === "male" &&
+      profile.gender === "female"
+    ) {
+      male = invitedProfile;
+      female = profile;
+    } else {
+      // Should not happen if filtered correctly before, but safe fallback
+      setCreatingRelationship(false);
+      return;
+    }
+
+    await createRelationship({
+      male,
+      female,
+    });
+    clearInvitation();
+    router.push("/");
+  };
 
   useEffect(() => {
     async function fetchReports() {
@@ -47,10 +112,7 @@ export default function TestResult() {
           supabase
             .from("report_aas")
             .select("*")
-            .eq(
-              "emotional_stability_level",
-              profile.emotional_stability_level
-            )
+            .eq("emotional_stability_level", profile.emotional_stability_level)
             .eq("type", profile.attachment_type)
             .single(),
           supabase
@@ -99,7 +161,9 @@ export default function TestResult() {
   if (error || !report || !flexibilityReport) {
     return (
       <View className="flex-1 justify-center items-center bg-background">
-        <Text className="text-foreground">{error || "보고서를 찾을 수 없습니다."}</Text>
+        <Text className="text-foreground">
+          {error || "보고서를 찾을 수 없습니다."}
+        </Text>
         <TouchableOpacity
           className="mt-4 bg-foreground px-6 py-3 rounded-full"
           onPress={() => router.back()}
@@ -140,7 +204,7 @@ export default function TestResult() {
             test="정서적 유연성"
             title={flexibilityReport.title}
             badges={[
-             "유연성: " + profile?.flexibility_percentage?.toFixed(1) +'%',
+              "유연성: " + profile?.flexibility_percentage?.toFixed(1) + "%",
             ]}
             overallEvaluation={flexibilityReport.overall_evaluation}
             detailEvaluations={flexibilityReport.detail_evaluation}
@@ -150,11 +214,17 @@ export default function TestResult() {
           <TouchableOpacity
             className="w-full bg-foreground h-14 rounded-full items-center justify-center mt-4"
             activeOpacity={0.8}
-            onPress={() => router.push('/')}
+            onPress={handleClickNext}
           >
-            <Text className="text-background font-semibold text-base">
-              시작하기
-            </Text>
+            {creatingRelationship ? (
+              <ActivityIndicator color="#222" />
+            ) : (
+              <Text className="text-background font-semibold text-base">
+                {invitedProfile
+                  ? `${invitedProfile.nickname}님과의 케미스트리 확인하기`
+                  : "시작하기"}
+              </Text>
+            )}
           </TouchableOpacity>
         </ScrollView>
       </View>

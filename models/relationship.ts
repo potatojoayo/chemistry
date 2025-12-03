@@ -2,7 +2,7 @@ export interface Relationship {
   id: string;
   inviting_profile_id: string;
   invited_profile_id: string;
-  relation_type: "couple" | "friend";
+  relationship_type: "couple" | "friend";
   created_at: string;
   updated_at: string;
   tikitaka_index: number;
@@ -17,4 +17,5 @@ export interface Relationship {
   passion_index: number;
 }
 
-export interface NewRelationship extends Omit<Relationship, "id" | "created_at" | "updated_at"> {}  
+export interface NewRelationship
+  extends Omit<Relationship, "id" | "created_at" | "updated_at"> {}

@@ -3,6 +3,7 @@ import { createRelationship } from "@/lib/create-relationship";
 import { supabase } from "@/lib/supabase";
 import { Profile } from "@/models/profile";
 import { useAuthStore } from "@/stores/auth-store";
+import { useInvitationStore } from "@/stores/invitation-store";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -22,9 +23,10 @@ export default function Test() {
   const [requesterProfile, setRequesterProfile] = useState<Profile | null>(
     null
   );
+  const { setRedirectPath } = useInvitationStore();
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const { profile, setRedirectPath } = useAuthStore();
+  const { profile } = useAuthStore();
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -44,7 +46,37 @@ export default function Test() {
     }
   }, [id]);
 
+  const [existingRelationship, setExistingRelationship] = useState(false);
+
+  useEffect(() => {
+    if (profile && requesterProfile) {
+      supabase
+        .from("relationships")
+        .select("*")
+        .or(
+          `and(inviting_profile_id.eq.${profile.id},invited_profile_id.eq.${requesterProfile.id}),and(inviting_profile_id.eq.${requesterProfile.id},invited_profile_id.eq.${profile.id})`
+        )
+        .maybeSingle()
+        .then(({ data }) => {
+          if (data) {
+            setExistingRelationship(true);
+          }
+        });
+    }
+  }, [profile, requesterProfile]);
+
+  const {
+    setInvitedProfileId,
+    setRedirectPath: setInvitationRedirectPath,
+    clearInvitation,
+  } = useInvitationStore();
+
   const handleStartTest = async () => {
+    if (existingRelationship) {
+      setRedirectPath(null);
+      router.push("/");
+      return;
+    }
     if (loading) return;
     if (!requesterProfile) {
       setSnackbarMessage("초대자 정보를 찾을 수 없습니다.");
@@ -53,23 +85,45 @@ export default function Test() {
     }
 
     if (!profile) {
-      setRedirectPath("/invite/" + id);
+      setInvitationRedirectPath("/invite/" + id);
+      setInvitedProfileId(id as string);
       router.push("/login");
       return;
     }
 
-
-
     if (profile.test_completed) {
-    setLoading(true);
-    await createRelationship({
-      invitingProfile: requesterProfile,
-      invitedProfile: profile,
-    })
+      setLoading(true);
+
+      let male = requesterProfile;
+      let female = profile;
+
+      if (requesterProfile.gender === "female" && profile.gender === "male") {
+        male = profile;
+        female = requesterProfile;
+      } else if (
+        requesterProfile.gender === "male" &&
+        profile.gender === "female"
+      ) {
+        male = requesterProfile;
+        female = profile;
+      } else {
+        setSnackbarMessage("현재 케미스트리 분석은 이성 커플만 지원해요.");
+        setSnackbarVisible(true);
+        setLoading(false);
+        return;
+      }
+
+      await createRelationship({
+        male,
+        female,
+      });
+      clearInvitation();
+      setRedirectPath(null);
       router.push(`/`);
       return;
     }
 
+    setInvitedProfileId(id as string);
     router.push(`/test/intro`);
   };
 
@@ -103,22 +157,32 @@ export default function Test() {
               <Image
                 source={{ uri: requesterProfile.avatar_url }}
                 style={{
-                  width: 80,
-                  height: 80,
+                  width: 96,
+                  height: 96,
                   borderRadius: 100,
                   marginHorizontal: "auto",
                   marginTop: "auto",
                 }}
               />
               <Text className="text-foreground text-2xl font-semibold mt-6 text-center">
-                {requesterProfile.nickname} 님이 당신과의 케미를
-                <br />
-                알고 싶어해요 ❤️
+                {existingRelationship
+                  ? `이미 ${requesterProfile.nickname} 님과의\n케미를 알아봤어요️`
+                  : `${requesterProfile.nickname} 님이 당신과의 케미를\n알고 싶어해요 ❤️`}
               </Text>
               <Text className="mt-3 text-foreground/50 font-medium leading-5 text-center text-[13px]">
-                두 사람 사이에 어떤 끌림이 숨겨져 있을까요?
-                <br />
-                그동안 잘 몰랐던 서로의 마음을 가까이 느낄 수 있을 거예요.
+                {existingRelationship ? (
+                  <>
+                    두 분의 소중한 결과가 기다리고 있어요.
+                    <br />
+                    다시 결과를 확인하러 가볼까요?
+                  </>
+                ) : (
+                  <>
+                    두 사람 사이에 어떤 끌림이 숨겨져 있을까요?
+                    <br />
+                    그동안 잘 몰랐던 서로의 마음을 가까이 느낄 수 있을 거예요.
+                  </>
+                )}
               </Text>
 
               <Animated.View
@@ -133,7 +197,11 @@ export default function Test() {
                 <TouchableOpacity
                   className={`bg-foreground rounded-full h-14 items-center justify-center`}
                   activeOpacity={0.7}
-                  onPress={handleStartTest}
+                  onPress={
+                    existingRelationship
+                      ? () => router.push("/")
+                      : handleStartTest
+                  }
                 >
                   {loading ? (
                     <ActivityIndicator color="#222" />

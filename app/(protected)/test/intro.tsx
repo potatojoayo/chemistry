@@ -14,7 +14,7 @@ import {
 import Animated from "react-native-reanimated";
 
 export default function Test() {
-  const { profile } = useAuthStore();
+  const { profile, signOut } = useAuthStore();
 
   useEffect(() => {
     if (profile?.test_completed) {
@@ -39,10 +39,7 @@ export default function Test() {
                   resizeMode="contain"
                 /> */}
               </View>
-              <Pressable
-                onPress={() => router.replace("/login")}
-                className="p-3 w-fit"
-              >
+              <Pressable onPress={signOut} className="p-3 w-fit">
                 <FontAwesome6
                   name="arrow-right-from-bracket"
                   size={20}

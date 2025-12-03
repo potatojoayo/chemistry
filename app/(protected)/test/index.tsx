@@ -1,9 +1,12 @@
 import AnimatedPageWrapper from "@/components/common/animated-page-wrapper";
+import { createRelationship } from "@/lib/create-relationship";
 import { computeAndSaveProfileScores } from "@/lib/scorerer";
 import { supabase } from "@/lib/supabase";
 import { Answer } from "@/models/answer";
+import { Profile } from "@/models/profile";
 import { Question } from "@/models/question";
 import { useAuthStore } from "@/stores/auth-store";
+import { useInvitationStore } from "@/stores/invitation-store";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { router } from "expo-router";
@@ -38,7 +41,7 @@ export default function TestPage() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [loading, setLoading] = useState(true);
-  const {fetchProfile} = useAuthStore();
+  const { fetchProfile } = useAuthStore();
 
   // AnimatedPageWrapper와 동일한 애니메이션
   const fadeAnim = useRef(new Animated.Value(0.5)).current;
@@ -242,6 +245,24 @@ export default function TestPage() {
     setPendingValue(null);
   };
 
+  const { invitedProfileId, clearInvitation } = useInvitationStore();
+  const [invitedProfile, setInvitedProfile] = useState<Profile | null>(null);
+
+  useEffect(() => {
+    if (invitedProfileId) {
+      supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", invitedProfileId)
+        .single()
+        .then(({ data }) => {
+          if (data) {
+            setInvitedProfile(data);
+          }
+        });
+    }
+  }, [invitedProfileId]);
+
   const handleCompleteTest = async () => {
     if (loading) return;
     if (!profile?.id) return;
@@ -249,6 +270,41 @@ export default function TestPage() {
     try {
       await computeAndSaveProfileScores(profile.id);
       await fetchProfile();
+
+      if (invitedProfileId) {
+        const { data: inviter } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", invitedProfileId)
+          .single();
+
+        if (inviter) {
+          let male = inviter;
+          let female = profile;
+
+          if (inviter.gender === "female" && profile.gender === "male") {
+            male = profile;
+            female = inviter;
+          } else if (inviter.gender === "male" && profile.gender === "female") {
+            male = inviter;
+            female = profile;
+          } else {
+            // Same gender or invalid, skip relationship creation but still show result
+            // or maybe show error? User didn't specify.
+            // For now, just proceed to result.
+          }
+
+          // Only create if we have a valid male/female pair (or if we decided to support same-gender in future, but current logic is strict)
+          if (male.gender !== female.gender) {
+            await createRelationship({ male, female });
+            router.replace("/");
+
+            clearInvitation();
+            return;
+          }
+        }
+      }
+
       router.replace("/test/result");
     } catch (error) {
       console.error("Error computing and saving profile scores:", error);
@@ -328,9 +384,10 @@ export default function TestPage() {
                       테스트 완료!
                     </Text>
                     <Text className="mt-3 text-pastel-gray font-medium leading-5">
-                      성격, 애착, 안정성 데이터를 바탕으로 당신의 연애 패턴을
-                      분석했어요. 지금 결과를 확인하고, 상대에게 공유해 두
-                      사람의 케미스트리를 확인해보세요.
+                      {invitedProfile &&
+                      invitedProfile.gender !== profile?.gender
+                        ? `성격, 애착, 안정성 데이터를 바탕으로 당신의 연애 패턴을 분석했어요. 지금 ${invitedProfile.nickname}님과의 케미스트리를 확인해보세요.`
+                        : "성격, 애착, 안정성 데이터를 바탕으로 당신의 연애 패턴을 분석했어요. 지금 결과를 확인하고, 상대에게 공유해 두 사람의 케미스트리를 확인해보세요."}
                     </Text>
                     <Image
                       source={require("../../../assets/images/test-done.png")}
@@ -343,9 +400,18 @@ export default function TestPage() {
                       contentFit="contain"
                     />
                     <TouchableOpacity
-                      className="w-full bg-foreground px-16 rounded-full mt-16 h-14 items-center justify-center"
+                      className={`w-full bg-foreground px-16 rounded-full mt-16 h-14 items-center justify-center ${
+                        invitedProfile &&
+                        invitedProfile.gender === profile?.gender
+                          ? "opacity-50"
+                          : ""
+                      }`}
                       onPress={handleCompleteTest}
                       activeOpacity={0.8}
+                      disabled={
+                        !!invitedProfile &&
+                        invitedProfile.gender === profile?.gender
+                      }
                     >
                       {loading ? (
                         <ActivityIndicator size="small" color="#222" />
@@ -353,10 +419,19 @@ export default function TestPage() {
                         <Text
                           className={`text-center text-background font-semibold text-base`}
                         >
-                          결과 확인하기
+                          {invitedProfile &&
+                          invitedProfile.gender !== profile?.gender
+                            ? `${invitedProfile.nickname}님과의 케미스트리 확인하기`
+                            : "결과 확인하기"}
                         </Text>
                       )}
                     </TouchableOpacity>
+                    {invitedProfile &&
+                      invitedProfile.gender === profile?.gender && (
+                        <Text className="text-red-400 text-center mt-4 font-medium">
+                          현재 케미스트리 분석은 이성 커플만 지원해요.
+                        </Text>
+                      )}
                   </View>
                 );
               }

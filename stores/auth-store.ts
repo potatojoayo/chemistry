@@ -9,11 +9,11 @@ interface AuthState {
   user: User | null;
   profile: Profile | null;
   loading: boolean;
-  redirectPath: string | null;
+  authRedirectPath: string | null;
   setUser: (user: User | null) => void;
   setProfile: (profile: Profile | null) => void;
   setLoading: (loading: boolean) => void;
-  setRedirectPath: (path: string | null) => void;
+  setAuthRedirectPath: (path: string | null) => void;
   fetchProfile: () => Promise<void>;
   signOut: () => Promise<void>;
   init: () => Promise<void>;
@@ -25,12 +25,11 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       profile: null,
       loading: true,
-      redirectPath: null,
+      authRedirectPath: null,
       setUser: (user) => set({ user }),
       setProfile: (profile) => set({ profile }),
       setLoading: (loading) => set({ loading }),
-      setRedirectPath: (path) => set({ redirectPath: path }),
-
+      setAuthRedirectPath: (path) => set({ authRedirectPath: path }),
       fetchProfile: async () => {
         const user = get().user;
         if (!user) return;
@@ -86,11 +85,11 @@ export const useAuthStore = create<AuthState>()(
             // 유저가 변경되었거나 프로필이 없는 경우 fetch
             // (이미 있는 경우 불필요한 fetch 방지 로직을 추가할 수도 있지만,
             //  onAuthStateChange는 로그인/앱시작 시 주로 발생하므로 안전하게 fetch)
-             await get().fetchProfile();
+            await get().fetchProfile();
           } else {
             set({ profile: null });
           }
-          
+
           set({ loading: false });
         });
 

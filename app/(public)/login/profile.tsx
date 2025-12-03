@@ -1,9 +1,10 @@
 import AnimatedPageWrapper from "@/components/common/animated-page-wrapper";
 import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/stores/auth-store";
+import { useInvitationStore } from "@/stores/invitation-store";
 import { FontAwesome6 } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
-import { router } from "expo-router";
+import { RelativePathString, router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -160,11 +161,18 @@ export default function Profile() {
     }
   };
 
+  const { redirectPath } = useInvitationStore();
+
   useEffect(() => {
     if (success && profile) {
-      router.replace("/test/intro");
+      if (redirectPath) {
+        const path = redirectPath;
+        router.replace(path as RelativePathString);
+      } else {
+        router.replace("/test/intro");
+      }
     }
-  }, [success, profile]);
+  }, [success, profile, redirectPath]);
 
   return (
     <AnimatedPageWrapper>
@@ -289,7 +297,6 @@ export default function Profile() {
                     width: "100%",
                     outline: "none",
                   }}
-                  autoFocus
                   onBlur={() => {
                     // focus가 해제되면 즉시 다시 focus
                     setTimeout(() => {
