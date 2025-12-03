@@ -1,9 +1,7 @@
 import AnimatedPageWrapper from "@/components/common/animated-page-wrapper";
 import ReportCard from "@/components/test/report-card";
+import { Profile, ReportAAS, ReportFlexibility } from "@/db/schema";
 import { supabase } from "@/lib/supabase";
-import { Profile } from "@/models/profile";
-import { ReportAAS } from "@/models/report_aas";
-import { ReportFlexibility } from "@/models/report_flexibility";
 import { useAuthStore } from "@/stores/auth-store";
 import { useInvitationStore } from "@/stores/invitation-store";
 import { RelativePathString, router } from "expo-router";

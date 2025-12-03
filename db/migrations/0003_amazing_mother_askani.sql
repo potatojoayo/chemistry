@@ -1,0 +1,1 @@
+ALTER TABLE "profiles" ALTER COLUMN "avatar_url" SET NOT NULL;

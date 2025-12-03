@@ -1,7 +1,7 @@
 import AnimatedPageWrapper from "@/components/common/animated-page-wrapper";
+import { Profile } from "@/db/schema";
 import { createRelationship } from "@/lib/create-relationship";
 import { supabase } from "@/lib/supabase";
-import { Profile } from "@/models/profile";
 import { useAuthStore } from "@/stores/auth-store";
 import { useInvitationStore } from "@/stores/invitation-store";
 import { router, useLocalSearchParams } from "expo-router";

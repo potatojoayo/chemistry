@@ -1,6 +1,6 @@
+import { Profile } from "@/db/schema";
 import { supabase } from "@/lib/supabase";
 import { normalCdf } from "@/lib/utils";
-import { Profile } from "@/models/profile";
 
 /**
  * 질문/답변을 집계해 profiles에 평균값과 Z-score를 저장합니다.
@@ -237,9 +237,12 @@ export async function computeAndSaveProfileScores(profileId: string) {
     const isHighAnx = zAnx >= 0;
     const isHighAvoid = zAvoid >= 0;
 
-    if (!isHighAnx && !isHighAvoid) attachmentType = "secure"; // 안정형
-    else if (isHighAnx && !isHighAvoid) attachmentType = "anxious"; // 불안형
-    else if (!isHighAnx && isHighAvoid) attachmentType = "avoidant"; // 회피형
+    if (!isHighAnx && !isHighAvoid)
+      attachmentType = "secure"; // 안정형
+    else if (isHighAnx && !isHighAvoid)
+      attachmentType = "anxious"; // 불안형
+    else if (!isHighAnx && isHighAvoid)
+      attachmentType = "avoidant"; // 회피형
     else attachmentType = "disorganized"; // 혼란형
   }
 
@@ -293,7 +296,7 @@ export async function computeAndSaveProfileScores(profileId: string) {
     // Relationship Passion Index = (0.5 * Phi(Z_erc) + 0.5 * Phi(Z_big)) * 100
     const phiErc = normalCdf(zErc);
     const phiBig = normalCdf(zBig);
-    
+
     const index = (0.5 * phiErc + 0.5 * phiBig) * 100;
     passionIndex = Math.max(0, Math.min(100, index));
 

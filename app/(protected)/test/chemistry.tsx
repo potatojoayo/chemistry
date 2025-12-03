@@ -1,7 +1,6 @@
 import AnimatedPageWrapper from "@/components/common/animated-page-wrapper";
+import { Profile, Relationship } from "@/db/schema";
 import { supabase } from "@/lib/supabase";
-import { Profile } from "@/models/profile";
-import { Relationship } from "@/models/relationship";
 import { useAuthStore } from "@/stores/auth-store";
 import { useInvitationStore } from "@/stores/invitation-store";
 import { router } from "expo-router";
@@ -15,7 +14,7 @@ import Animated, {
 
 export default function ChemistryPage() {
   const { profile } = useAuthStore();
-  const { inviterProfileId, clearInvitation } = useInvitationStore();
+  const { clearInvitation } = useInvitationStore();
   const [loading, setLoading] = useState(true);
   const [relationship, setRelationship] = useState<Relationship | null>(null);
   const [partner, setPartner] = useState<Profile | null>(null);

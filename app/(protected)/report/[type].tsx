@@ -1,7 +1,6 @@
 import ReportCard from "@/components/test/report-card";
+import { ReportAAS, ReportFlexibility } from "@/db/schema";
 import { supabase } from "@/lib/supabase";
-import { ReportAAS } from "@/models/report_aas";
-import { ReportFlexibility } from "@/models/report_flexibility";
 import { useAuthStore } from "@/stores/auth-store";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";

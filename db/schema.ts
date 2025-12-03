@@ -26,18 +26,23 @@ const users = authSchema.table("users", {
 export const profiles = pgTable(
   "profiles",
   {
-    userId: uuid("user_id")
+    user_id: uuid("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     nickname: text("nickname"),
-    avatarUrl: text("avatar_url").default(
-      "https://bsqlysekyircziilazvv.supabase.co/storage/v1/object/public/images/profiles/default-avatar.png"
-    ),
-    createdAt: timestamp("created_at", { withTimezone: true })
+    avatar_url: text("avatar_url")
+      .default(
+        "https://bsqlysekyircziilazvv.supabase.co/storage/v1/object/public/images/profiles/default-avatar.png"
+      )
+      .notNull(),
+    created_at: timestamp("created_at", { withTimezone: true, mode: "string" })
       .defaultNow()
       .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
-    testIndex: integer("test_index").default(0).notNull(),
+    updated_at: timestamp("updated_at", {
+      withTimezone: true,
+      mode: "string",
+    }).defaultNow(),
+    test_index: integer("test_index").default(0).notNull(),
     id: uuid("id").defaultRandom().primaryKey().notNull(),
     openness: real("openness"),
     conscientiousness: real("conscientiousness"),
@@ -48,25 +53,25 @@ export const profiles = pgTable(
     anxiety: real("anxiety"),
     humor: real("humor"),
     conflict: real("conflict"),
-    zOpenness: real("z_openness"),
-    zConscientiousness: real("z_conscientiousness"),
-    zExtraversion: real("z_extraversion"),
-    zAgreeableness: real("z_agreeableness"),
-    zNeuroticism: real("z_neuroticism"),
-    zAvoidance: real("z_avoidance"),
-    zAnxiety: real("z_anxiety"),
-    zHumor: real("z_humor"),
-    zConflict: real("z_conflict"),
-    testCompleted: boolean("test_completed").default(false).notNull(),
-    emotionalStabilityPercentage: real("emotional_stability_percentage"),
-    big5Type: bigint("big_5_type", { mode: "number" }),
-    flexibilityPercentage: real("flexibility_percentage"),
-    emotionalStabilityLevel: smallint("emotional_stability_level"),
-    attachmentType: text("attachment_type"),
-    flexibilityLevel: smallint("flexibility_level"),
-    passionLevel: smallint("passion_level"),
-    passionType: text("passion_type"),
-    passionIndex: real("passion_index"),
+    z_openness: real("z_openness"),
+    z_conscientiousness: real("z_conscientiousness"),
+    z_extraversion: real("z_extraversion"),
+    z_agreeableness: real("z_agreeableness"),
+    z_neuroticism: real("z_neuroticism"),
+    z_avoidance: real("z_avoidance"),
+    z_anxiety: real("z_anxiety"),
+    z_humor: real("z_humor"),
+    z_conflict: real("z_conflict"),
+    test_completed: boolean("test_completed").default(false).notNull(),
+    emotional_stability_percentage: real("emotional_stability_percentage"),
+    big_5_type: bigint("big_5_type", { mode: "number" }),
+    flexibility_percentage: real("flexibility_percentage"),
+    emotional_stability_level: smallint("emotional_stability_level"),
+    attachment_type: text("attachment_type"),
+    flexibility_level: smallint("flexibility_level"),
+    passion_level: smallint("passion_level"),
+    passion_type: text("passion_type"),
+    passion_index: real("passion_index"),
     gender: text("gender").notNull(),
   },
   (table) => [
@@ -95,12 +100,13 @@ export const tests = pgTable(
     id: text("id").primaryKey().notNull(),
     name: text("name").notNull(),
     description: text("description").notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true })
+    created_at: timestamp("created_at", { withTimezone: true, mode: "string" })
       .defaultNow()
       .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
-      .defaultNow()
-      .notNull(),
+    updated_at: timestamp("updated_at", {
+      withTimezone: true,
+      mode: "string",
+    }).defaultNow(),
   },
   (table) => [
     pgPolicy("public can view tests", {
@@ -113,15 +119,14 @@ export const tests = pgTable(
 
 export const questions = pgTable("questions", {
   id: uuid("id").defaultRandom().primaryKey().notNull(),
-  testId: text("test_id")
+  test_id: text("test_id")
     .default("gen_random_uuid()")
     .notNull()
     .references(() => tests.id, { onDelete: "cascade" }),
   domain: text("domain").notNull(),
-  code: text("code").notNull(),
   content: text("content").notNull(),
-  selectionCount: smallint("selection_count").default(5).notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true })
+  selection_count: smallint("selection_count").default(5).notNull(),
+  created_at: timestamp("created_at", { withTimezone: true, mode: "string" })
     .defaultNow()
     .notNull(),
   index: bigint("index", { mode: "number" }).default(0).notNull(),
@@ -131,21 +136,21 @@ export const answers = pgTable(
   "answers",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    profileId: uuid("profile_id")
+    profile_id: uuid("profile_id")
       .notNull()
       .references(() => profiles.id, { onDelete: "cascade" }),
-    questionId: uuid("question_id")
+    question_id: uuid("question_id")
       .notNull()
       .references(() => questions.id, { onDelete: "restrict" }),
     answer: smallint("answer").notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true })
+    created_at: timestamp("created_at", { withTimezone: true, mode: "string" })
       .defaultNow()
       .notNull(),
   },
   (table) => [
     unique("answers_profile_id_question_id_key").on(
-      table.profileId,
-      table.questionId
+      table.profile_id,
+      table.question_id
     ),
     pgPolicy("users can manage their own answers", {
       for: "all",
@@ -160,37 +165,38 @@ export const relationships = pgTable(
   "relationships",
   {
     id: uuid("id").defaultRandom().primaryKey().notNull(),
-    inviterProfileId: uuid("inviter_profile_id")
+    inviter_profile_id: uuid("inviter_profile_id")
       .notNull()
       .references(() => profiles.id, { onDelete: "cascade" }),
-    inviteeProfileId: uuid("invitee_profile_id")
+    invitee_profile_id: uuid("invitee_profile_id")
       .notNull()
       .references(() => profiles.id, { onDelete: "cascade" }),
-    relationshipType: text("relationship_type").notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true })
+    relationship_type: text("relationship_type").notNull(),
+    created_at: timestamp("created_at", { withTimezone: true, mode: "string" })
       .defaultNow()
       .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
-      .defaultNow()
-      .notNull(),
-    tikitakaIndex: real("tikitaka_index").notNull(),
-    chemistryIndex: real("chemistry_index").notNull(),
-    aasScore: real("aas_score").notNull(),
-    aasLevel: smallint("aas_level").notNull(),
-    big5Score: real("big_5_score").notNull(),
-    big5Level: smallint("big_5_level").notNull(),
-    passionTypeNumber: smallint("passion_type_number").notNull(),
-    passionIndex: real("passion_index").notNull(),
-    flexibilityScore: real("flexibility_score").notNull(),
-    flexibilityLevel: smallint("flexibility_level").notNull(),
+    updated_at: timestamp("updated_at", {
+      withTimezone: true,
+      mode: "string",
+    }).defaultNow(),
+    tikitaka_index: real("tikitaka_index").notNull(),
+    chemistry_index: real("chemistry_index").notNull(),
+    aas_score: real("aas_score").notNull(),
+    aas_level: smallint("aas_level").notNull(),
+    big_5_score: real("big_5_score").notNull(),
+    big_5_level: smallint("big_5_level").notNull(),
+    passion_type_number: smallint("passion_type_number").notNull(),
+    passion_index: real("passion_index").notNull(),
+    flexibility_score: real("flexibility_score").notNull(),
+    flexibility_level: smallint("flexibility_level").notNull(),
   },
   (table) => [
     unique("uq_relation_pair").on(
-      table.inviterProfileId,
-      table.inviteeProfileId
+      table.inviter_profile_id,
+      table.invitee_profile_id
     ),
-    index("idx_relations_requester").on(table.inviterProfileId),
-    index("idx_relations_target").on(table.inviteeProfileId),
+    index("idx_relations_requester").on(table.inviter_profile_id),
+    index("idx_relations_target").on(table.invitee_profile_id),
     pgPolicy("users can manage their own relationships", {
       for: "all",
       to: authenticatedRole,
@@ -205,18 +211,19 @@ export const reportAas = pgTable(
   {
     id: uuid("id").defaultRandom().primaryKey().notNull(),
     type: text("type").notNull(),
-    typeText: text("type_text").notNull(),
-    emotionalStabilityLevel: smallint("emotional_stability_level").notNull(),
-    overallEvaluation: text("overall_evaluation").notNull(),
-    detailEvaluations: text("detail_evaluations").notNull(),
-    counselingText: text("counseling_text").notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true })
+    type_text: text("type_text").notNull(),
+    emotional_stability_level: smallint("emotional_stability_level").notNull(),
+    overall_evaluation: text("overall_evaluation").notNull(),
+    detail_evaluations: text("detail_evaluations").notNull(),
+    counseling_text: text("counseling_text").notNull(),
+    created_at: timestamp("created_at", { withTimezone: true, mode: "string" })
       .defaultNow()
       .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
-      .defaultNow()
-      .notNull(),
-    emotionalStabilityText: text("emotional_stability_text").notNull(),
+    updated_at: timestamp("updated_at", {
+      withTimezone: true,
+      mode: "string",
+    }).defaultNow(),
+    emotional_stability_text: text("emotional_stability_text").notNull(),
     title: text("title").notNull(),
     sequence: smallint("sequence").notNull(),
   },
@@ -233,22 +240,23 @@ export const reportBig5 = pgTable(
   "report_big_5",
   {
     id: uuid("id").defaultRandom().primaryKey().notNull(),
-    big5Type: bigint("big_5_type", { mode: "number" }).notNull(),
+    big_5_type: bigint("big_5_type", { mode: "number" }).notNull(),
     sequence: integer("sequence").notNull(),
     nickname: text("nickname").notNull(),
     title: text("title").notNull(),
-    overallEvaluation: text("overall_evaluation").notNull(),
-    detailEvaluations: text("detail_evaluations").notNull(),
-    counselingText: text("counseling_text").notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true })
+    overall_evaluation: text("overall_evaluation").notNull(),
+    detail_evaluations: text("detail_evaluations").notNull(),
+    counseling_text: text("counseling_text").notNull(),
+    created_at: timestamp("created_at", { withTimezone: true, mode: "string" })
       .defaultNow()
       .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
-      .defaultNow()
-      .notNull(),
+    updated_at: timestamp("updated_at", {
+      withTimezone: true,
+      mode: "string",
+    }).defaultNow(),
   },
   (table) => [
-    unique("report_big_5_big_5_type_key").on(table.big5Type),
+    unique("report_big_5_big_5_type_key").on(table.big_5_type),
     pgPolicy("public_read_access", {
       for: "select",
       to: "public",
@@ -261,19 +269,20 @@ export const reportChemistry = pgTable(
   "report_chemistry",
   {
     id: uuid("id").defaultRandom().primaryKey().notNull(),
-    aasLevel: integer("aas_level").notNull(),
-    big5Level: integer("big_5_level").notNull(),
-    flexibilityLevel: integer("flexibility_level").notNull(),
-    overallEvaluation: text("overall_evaluation").notNull(),
-    detailEvaluations: text("detail_evaluations").notNull(),
-    counselingText: text("counseling_text").notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true })
+    aas_level: integer("aas_level").notNull(),
+    big_5_level: integer("big_5_level").notNull(),
+    flexibility_level: integer("flexibility_level").notNull(),
+    overall_evaluation: text("overall_evaluation").notNull(),
+    detail_evaluations: text("detail_evaluations").notNull(),
+    counseling_text: text("counseling_text").notNull(),
+    created_at: timestamp("created_at", { withTimezone: true, mode: "string" })
       .defaultNow()
       .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
-      .defaultNow()
-      .notNull(),
-    emotionalStabilityText: text("emotional_stability_text").notNull(),
+    updated_at: timestamp("updated_at", {
+      withTimezone: true,
+      mode: "string",
+    }).defaultNow(),
+    emotional_stability_text: text("emotional_stability_text").notNull(),
     title: text("title").notNull(),
     sequence: smallint("sequence").notNull(),
   },
@@ -290,18 +299,19 @@ export const reportFlexibility = pgTable(
   "report_flexibility",
   {
     id: uuid("id").defaultRandom().primaryKey().notNull(),
-    flexibilityLevel: smallint("flexibility_level").notNull(),
-    flexibilityLabel: text("flexibility_label").notNull(),
+    flexibility_level: smallint("flexibility_level").notNull(),
+    flexibility_label: text("flexibility_label").notNull(),
     title: text("title").notNull(),
-    overallEvaluation: text("overall_evaluation").notNull(),
-    detailEvaluation: text("detail_evaluation").notNull(),
-    counselingText: text("counseling_text").notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true })
+    overall_evaluation: text("overall_evaluation").notNull(),
+    detail_evaluation: text("detail_evaluation").notNull(),
+    counseling_text: text("counseling_text").notNull(),
+    created_at: timestamp("created_at", { withTimezone: true, mode: "string" })
       .defaultNow()
       .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
-      .defaultNow()
-      .notNull(),
+    updated_at: timestamp("updated_at", {
+      withTimezone: true,
+      mode: "string",
+    }).defaultNow(),
   },
   (table) => [
     pgPolicy("public_read_access", {
@@ -316,23 +326,24 @@ export const reportPassion = pgTable(
   "report_passion",
   {
     id: uuid("id").defaultRandom().primaryKey().notNull(),
-    malePassionLevel: integer("male_passion_level").notNull(),
-    femalePassionLevel: integer("female_passion_level").notNull(),
-    malePassionType: text("male_passion_type").notNull(),
-    femalePassionType: text("female_passion_type").notNull(),
-    overallEvaluation: text("overall_evaluation").notNull(),
-    detailEvaluations: text("detail_evaluations").notNull(),
-    counselingText: text("counseling_text").notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true })
+    male_passion_level: integer("male_passion_level").notNull(),
+    female_passion_level: integer("female_passion_level").notNull(),
+    male_passion_type: text("male_passion_type").notNull(),
+    female_passion_type: text("female_passion_type").notNull(),
+    overall_evaluation: text("overall_evaluation").notNull(),
+    detail_evaluations: text("detail_evaluations").notNull(),
+    counseling_text: text("counseling_text").notNull(),
+    created_at: timestamp("created_at", { withTimezone: true, mode: "string" })
       .defaultNow()
       .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
-      .defaultNow()
-      .notNull(),
-    emotionalStabilityText: text("emotional_stability_text").notNull(),
+    updated_at: timestamp("updated_at", {
+      withTimezone: true,
+      mode: "string",
+    }).defaultNow(),
+    emotional_stability_text: text("emotional_stability_text").notNull(),
     title: text("title").notNull(),
     sequence: smallint("sequence").notNull(),
-    typeNumber: smallint("type_number").notNull(),
+    type_number: smallint("type_number").notNull(),
   },
   (table) => [
     pgPolicy("public_read_access", {
@@ -347,16 +358,17 @@ export const reportTikitaka = pgTable(
   "report_tikitaka",
   {
     id: uuid("id").defaultRandom().primaryKey().notNull(),
-    tikitakaIndex: doublePrecision("tikitaka_index").notNull(),
-    overallEvaluation: text("overall_evaluation").notNull(),
-    detailEvaluations: text("detail_evaluations").notNull(),
-    counselingText: text("counseling_text").notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true })
+    tikitaka_index: doublePrecision("tikitaka_index").notNull(),
+    overall_evaluation: text("overall_evaluation").notNull(),
+    detail_evaluations: text("detail_evaluations").notNull(),
+    counseling_text: text("counseling_text").notNull(),
+    created_at: timestamp("created_at", { withTimezone: true, mode: "string" })
       .defaultNow()
       .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
-      .defaultNow()
-      .notNull(),
+    updated_at: timestamp("updated_at", {
+      withTimezone: true,
+      mode: "string",
+    }).defaultNow(),
     title: text("title").notNull(),
     sequence: smallint("sequence").notNull(),
   },
@@ -368,3 +380,36 @@ export const reportTikitaka = pgTable(
     }),
   ]
 );
+
+export type Profile = typeof profiles.$inferSelect;
+export type NewProfile = typeof profiles.$inferInsert;
+
+export type Test = typeof tests.$inferSelect;
+export type NewTest = typeof tests.$inferInsert;
+
+export type Question = typeof questions.$inferSelect;
+export type NewQuestion = typeof questions.$inferInsert;
+
+export type Answer = typeof answers.$inferSelect;
+export type NewAnswer = typeof answers.$inferInsert;
+
+export type Relationship = typeof relationships.$inferSelect;
+export type NewRelationship = typeof relationships.$inferInsert;
+
+export type ReportBig5 = typeof reportBig5.$inferSelect;
+export type NewReportBig5 = typeof reportBig5.$inferInsert;
+
+export type ReportFlexibility = typeof reportFlexibility.$inferSelect;
+export type NewReportFlexibility = typeof reportFlexibility.$inferInsert;
+
+export type ReportPassion = typeof reportPassion.$inferSelect;
+export type NewReportPassion = typeof reportPassion.$inferInsert;
+
+export type ReportTikitaka = typeof reportTikitaka.$inferSelect;
+export type NewReportTikitaka = typeof reportTikitaka.$inferInsert;
+
+export type ReportAAS = typeof reportAas.$inferSelect;
+export type NewReportAAS = typeof reportAas.$inferInsert;
+
+export type ReportChemistry = typeof reportChemistry.$inferSelect;
+export type NewReportChemistry = typeof reportChemistry.$inferInsert;

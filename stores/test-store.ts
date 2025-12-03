@@ -1,15 +1,14 @@
+import { NewAnswer, Question } from "@/db/schema";
 import { supabase } from "@/lib/supabase";
-import { Answer } from "@/models/answer";
-import { Question } from "@/models/question";
 import { create } from "zustand";
 
 interface TestStore {
   currentIndex: number;
   questions: Question[];
-  answers: Answer[];
+  answers: NewAnswer[];
   setCurrentQuestionIndex: ({ index }: { index: number }) => void;
   setQuestions: (questions: Question[]) => void;
-  setAnswers: (answers: Answer[]) => void;
+  setAnswers: (answers: NewAnswer[]) => void;
   goPrev: () => void;
   goNext: () => void;
   answerToQuestion: ({
@@ -33,7 +32,7 @@ export const useTestStore = create<TestStore>((set, get) => ({
       questions,
     }));
   },
-  setAnswers: (answers: Answer[]) => {
+  setAnswers: (answers: NewAnswer[]) => {
     set((state) => ({
       ...state,
       answers,

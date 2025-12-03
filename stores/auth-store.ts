@@ -1,5 +1,5 @@
+import { Profile } from "@/db/schema";
 import { supabase } from "@/lib/supabase";
-import { Profile } from "@/models/profile";
 import { User } from "@supabase/supabase-js";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";

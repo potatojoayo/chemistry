@@ -1,5 +1,4 @@
-import { Answer } from "@/models/answer";
-import { Question } from "@/models/question";
+import { Answer, Question } from "@/db/schema";
 import { useAuthStore } from "@/stores/auth-store";
 import { useTestStore } from "@/stores/test-store";
 import { FontAwesome6 } from "@expo/vector-icons";

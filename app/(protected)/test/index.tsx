@@ -1,10 +1,8 @@
 import AnimatedPageWrapper from "@/components/common/animated-page-wrapper";
+import { NewAnswer, Profile, Question } from "@/db/schema";
 import { createRelationship } from "@/lib/create-relationship";
 import { computeAndSaveProfileScores } from "@/lib/scorerer";
 import { supabase } from "@/lib/supabase";
-import { Answer } from "@/models/answer";
-import { Profile } from "@/models/profile";
-import { Question } from "@/models/question";
 import { useAuthStore } from "@/stores/auth-store";
 import { useInvitationStore } from "@/stores/invitation-store";
 import { FontAwesome6 } from "@expo/vector-icons";
@@ -39,7 +37,7 @@ export default function TestPage() {
   const { profile } = useAuthStore();
   const [currentIndex, setCurrentIndex] = useState(profile?.test_index ?? 0);
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [answers, setAnswers] = useState<Answer[]>([]);
+  const [answers, setAnswers] = useState<NewAnswer[]>([]);
   const [loading, setLoading] = useState(true);
   const { fetchProfile } = useAuthStore();
 

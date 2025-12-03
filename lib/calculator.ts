@@ -1,14 +1,14 @@
+import { Profile } from "@/db/schema";
 import { normalCdf, nz, phiPct, scoreToLevel } from "@/lib/utils";
-import { Profile } from "@/models/profile";
 
 interface ChemistryIndex {
-  aas_score: number;          // E
-  aas_level: number;          // 1~5
-  big_5_score: number;         // B
-  big_5_level: number;         // 1~5
-  flexibility_score: number;  // L
-  flexibility_level: number;  // 1~5
-  chemistry_index: number;    // 최종 LLUBB
+  aas_score: number; // E
+  aas_level: number; // 1~5
+  big_5_score: number; // B
+  big_5_level: number; // 1~5
+  flexibility_score: number; // L
+  flexibility_level: number; // 1~5
+  chemistry_index: number; // 최종 LLUBB
 }
 
 interface TikitakaResult {
@@ -23,7 +23,10 @@ interface PassionResult {
   couple_passion_index: number; // 0~100
 }
 
-export interface RelationshipMetrics extends ChemistryIndex, TikitakaResult, PassionResult {}
+export interface RelationshipMetrics
+  extends ChemistryIndex,
+    TikitakaResult,
+    PassionResult {}
 
 /**
  * 두 프로필로부터 AAS(애착 안정), Big5, 정서적 유연성 점수와
@@ -65,8 +68,7 @@ function calculateChemistryIndex({
   const phiAvoidA = phiPct(zAvoidA);
   const phiAvoidB = phiPct(zAvoidB);
 
-  const pTrap =
-    (phiAnxA * phiAvoidB + phiAnxB * phiAvoidA) / 10000;
+  const pTrap = (phiAnxA * phiAvoidB + phiAnxB * phiAvoidA) / 10000;
 
   let E = 100 - avgErc - kappa * pTrap;
   E = Math.max(0, Math.min(100, E));

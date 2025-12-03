@@ -1,7 +1,7 @@
 import TabPageWrapper from "@/components/common/tab-page-wrapper";
+import { Relationship } from "@/db/schema";
 import { useKakao } from "@/lib/kakao-web";
 import { supabase } from "@/lib/supabase";
-import { Relationship } from "@/models/relationship";
 import { useAuthStore } from "@/stores/auth-store";
 import { FontAwesome6 } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
@@ -14,7 +14,7 @@ import {
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
-  View
+  View,
 } from "react-native";
 import {
   Gesture,
@@ -52,11 +52,15 @@ export default function Home() {
 
   const closeModal = () => {
     overlayOpacity.value = withTiming(0, { duration: 300 });
-    contentTranslateY.value = withTiming(1000, { duration: 300 }, (finished) => {
-      if (finished) {
-        runOnJS(setModalVisible)(false);
+    contentTranslateY.value = withTiming(
+      1000,
+      { duration: 300 },
+      (finished) => {
+        if (finished) {
+          runOnJS(setModalVisible)(false);
+        }
       }
-    });
+    );
   };
 
   const overlayStyle = useAnimatedStyle(() => ({
@@ -211,7 +215,10 @@ export default function Home() {
                 <Text className="text-foreground font-semibold text-lg">
                   케미스트리 초대하기
                 </Text>
-                <TouchableOpacity onPress={closeModal} className="w-10 flex flex-row justify-end pr-2">
+                <TouchableOpacity
+                  onPress={closeModal}
+                  className="w-10 flex flex-row justify-end pr-2"
+                >
                   <FontAwesome6 name="xmark" size={20} color="#ECEEDF" />
                 </TouchableOpacity>
               </View>

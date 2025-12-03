@@ -1,7 +1,6 @@
+import { NewRelationship, Profile } from "@/db/schema";
 import { calculateRelationshipMetrics } from "@/lib/calculator";
 import { supabase } from "@/lib/supabase";
-import { Profile } from "@/models/profile";
-import { NewRelationship } from "@/models/relationship";
 
 export const createRelationship = async ({
   male,
@@ -41,8 +40,8 @@ export const createRelationship = async ({
     });
 
     const newRelationship: NewRelationship = {
-      inviting_profile_id: male.id,
-      invited_profile_id: female.id,
+      inviter_profile_id: male.id,
+      invitee_profile_id: female.id,
       relationship_type: "couple",
       passion_index: couple_passion_index,
       chemistry_index,

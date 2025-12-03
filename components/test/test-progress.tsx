@@ -1,4 +1,4 @@
-import { Question } from "@/models/question";
+import { Question } from "@/db/schema";
 import { useTestStore } from "@/stores/test-store";
 import { useEffect } from "react";
 import { Platform, Text, View } from "react-native";

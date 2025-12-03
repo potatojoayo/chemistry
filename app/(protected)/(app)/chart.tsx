@@ -1,9 +1,8 @@
 import RadarChart from "@/components/chart/radar-chart";
 import SummaryCard from "@/components/chart/summary-card";
 import TabPageWrapper from "@/components/common/tab-page-wrapper";
+import { ReportAAS, ReportFlexibility } from "@/db/schema";
 import { supabase } from "@/lib/supabase";
-import { ReportAAS } from "@/models/report_aas";
-import { ReportFlexibility } from "@/models/report_flexibility";
 import { useAuthStore } from "@/stores/auth-store";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
