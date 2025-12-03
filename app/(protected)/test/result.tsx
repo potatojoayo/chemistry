@@ -60,7 +60,7 @@ export default function TestResult() {
 
       try {
         if (
-          !profile.emotional_stability_level ||
+          !profile.emotional_flexibility_level ||
           !profile.attachment_type ||
           !profile.flexibility_level
         ) {
@@ -70,7 +70,7 @@ export default function TestResult() {
         }
 
         console.log("Querying reports with:", {
-          level: profile.emotional_stability_level,
+          level: profile.emotional_flexibility_level,
           type: profile.attachment_type,
           flexibility: profile.flexibility_level,
         });
@@ -79,7 +79,10 @@ export default function TestResult() {
           supabase
             .from("report_aas")
             .select("*")
-            .eq("emotional_stability_level", profile.emotional_stability_level)
+            .eq(
+              "emotional_flexibility_level",
+              profile.emotional_flexibility_level
+            )
             .eq("type", profile.attachment_type)
             .single(),
           supabase
@@ -160,7 +163,7 @@ export default function TestResult() {
             title={report.title}
             badges={[
               "유형: " + report.type_text,
-              "마음 평온도: " + report.emotional_stability_text,
+              "마음 평온도: " + report.emotional_flexibility_text,
             ]}
             overallEvaluation={report.overall_evaluation}
             detailEvaluations={report.detail_evaluations}

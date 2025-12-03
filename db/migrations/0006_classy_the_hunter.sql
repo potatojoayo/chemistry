@@ -1,0 +1,1 @@
+CREATE POLICY "public_read_access" ON "questions" AS PERMISSIVE FOR SELECT TO public USING (true);

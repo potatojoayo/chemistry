@@ -53,7 +53,10 @@ export default function ReportPage() {
         }
 
         if (type === "aas") {
-          if (!profile.emotional_stability_level || !profile.attachment_type) {
+          if (
+            !profile.emotional_flexibility_level ||
+            !profile.attachment_type
+          ) {
             setError("Incomplete test results");
             setLoading(false);
             return;
@@ -62,7 +65,10 @@ export default function ReportPage() {
           const { data, error } = await supabase
             .from("report_aas")
             .select("*")
-            .eq("emotional_stability_level", profile.emotional_stability_level)
+            .eq(
+              "emotional_flexibility_level",
+              profile.emotional_flexibility_level
+            )
             .eq("type", profile.attachment_type)
             .limit(1)
             .maybeSingle();
@@ -178,7 +184,7 @@ export default function ReportPage() {
               title={aasReport.title}
               badges={[
                 "유형: " + aasReport.type_text,
-                "마음 평온도: " + aasReport.emotional_stability_text,
+                "마음 평온도: " + aasReport.emotional_flexibility_text,
               ]}
               overallEvaluation={aasReport.overall_evaluation}
               detailEvaluations={aasReport.detail_evaluations}

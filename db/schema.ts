@@ -63,10 +63,10 @@ export const profiles = pgTable(
     z_humor: real("z_humor"),
     z_conflict: real("z_conflict"),
     test_completed: boolean("test_completed").default(false).notNull(),
-    emotional_stability_percentage: real("emotional_stability_percentage"),
+    emotional_flexibility_percentage: real("emotional_flexibility_percentage"),
     big_5_type: bigint("big_5_type", { mode: "number" }),
     flexibility_percentage: real("flexibility_percentage"),
-    emotional_stability_level: smallint("emotional_stability_level"),
+    emotional_flexibility_level: smallint("emotional_flexibility_level"),
     attachment_type: text("attachment_type"),
     flexibility_level: smallint("flexibility_level"),
     passion_level: smallint("passion_level"),
@@ -117,20 +117,30 @@ export const tests = pgTable(
   ]
 );
 
-export const questions = pgTable("questions", {
-  id: uuid("id").defaultRandom().primaryKey().notNull(),
-  test_id: text("test_id")
-    .default("gen_random_uuid()")
-    .notNull()
-    .references(() => tests.id, { onDelete: "cascade" }),
-  domain: text("domain").notNull(),
-  content: text("content").notNull(),
-  selection_count: smallint("selection_count").default(5).notNull(),
-  created_at: timestamp("created_at", { withTimezone: true, mode: "string" })
-    .defaultNow()
-    .notNull(),
-  index: bigint("index", { mode: "number" }).default(0).notNull(),
-}).enableRLS();
+export const questions = pgTable(
+  "questions",
+  {
+    id: uuid("id").defaultRandom().primaryKey().notNull(),
+    test_id: text("test_id")
+      .default("gen_random_uuid()")
+      .notNull()
+      .references(() => tests.id, { onDelete: "cascade" }),
+    domain: text("domain").notNull(),
+    content: text("content").notNull(),
+    selection_count: smallint("selection_count").default(5).notNull(),
+    created_at: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .defaultNow()
+      .notNull(),
+    index: bigint("index", { mode: "number" }).default(0).notNull(),
+  },
+  (table) => [
+    pgPolicy("public_read_access", {
+      for: "select",
+      to: "public",
+      using: sql`true`,
+    }),
+  ]
+).enableRLS();
 
 export const answers = pgTable(
   "answers",
@@ -212,7 +222,9 @@ export const reportAas = pgTable(
     id: uuid("id").defaultRandom().primaryKey().notNull(),
     type: text("type").notNull(),
     type_text: text("type_text").notNull(),
-    emotional_stability_level: smallint("emotional_stability_level").notNull(),
+    emotional_flexibility_level: smallint(
+      "emotional_flexibility_level"
+    ).notNull(),
     overall_evaluation: text("overall_evaluation").notNull(),
     detail_evaluations: text("detail_evaluations").notNull(),
     counseling_text: text("counseling_text").notNull(),
@@ -223,7 +235,7 @@ export const reportAas = pgTable(
       withTimezone: true,
       mode: "string",
     }).defaultNow(),
-    emotional_stability_text: text("emotional_stability_text").notNull(),
+    emotional_flexibility_text: text("emotional_flexibility_text").notNull(),
     title: text("title").notNull(),
     sequence: smallint("sequence").notNull(),
   },
@@ -282,7 +294,7 @@ export const reportChemistry = pgTable(
       withTimezone: true,
       mode: "string",
     }).defaultNow(),
-    emotional_stability_text: text("emotional_stability_text").notNull(),
+    emotional_flexibility_text: text("emotional_flexibility_text").notNull(),
     title: text("title").notNull(),
     sequence: smallint("sequence").notNull(),
   },
@@ -340,7 +352,7 @@ export const reportPassion = pgTable(
       withTimezone: true,
       mode: "string",
     }).defaultNow(),
-    emotional_stability_text: text("emotional_stability_text").notNull(),
+    emotional_flexibility_text: text("emotional_flexibility_text").notNull(),
     title: text("title").notNull(),
     sequence: smallint("sequence").notNull(),
     type_number: smallint("type_number").notNull(),

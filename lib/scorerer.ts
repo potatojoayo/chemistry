@@ -5,7 +5,7 @@ import { normalCdf } from "@/lib/utils";
 /**
  * 질문/답변을 집계해 profiles에 평균값과 Z-score를 저장합니다.
  * - 입력: profileId
- * - 처리: adult-attachment, big-5, stability 도메인별 평균 & Z 계산
+ * - 처리: adult-attachment, big-5, flexibility 도메인별 평균 & Z 계산
  * - 저장: profiles의 원시 평균(openness 등) + z_* 컬럼들
  * - 완료판정: 세 테스트의 모든 도메인 평균이 존재하면 test_completed=true
  */
@@ -17,7 +17,7 @@ export async function computeAndSaveProfileScores(profileId: string) {
     anx: { mean: 3.5, sd: 1.1 },
   };
 
-  // Stability (1~7)  ─ Cann, 2008 예시
+  // flexibility (1~7)  ─ Cann, 2008 예시
   const STAB = {
     humor: { mean: 5.56, sd: 0.91 },
     conflict: { mean: 5.54, sd: 0.95 },
@@ -66,7 +66,7 @@ export async function computeAndSaveProfileScores(profileId: string) {
 
   const byTest: Record<string, Record<string, number[]>> = {};
   for (const r of (rows ?? []) as unknown as Row[]) {
-    const test = r.questions.test_id; // 'adult-attachment' | 'big-5' | 'stability'
+    const test = r.questions.test_id; // 'adult-attachment' | 'big-5' | 'flexibility'
     const domain = r.questions.domain; // 'Anxiety', 'Avoidance', 'Openness', ...
     byTest[test] ||= {};
     byTest[test][domain] ||= [];
@@ -84,9 +84,9 @@ export async function computeAndSaveProfileScores(profileId: string) {
   const avgAvoid = mean(byTest["adult-attachment"]?.["Avoidance"]);
   const avgAnx = mean(byTest["adult-attachment"]?.["Anxiety"]);
 
-  // ─ Stability
-  const avgHumor = mean(byTest["stability"]?.["Humor"]);
-  const avgConflict = mean(byTest["stability"]?.["Conflict"]);
+  // ─ Flexibility
+  const avgHumor = mean(byTest["flexibility"]?.["Humor"]);
+  const avgConflict = mean(byTest["flexibility"]?.["Conflict"]);
 
   // ─ BIG5
   const avgOpen = mean(byTest["big-5"]?.["Openness"]);
@@ -143,18 +143,18 @@ export async function computeAndSaveProfileScores(profileId: string) {
         (zExtra != null ? 0.08 * zExtra : 0) +
         (zOpen != null ? 0.02 * zOpen : 0);
 
-  const zStability =
+  const zflexibility =
     zHumor == null || zConflict == null
       ? undefined
       : 0.6 * zHumor + 0.4 * zConflict;
 
   // Flexibility Percentage Calculation
-  // Percentage = ((zStability - Zmin) / (Zmax - Zmin)) * 100
+  // Percentage = ((zflexibility - Zmin) / (Zmax - Zmin)) * 100
   // Zmin corresponds to raw scores of 1 (Min Humor/Conflict -> Min Total Score)
   // Zmax corresponds to raw scores of 7 (Max Humor/Conflict -> Max Total Score)
   let flexibilityPercentage: number | undefined;
   let flexibilityLevel: number | undefined;
-  if (zStability != null) {
+  if (zflexibility != null) {
     // Calculate theoretical Min/Max Z-scores based on raw range 1-7
     const rawMin = 1;
     const rawMax = 7;
@@ -164,12 +164,13 @@ export async function computeAndSaveProfileScores(profileId: string) {
     const zConflictMin = (rawMin - STAB.conflict.mean) / STAB.conflict.sd;
     const zConflictMax = (rawMax - STAB.conflict.mean) / STAB.conflict.sd;
 
-    // zStability is positive weighted sum
-    const zStabilityMin = 0.6 * zHumorMin + 0.4 * zConflictMin;
-    const zStabilityMax = 0.6 * zHumorMax + 0.4 * zConflictMax;
+    // zflexibility is positive weighted sum
+    const zflexibilityMin = 0.6 * zHumorMin + 0.4 * zConflictMin;
+    const zflexibilityMax = 0.6 * zHumorMax + 0.4 * zConflictMax;
 
     const percentage =
-      ((zStability - zStabilityMin) / (zStabilityMax - zStabilityMin)) * 100;
+      ((zflexibility - zflexibilityMin) / (zflexibilityMax - zflexibilityMin)) *
+      100;
 
     // Clamp between 0 and 100, keep decimals for float4
     flexibilityPercentage = Math.max(0, Math.min(100, percentage));
@@ -182,13 +183,13 @@ export async function computeAndSaveProfileScores(profileId: string) {
     else flexibilityLevel = 5;
   }
 
-  // Emotional Stability Percentage Calculation (formerly Calmness/AAS Percentage)
+  // Emotional flexibility Percentage Calculation (formerly Calmness/AAS Percentage)
   // Zecr_total = -(0.57 * zAnx + 0.15 * zAvoid)
   // Percentage = ((Zecr_total - Zmin) / (Zmax - Zmin)) * 100
   // Zmin corresponds to raw scores of 7 (Max Anxiety/Avoidance -> Min Total Score)
   // Zmax corresponds to raw scores of 1 (Min Anxiety/Avoidance -> Max Total Score)
-  let emotionalStabilityPercentage: number | undefined;
-  let emotionalStabilityLevel: number | undefined;
+  let emotionalflexibilityPercentage: number | undefined;
+  let emotionalflexibilityLevel: number | undefined;
   let attachmentType: string | undefined;
 
   if (zAnx != null && zAvoid != null) {
@@ -213,14 +214,14 @@ export async function computeAndSaveProfileScores(profileId: string) {
       ((zEcrTotal - zEcrTotalMin) / (zEcrTotalMax - zEcrTotalMin)) * 100;
 
     // Clamp between 0 and 100, keep decimals for float4
-    emotionalStabilityPercentage = Math.max(0, Math.min(100, percentage));
+    emotionalflexibilityPercentage = Math.max(0, Math.min(100, percentage));
 
     // Calculate Level (1-5)
-    if (emotionalStabilityPercentage < 20) emotionalStabilityLevel = 1;
-    else if (emotionalStabilityPercentage < 40) emotionalStabilityLevel = 2;
-    else if (emotionalStabilityPercentage < 60) emotionalStabilityLevel = 3;
-    else if (emotionalStabilityPercentage < 80) emotionalStabilityLevel = 4;
-    else emotionalStabilityLevel = 5;
+    if (emotionalflexibilityPercentage < 20) emotionalflexibilityLevel = 1;
+    else if (emotionalflexibilityPercentage < 40) emotionalflexibilityLevel = 2;
+    else if (emotionalflexibilityPercentage < 60) emotionalflexibilityLevel = 3;
+    else if (emotionalflexibilityPercentage < 80) emotionalflexibilityLevel = 4;
+    else emotionalflexibilityLevel = 5;
 
     // Calculate Attachment Type (4 Quadrants)
     // Secure (안정형): Low Anxiety, Low Avoidance
@@ -364,11 +365,11 @@ export async function computeAndSaveProfileScores(profileId: string) {
       ? { test_completed: true }
       : {}),
     ...(big5Type != null ? { big_5_type: big5Type } : {}),
-    ...(emotionalStabilityPercentage != null
-      ? { emotional_stability_percentage: emotionalStabilityPercentage }
+    ...(emotionalflexibilityPercentage != null
+      ? { emotional_flexibility_percentage: emotionalflexibilityPercentage }
       : {}),
-    ...(emotionalStabilityLevel != null
-      ? { emotional_stability_level: emotionalStabilityLevel }
+    ...(emotionalflexibilityLevel != null
+      ? { emotional_flexibility_level: emotionalflexibilityLevel }
       : {}),
     ...(attachmentType != null ? { attachment_type: attachmentType } : {}),
     ...(flexibilityPercentage != null
@@ -415,10 +416,10 @@ export async function computeAndSaveProfileScores(profileId: string) {
       z_agreeableness: zAgree,
       z_neuroticism: zNeuro,
       z_big5_total: zBig5Total,
-      z_stability: zStability,
+      z_flexibility: zflexibility,
       big_5_type: big5Type,
-      emotional_stability_percentage: emotionalStabilityPercentage,
-      emotional_stability_level: emotionalStabilityLevel,
+      emotional_flexibility_percentage: emotionalflexibilityPercentage,
+      emotional_flexibility_level: emotionalflexibilityLevel,
       attachment_type: attachmentType,
       flexibility_percentage: flexibilityPercentage,
       flexibility_level: flexibilityLevel,

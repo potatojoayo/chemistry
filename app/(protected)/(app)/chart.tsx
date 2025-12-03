@@ -39,7 +39,7 @@ export default function Chart() {
   useEffect(() => {
     async function fetchReports() {
       if (
-        !profile?.emotional_stability_level ||
+        !profile?.emotional_flexibility_level ||
         !profile?.attachment_type ||
         !profile?.flexibility_level
       ) {
@@ -52,7 +52,10 @@ export default function Chart() {
           supabase
             .from("report_aas")
             .select("*")
-            .eq("emotional_stability_level", profile.emotional_stability_level)
+            .eq(
+              "emotional_flexibility_level",
+              profile.emotional_flexibility_level
+            )
             .eq("type", profile.attachment_type)
             .single(),
           supabase
@@ -132,7 +135,7 @@ export default function Chart() {
               <SummaryCard
                 label="성인 애착 유형"
                 value={aasReport.type_text}
-                subValue={"마음평온도: " + aasReport.emotional_stability_text}
+                subValue={"마음평온도: " + aasReport.emotional_flexibility_text}
                 colorClass="bg-foreground/5"
                 onPress={() => router.push("/report/aas")}
               />

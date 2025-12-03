@@ -166,8 +166,8 @@ function calculateTikitakaIndex({
   const k2 = 0.3;
 
   // S = 불안정성 점수 = 100 - stability%
-  const S_M = 100 - (male.emotional_stability_percentage ?? 50);
-  const S_F = 100 - (female.emotional_stability_percentage ?? 50);
+  const S_M = 100 - (male.emotional_flexibility_percentage ?? 50);
+  const S_F = 100 - (female.emotional_flexibility_percentage ?? 50);
 
   // 1) Stability penalty
   const Stab_M = 100 - S_M;

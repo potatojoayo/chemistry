@@ -1,13 +1,20 @@
 import * as Sentry from "@sentry/react-native";
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack } from "expo-router";
+import { cssInterop } from "nativewind";
 import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { PaperProvider } from "react-native-paper";
 import "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import "../global.css";
 import { useAuthStore } from "../stores/auth-store";
+
+cssInterop(Animated.View, { className: "style" });
+cssInterop(Animated.Text, { className: "style" });
+cssInterop(Animated.Image, { className: "style" });
+cssInterop(Animated.ScrollView, { className: "style" });
 
 Sentry.init({
   dsn: "https://0260d38c5ecf94138de7278c21eae8fb@o4510069231845376.ingest.us.sentry.io/4510069233090560",

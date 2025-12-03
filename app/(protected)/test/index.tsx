@@ -23,15 +23,7 @@ import Reanimated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
-
-// Simple UUID generator for React Native
-const generateUUID = () => {
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-    const r = (Math.random() * 16) | 0;
-    const v = c === "x" ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
-};
+import { v4 } from "uuid";
 
 export default function TestPage() {
   const { profile } = useAuthStore();
@@ -47,7 +39,10 @@ export default function TestPage() {
 
   useEffect(() => {
     Promise.all([
-      supabase.from("questions").select("*"),
+      supabase
+        .from("questions")
+        .select("*")
+        .order("index", { ascending: true }),
       supabase
         .from("answers")
         .select("*")
@@ -86,9 +81,9 @@ export default function TestPage() {
       questions.length > 0 ? (currentIndex / questions.length) * 100 : 0;
     progress.value = withTiming(pct, { duration: 300 });
   }, [currentIndex, questions.length, progress]);
+
   const progressStyle = useAnimatedStyle(() => {
     return {
-      width: `${progress.value}%`,
       borderBottomRightRadius: progress.value >= 100 ? 0 : 4,
       borderTopRightRadius: progress.value >= 100 ? 0 : 4,
     };
@@ -215,7 +210,7 @@ export default function TestPage() {
       return [
         ...prev,
         {
-          id: generateUUID(),
+          id: v4(),
           profile_id: profile.id,
           question_id: q.id,
           answer: value,
