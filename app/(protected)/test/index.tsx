@@ -271,6 +271,9 @@ export default function TestPage() {
       await computeAndSaveProfileScores(profile.id);
       await fetchProfile();
 
+      const updatedProfile = useAuthStore.getState().profile;
+      if (!updatedProfile) return;
+
       if (invitedProfileId) {
         const { data: inviter } = await supabase
           .from("profiles")
@@ -280,14 +283,17 @@ export default function TestPage() {
 
         if (inviter) {
           let male = inviter;
-          let female = profile;
+          let female = updatedProfile;
 
-          if (inviter.gender === "female" && profile.gender === "male") {
-            male = profile;
+          if (inviter.gender === "female" && updatedProfile.gender === "male") {
+            male = updatedProfile;
             female = inviter;
-          } else if (inviter.gender === "male" && profile.gender === "female") {
+          } else if (
+            inviter.gender === "male" &&
+            updatedProfile.gender === "female"
+          ) {
             male = inviter;
-            female = profile;
+            female = updatedProfile;
           } else {
             // Same gender or invalid, skip relationship creation but still show result
             // or maybe show error? User didn't specify.
@@ -297,10 +303,6 @@ export default function TestPage() {
           // Only create if we have a valid male/female pair (or if we decided to support same-gender in future, but current logic is strict)
           if (male.gender !== female.gender) {
             await createRelationship({ male, female });
-            router.replace("/");
-
-            clearInvitation();
-            return;
           }
         }
       }
@@ -384,10 +386,9 @@ export default function TestPage() {
                       테스트 완료!
                     </Text>
                     <Text className="mt-3 text-pastel-gray font-medium leading-5">
-                      {invitedProfile &&
-                      invitedProfile.gender !== profile?.gender
-                        ? `성격, 애착, 안정성 데이터를 바탕으로 당신의 연애 패턴을 분석했어요. 지금 ${invitedProfile.nickname}님과의 케미스트리를 확인해보세요.`
-                        : "성격, 애착, 안정성 데이터를 바탕으로 당신의 연애 패턴을 분석했어요. 지금 결과를 확인하고, 상대에게 공유해 두 사람의 케미스트리를 확인해보세요."}
+                      성격, 애착, 안정성 데이터를 바탕으로 당신의 연애 패턴을
+                      분석했어요. 지금 결과를 확인하고, 상대에게 공유해 두
+                      사람의 케미스트리를 확인해보세요.
                     </Text>
                     <Image
                       source={require("../../../assets/images/test-done.png")}
@@ -400,18 +401,9 @@ export default function TestPage() {
                       contentFit="contain"
                     />
                     <TouchableOpacity
-                      className={`w-full bg-foreground px-16 rounded-full mt-16 h-14 items-center justify-center ${
-                        invitedProfile &&
-                        invitedProfile.gender === profile?.gender
-                          ? "opacity-50"
-                          : ""
-                      }`}
+                      className="w-full bg-foreground px-16 rounded-full mt-16 h-14 items-center justify-center"
                       onPress={handleCompleteTest}
                       activeOpacity={0.8}
-                      disabled={
-                        !!invitedProfile &&
-                        invitedProfile.gender === profile?.gender
-                      }
                     >
                       {loading ? (
                         <ActivityIndicator size="small" color="#222" />
@@ -419,19 +411,10 @@ export default function TestPage() {
                         <Text
                           className={`text-center text-background font-semibold text-base`}
                         >
-                          {invitedProfile &&
-                          invitedProfile.gender !== profile?.gender
-                            ? `${invitedProfile.nickname}님과의 케미스트리 확인하기`
-                            : "결과 확인하기"}
+                          결과 확인하기
                         </Text>
                       )}
                     </TouchableOpacity>
-                    {invitedProfile &&
-                      invitedProfile.gender === profile?.gender && (
-                        <Text className="text-red-400 text-center mt-4 font-medium">
-                          현재 케미스트리 분석은 이성 커플만 지원해요.
-                        </Text>
-                      )}
                   </View>
                 );
               }

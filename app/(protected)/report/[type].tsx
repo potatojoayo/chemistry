@@ -11,7 +11,7 @@ import {
   ScrollView,
   Text,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 
 import Animated, {
@@ -54,24 +54,25 @@ export default function ReportPage() {
         }
 
         if (type === "aas") {
-          if (
-            !profile.emotional_stability_level ||
-            !profile.attachment_type
-          ) {
+          if (!profile.emotional_stability_level || !profile.attachment_type) {
             setError("Incomplete test results");
             setLoading(false);
             return;
           }
+
           const { data, error } = await supabase
             .from("report_aas")
             .select("*")
             .eq("emotional_stability_level", profile.emotional_stability_level)
             .eq("type", profile.attachment_type)
-            .single();
+            .limit(1)
+            .maybeSingle();
 
           if (error) {
             console.error("Error fetching AAS report:", error);
             setError("Failed to load AAS report");
+          } else if (!data) {
+            setError("No report found");
           } else {
             setAasReport(data as ReportAAS);
           }
@@ -81,22 +82,25 @@ export default function ReportPage() {
             setLoading(false);
             return;
           }
+
           const { data, error } = await supabase
             .from("report_flexibility")
             .select("*")
             .eq("flexibility_level", profile.flexibility_level)
-            .single();
+            .limit(1)
+            .maybeSingle();
 
           if (error) {
             console.error("Error fetching flexibility report:", error);
             setError("Failed to load flexibility report");
+          } else if (!data) {
+            setError("No report found");
           } else {
             setFlexibilityReport(data as ReportFlexibility);
           }
         } else {
-            setError("Invalid report type");
+          setError("Invalid report type");
         }
-
       } catch (e) {
         console.error("Unexpected error:", e);
         setError("An unexpected error occurred");
@@ -108,10 +112,39 @@ export default function ReportPage() {
     fetchResult();
   }, [profile, type]);
 
-
-  if (!loading && (error || (!aasReport && !flexibilityReport))) {
+  if (loading) {
+    console.log("loading");
     return (
-      <View className="flex-1 justify-center items-center bg-background">
+      <View className="flex-1 bg-background flex-col">
+        <View className="flex flex-row items-center justify-between px-4 h-14 border-b border-pastel-gray/10 w-full">
+          <Pressable onPress={() => router.back()} className="p-2">
+            <FontAwesome6 name="chevron-left" size={20} color="#ECEEDF" />
+          </Pressable>
+          <Text className="text-foreground font-semibold text-lg">
+            {type === "aas" ? "성인 애착 유형" : "정서적 유연성"}
+          </Text>
+          <View className="w-9" />
+        </View>
+      </View>
+    );
+  }
+
+  if (error || (!aasReport && !flexibilityReport)) {
+    console.log(loading);
+    console.log(error);
+    console.log(aasReport);
+    console.log(flexibilityReport);
+    return (
+      <View className="flex-1 bg-background flex-col">
+        <View className="flex flex-row items-center justify-between px-4 h-14 border-b border-pastel-gray/10 w-full">
+          <Pressable onPress={() => router.back()} className="p-2">
+            <FontAwesome6 name="chevron-left" size={20} color="#ECEEDF" />
+          </Pressable>
+          <Text className="text-foreground font-semibold text-lg">
+            {type === "aas" ? "성인 애착 유형" : "정서적 유연성"}
+          </Text>
+          <View className="w-9" />
+        </View>
         <Text className="text-foreground">{error || "No report found"}</Text>
         <TouchableOpacity
           className="mt-4 bg-foreground px-6 py-3 rounded-full"
@@ -124,55 +157,50 @@ export default function ReportPage() {
   }
 
   return (
-      <View className="flex-1 flex-col bg-background">
-        {/* Header */}
-        <View className="flex flex-row items-center justify-between px-4 h-14 border-b border-pastel-gray/10">
-          <Pressable onPress={() => router.back()} className="p-2">
-            <FontAwesome6 name="chevron-left" size={20} color="#ECEEDF" />
-          </Pressable>
-          <Text className="text-foreground font-semibold text-lg">
-            {type === "aas" ? "성인 애착 유형" : "정서적 유연성"}
-          </Text>
-          <View className="w-9" />
-        </View>
-        {!loading && (
-          <Animated.View style={[{ flex: 1 }, animatedStyle]}>
-            <ScrollView
-              contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
-              className="flex-1"
-            >
-              {type === "aas" && aasReport && (
-                <ReportCard
-                  test="성인 애착 유형"
-                  title={aasReport.title}
-                  badges={[
-                    "유형: " + aasReport.type_text,
-                    "마음 평온도: " + aasReport.emotional_stability_text,
-                  ]}
-                  overallEvaluation={aasReport.overall_evaluation}
-                  detailEvaluations={aasReport.detail_evaluations}
-                  counselingText={aasReport.counseling_text}
-                />
-              )}
-
-              {type === "flexibility" && flexibilityReport && (
-                <ReportCard
-                  test="정서적 유연성"
-                  title={flexibilityReport.title}
-                  badges={[
-                    "유연성: " +
-                      profile?.flexibility_percentage?.toFixed(1) +
-                      "%",
-                  ]}
-                  overallEvaluation={flexibilityReport.overall_evaluation}
-                  detailEvaluations={flexibilityReport.detail_evaluation}
-                  counselingText={flexibilityReport.counseling_text}
-                />
-              )}
-            </ScrollView>
-          </Animated.View>
-        )}
+    <View className="flex-1 flex-col bg-background">
+      {/* Header */}
+      <View className="flex flex-row items-center justify-between px-4 h-14 border-b border-pastel-gray/10">
+        <Pressable onPress={() => router.back()} className="p-2">
+          <FontAwesome6 name="chevron-left" size={20} color="#ECEEDF" />
+        </Pressable>
+        <Text className="text-foreground font-semibold text-lg">
+          {type === "aas" ? "성인 애착 유형" : "정서적 유연성"}
+        </Text>
+        <View className="w-9" />
       </View>
+      <Animated.View style={[{ flex: 1 }, animatedStyle]}>
+        <ScrollView
+          contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
+          className="flex-1"
+        >
+          {type === "aas" && aasReport && (
+            <ReportCard
+              test="성인 애착 유형"
+              title={aasReport.title}
+              badges={[
+                "유형: " + aasReport.type_text,
+                "마음 평온도: " + aasReport.emotional_stability_text,
+              ]}
+              overallEvaluation={aasReport.overall_evaluation}
+              detailEvaluations={aasReport.detail_evaluations}
+              counselingText={aasReport.counseling_text}
+            />
+          )}
+
+          {type === "flexibility" && flexibilityReport && (
+            <ReportCard
+              test="정서적 유연성"
+              title={flexibilityReport.title}
+              badges={[
+                "유연성: " + profile?.flexibility_percentage?.toFixed(1) + "%",
+              ]}
+              overallEvaluation={flexibilityReport.overall_evaluation}
+              detailEvaluations={flexibilityReport.detail_evaluation}
+              counselingText={flexibilityReport.counseling_text}
+            />
+          )}
+        </ScrollView>
+      </Animated.View>
+    </View>
   );
 }
-

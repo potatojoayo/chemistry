@@ -69,6 +69,7 @@ export default function Chart() {
       } catch (error) {
         console.error("Error fetching reports:", error);
       } finally {
+        console.log("yes");
         setLoading(false);
       }
     }
@@ -142,9 +143,7 @@ export default function Chart() {
                 label="정서적 유연성"
                 value={flexibilityReport.flexibility_label}
                 subValue={
-                  "유연성: " +
-                  profile.flexibility_percentage?.toFixed(1) +
-                  "%"
+                  "유연성: " + profile.flexibility_percentage?.toFixed(1) + "%"
                 }
                 colorClass="bg-foreground/5"
                 onPress={() => router.push("/report/flexibility")}

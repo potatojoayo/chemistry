@@ -3,7 +3,7 @@ import { Profile } from "@/models/profile";
 import { User } from "@supabase/supabase-js";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { getWebStorage } from "./get-web-storage";
+import { storage } from "./storage";
 
 interface AuthState {
   user: User | null;
@@ -63,15 +63,21 @@ export const useAuthStore = create<AuthState>()(
       },
 
       init: async () => {
-        // 초기 세션 확인
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
+        try {
+          // 초기 세션 확인
+          const {
+            data: { session },
+          } = await supabase.auth.getSession();
 
-        set({ user: session?.user ?? null });
+          set({ user: session?.user ?? null });
 
-        if (session?.user) {
-          await get().fetchProfile();
+          if (session?.user) {
+            await get().fetchProfile();
+          }
+        } catch (error) {
+          console.error("Error initializing auth:", error);
+        } finally {
+          set({ loading: false });
         }
 
         // 로그인/로그아웃 실시간 반영
@@ -79,26 +85,23 @@ export const useAuthStore = create<AuthState>()(
           const currentUser = get().user;
           const newUser = session?.user ?? null;
 
-          set({ user: newUser });
-
-          if (newUser) {
-            // 유저가 변경되었거나 프로필이 없는 경우 fetch
-            // (이미 있는 경우 불필요한 fetch 방지 로직을 추가할 수도 있지만,
-            //  onAuthStateChange는 로그인/앱시작 시 주로 발생하므로 안전하게 fetch)
-            await get().fetchProfile();
-          } else {
-            set({ profile: null });
+          // 세션이 변경되었을 때만 업데이트
+          if (currentUser?.id !== newUser?.id) {
+            set({ user: newUser });
+            if (newUser) {
+              await get().fetchProfile();
+            } else {
+              set({ profile: null });
+            }
           }
 
           set({ loading: false });
         });
-
-        set({ loading: false });
       },
     }),
     {
       name: "auth-store",
-      storage: createJSONStorage(() => getWebStorage()),
+      storage: createJSONStorage(() => storage),
       partialize: (state) => ({
         user: state.user,
         profile: state.profile,
