@@ -1,0 +1,1 @@
+ALTER TABLE "report_chemistry" DROP COLUMN "emotional_flexibility_text";--> statement-breakpoint

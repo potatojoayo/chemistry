@@ -293,7 +293,6 @@ export const reportChemistry = pgTable(
       withTimezone: true,
       mode: "string",
     }).defaultNow(),
-    emotional_flexibility_text: text("emotional_flexibility_text").notNull(),
     title: text("title").notNull(),
     sequence: smallint("sequence").notNull(),
   },
