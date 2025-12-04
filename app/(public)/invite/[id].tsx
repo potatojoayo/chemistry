@@ -67,6 +67,7 @@ export default function Test() {
   const { setInviterProfileId, clearInvitation } = useInvitationStore();
 
   const handleStartTest = async () => {
+    setRedirectPath("/invite/" + id);
     if (existingRelationship) {
       setRedirectPath(null);
       router.push("/");

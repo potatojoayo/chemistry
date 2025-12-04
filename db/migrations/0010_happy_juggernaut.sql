@@ -1,0 +1,1 @@
+ALTER POLICY "authenticated can view all profiles" ON "profiles" RENAME TO "public can view all profiles";

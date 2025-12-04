@@ -74,9 +74,9 @@ export const profiles = pgTable(
     gender: text("gender").notNull(),
   },
   (table) => [
-    pgPolicy("authenticated can view all profiles", {
+    pgPolicy("public can view all profiles", {
       for: "select",
-      to: authenticatedRole,
+      to: "public",
       using: sql`true`,
     }),
     pgPolicy("users can insert their own profile", {

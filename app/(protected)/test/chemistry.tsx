@@ -31,7 +31,7 @@ export default function ChemistryPage() {
           .from("relationships")
           .select("*")
           .or(
-            `inviting_profile_id.eq.${profile.id},invited_profile_id.eq.${profile.id}`
+            `inviter_profile_id.eq.${profile.id},invitee_profile_id.eq.${profile.id}`
           )
           .order("created_at", { ascending: false })
           .limit(1)
@@ -47,9 +47,9 @@ export default function ChemistryPage() {
 
         // Fetch partner profile
         const partnerId =
-          relData.inviting_profile_id === profile.id
-            ? relData.invited_profile_id
-            : relData.inviting_profile_id;
+          relData.inviter_profile_id === profile.id
+            ? relData.invitee_profile_id
+            : relData.inviter_profile_id;
 
         const { data: partnerData, error: partnerError } = await supabase
           .from("profiles")

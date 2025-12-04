@@ -84,6 +84,7 @@ export default function TestPage() {
 
   const progressStyle = useAnimatedStyle(() => {
     return {
+      width: `${progress.value}%`,
       borderBottomRightRadius: progress.value >= 100 ? 0 : 4,
       borderTopRightRadius: progress.value >= 100 ? 0 : 4,
     };
