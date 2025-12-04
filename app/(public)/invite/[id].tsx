@@ -1,4 +1,5 @@
 import AnimatedPageWrapper from "@/components/common/animated-page-wrapper";
+import { useSnackbar } from "@/context/snackbar-context";
 import { Profile } from "@/db/schema";
 import { createRelationship } from "@/lib/create-relationship";
 import { supabase } from "@/lib/supabase";
@@ -9,13 +10,11 @@ import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Image,
-  Pressable,
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import { Snackbar } from "react-native-paper";
 import Animated from "react-native-reanimated";
 
 export default function Test() {
@@ -24,8 +23,7 @@ export default function Test() {
     null
   );
   const { setRedirectPath } = useInvitationStore();
-  const [snackbarVisible, setSnackbarVisible] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const { showSnackbar } = useSnackbar();
   const { profile } = useAuthStore();
   const [loading, setLoading] = useState(false);
 
@@ -37,8 +35,9 @@ export default function Test() {
         .eq("id", id)
         .then(({ data, error }) => {
           if (error) {
-            setSnackbarMessage("프로필을 불러오는데 실패했습니다.");
-            setSnackbarVisible(true);
+            showSnackbar({
+              message: "프로필을 찾을 수 없어요. 다시 시도해주세요.",
+            });
             return;
           }
           setRequesterProfile(data?.[0] ?? null);
@@ -75,8 +74,9 @@ export default function Test() {
     }
     if (loading) return;
     if (!requesterProfile) {
-      setSnackbarMessage("초대자 정보를 찾을 수 없습니다.");
-      setSnackbarVisible(true);
+      showSnackbar({
+        message: "초대자 정보를 찾을 수 없어요. 다시 시도해주세요.",
+      });
       return;
     }
 
@@ -101,8 +101,9 @@ export default function Test() {
         male = requesterProfile;
         female = profile;
       } else {
-        setSnackbarMessage("현재 케미스트리 분석은 이성 커플만 지원해요.");
-        setSnackbarVisible(true);
+        showSnackbar({
+          message: "현재 케미스트리 분석은 이성 커플만 지원해요.",
+        });
         setLoading(false);
         return;
       }
@@ -210,33 +211,6 @@ export default function Test() {
           </View>
         </TouchableWithoutFeedback>
       </View>
-
-      <Snackbar
-        visible={snackbarVisible}
-        onDismiss={() => setSnackbarVisible(false)}
-        duration={3000}
-        wrapperStyle={{
-          position: "absolute",
-          left: 0,
-          right: 0,
-          bottom: 16,
-        }}
-        style={{
-          backgroundColor: "#222",
-        }}
-      >
-        <View className="flex flex-row items-center justify-between">
-          <Text className="text-foreground text-sm font-medium">
-            {snackbarMessage}
-          </Text>
-          <Pressable
-            onPress={() => setSnackbarVisible(false)}
-            className="bg-foreground rounded-full px-4 py-2"
-          >
-            <Text className="text-background text-xs font-semibold">확인</Text>
-          </Pressable>
-        </View>
-      </Snackbar>
     </AnimatedPageWrapper>
   );
 }

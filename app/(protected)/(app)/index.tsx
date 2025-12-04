@@ -1,4 +1,5 @@
 import TabPageWrapper from "@/components/common/tab-page-wrapper";
+import { useSnackbar } from "@/context/snackbar-context";
 import { Relationship } from "@/db/schema";
 import { useKakao } from "@/lib/kakao-web";
 import { supabase } from "@/lib/supabase";
@@ -10,7 +11,6 @@ import { useEffect, useState } from "react";
 import {
   Modal,
   Platform,
-  Pressable,
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
@@ -21,7 +21,6 @@ import {
   GestureDetector,
   ScrollView,
 } from "react-native-gesture-handler";
-import { Snackbar } from "react-native-paper";
 import Animated, {
   runOnJS,
   useAnimatedStyle,
@@ -35,7 +34,7 @@ export default function Home() {
 
   const [relationships, setRelationships] = useState<Relationship[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
-  const [snackbarVisible, setSnackbarVisible] = useState(false);
+  const { showSnackbar } = useSnackbar();
   const [loading, setLoading] = useState(true);
 
   const overlayOpacity = useSharedValue(0);
@@ -80,7 +79,11 @@ export default function Home() {
 
     try {
       await Clipboard.setStringAsync(inviteLink);
-      setSnackbarVisible(true);
+      await Clipboard.setStringAsync(inviteLink);
+      showSnackbar({
+        message: "초대 링크가 클립보드에 복사되었어요!",
+        bottom: 56,
+      });
       closeModal();
     } catch (error) {
       console.error("클립보드 복사 실패:", error);
@@ -282,33 +285,6 @@ export default function Home() {
           </GestureDetector>
         </View>
       </Modal>
-
-      <Snackbar
-        visible={snackbarVisible}
-        onDismiss={() => setSnackbarVisible(false)}
-        duration={3000}
-        wrapperStyle={{
-          position: "absolute",
-          bottom: 24,
-          left: 0,
-          right: 0,
-        }}
-        style={{
-          backgroundColor: "#222",
-        }}
-      >
-        <View className="flex flex-row items-center justify-between">
-          <Text className="text-foreground text-sm font-medium">
-            초대 링크가 클립보드에 복사되었어요!
-          </Text>
-          <Pressable
-            onPress={() => setSnackbarVisible(false)}
-            className="bg-foreground rounded-full px-4 py-2"
-          >
-            <Text className="text-background text-xs font-semibold">확인</Text>
-          </Pressable>
-        </View>
-      </Snackbar>
     </TabPageWrapper>
   );
 }

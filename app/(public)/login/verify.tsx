@@ -1,4 +1,5 @@
 import AnimatedPageWrapper from "@/components/common/animated-page-wrapper";
+import { useSnackbar } from "@/context/snackbar-context";
 import { formatPhoneNumber } from "@/lib/formatters";
 import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/stores/auth-store";
@@ -16,7 +17,6 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import { Snackbar } from "react-native-paper";
 import Animated from "react-native-reanimated";
 
 export default function Verify() {
@@ -25,8 +25,7 @@ export default function Verify() {
   const [loading, setLoading] = useState(false);
   const [token, setToken] = useState("");
   const [timeLeft, setTimeLeft] = useState(300); // 5분 = 300초
-  const [snackbarVisible, setSnackbarVisible] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const { showSnackbar } = useSnackbar();
   const [verified, setVerified] = useState(false);
   const inputRef = useRef<TextInput>(null);
 
@@ -58,8 +57,10 @@ export default function Verify() {
       });
       if (error) {
         console.log(error);
-        setSnackbarMessage("인증번호가 올바르지 않습니다.");
-        setSnackbarVisible(true);
+        showSnackbar({
+          message: "인증번호가 올바르지 않습니다.",
+          top: 4,
+        });
         setLoading(false);
         setToken("");
         return;
@@ -119,13 +120,11 @@ export default function Verify() {
       await supabase.auth.signInWithOtp({
         phone: "+82" + phone.slice(1).replaceAll("-", ""),
       });
-      setSnackbarMessage("인증번호가 재전송되었어요.");
-      setSnackbarVisible(true);
+      showSnackbar({ message: "인증번호가 재전송되었어요.", top: 60 });
       setTimeLeft(300); // 타이머 리셋
     } catch (error) {
       console.log(error);
-      setSnackbarMessage("인증번호 전송에 실패했습니다.");
-      setSnackbarVisible(true);
+      showSnackbar({ message: "인증번호 전송에 실패했습니다.", top: 60 });
     }
     setLoading(false);
   };
@@ -187,7 +186,7 @@ export default function Verify() {
                   height: 1,
                   opacity: 0,
                 }}
-                selectionColor="#ECEEDF"
+                selectionColor="transparent"
               />
 
               {/* 카운트다운 타이머 */}
@@ -223,24 +222,6 @@ export default function Verify() {
           </View>
         </TouchableWithoutFeedback>
       </View>
-      <Snackbar
-        visible={snackbarVisible}
-        onDismiss={() => {
-          setSnackbarVisible(false);
-        }}
-      >
-        <View className="flex flex-row items-center justify-between">
-          <Text className="text-foreground text-sm font-medium">
-            {snackbarMessage}
-          </Text>
-          <Pressable
-            onPress={() => setSnackbarVisible(false)}
-            className="bg-foreground rounded-full px-4 py-2"
-          >
-            <Text className="text-background text-xs font-semibold">확인</Text>
-          </Pressable>
-        </View>
-      </Snackbar>
     </AnimatedPageWrapper>
   );
 }

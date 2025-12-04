@@ -1,4 +1,5 @@
 import AnimatedPageWrapper from "@/components/common/animated-page-wrapper";
+import { useSnackbar } from "@/context/snackbar-context";
 import { formatPhoneNumber } from "@/lib/formatters";
 import { supabase } from "@/lib/supabase";
 import { FontAwesome6 } from "@expo/vector-icons";
@@ -9,17 +10,16 @@ import {
   Pressable,
   Text,
   TextInput,
+  TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import { Snackbar } from "react-native-paper";
 import Animated from "react-native-reanimated";
 
 export default function Register() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [loading, setLoading] = useState(false);
-  const [snackbarVisible, setSnackbarVisible] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const { showSnackbar } = useSnackbar();
   const inputRef = useRef<TextInput>(null);
 
   const handlePhoneNumberChange = (text: string) => {
@@ -30,26 +30,33 @@ export default function Register() {
   const handleSendVerificationCode = async () => {
     if (loading) return;
     setLoading(true);
+
+    // Optimistic Navigation: API 응답을 기다리지 않고 즉시 이동
+    // 이는 iOS Safari에서 async 작업 후의 navigation을 programmatic으로 간주하여
+    // 다음 화면의 autoFocus를 차단하는 것을 방지하기 위함입니다.
+    router.push(("/login/verify?phone=" + phoneNumber) as RelativePathString);
+
     const { error } = await supabase.auth.signInWithOtp({
       phone: "+82" + phoneNumber.slice(1).replaceAll("-", ""),
     });
+
     if (error) {
       console.log(error);
+      // 실패 시 다시 돌아옴
+      router.back();
+
       if (error.message.includes("Max send attempts reached")) {
-        setSnackbarMessage(
-          "인증번호 전송 횟수를 초과했습니다. 잠시 후 다시 시도해주세요."
-        );
+        showSnackbar({
+          message:
+            "인증번호 전송 횟수를 초과했습니다. 잠시 후 다시 시도해주세요.",
+        });
       } else {
-        setSnackbarMessage("인증번호 전송에 실패했습니다. 다시 시도해주세요.");
+        showSnackbar({
+          message: "인증번호 전송에 실패했습니다. 다시 시도해주세요.",
+        });
       }
-      setSnackbarVisible(true);
-      setLoading(false);
-      return;
     }
-    router.push(("/login/verify?phone=" + phoneNumber) as RelativePathString);
-    setTimeout(() => {
-      setLoading(false);
-    }, 1000);
+    setLoading(false);
   };
 
   return (
@@ -60,28 +67,6 @@ export default function Register() {
             <View className="flex flex-row justify-between h-12">
               <Pressable onPress={() => router.back()} className="p-3 w-fit">
                 <FontAwesome6 name="chevron-left" size={20} color="#ECEEDF" />
-              </Pressable>
-
-              <Pressable
-                className="p-3 w-fit"
-                disabled={phoneNumber.length !== 13 || loading}
-                onPress={() => {
-                  handleSendVerificationCode();
-                }}
-              >
-                {loading ? (
-                  <ActivityIndicator color="#5AAEFF" size={22} />
-                ) : (
-                  <Text
-                    className={`font-medium text-lg ${
-                      phoneNumber.length === 13
-                        ? "text-blue-500"
-                        : "text-blue-500/50"
-                    }`}
-                  >
-                    다음
-                  </Text>
-                )}
               </Pressable>
             </View>
             <View className="flex flex-col p-3 pt-0 flex-1">
@@ -106,12 +91,6 @@ export default function Register() {
                     outline: "none",
                   }}
                   autoFocus
-                  onBlur={() => {
-                    // focus가 해제되면 즉시 다시 focus
-                    setTimeout(() => {
-                      inputRef.current?.focus();
-                    }, 0);
-                  }}
                   placeholderTextColor="#666"
                   keyboardType="phone-pad"
                   maxLength={13} // 010-0000-0000 (13자리)
@@ -128,7 +107,7 @@ export default function Register() {
                   },
                 ]}
               >
-                {/* <TouchableOpacity
+                <TouchableOpacity
                   className={`bg-foreground rounded-full h-14 items-center justify-center ${phoneNumber.length !== 13 ? "opacity-50" : "opacity-100"} ${loading ? "opacity-50" : "opacity-100"}`}
                   disabled={phoneNumber.length !== 13 ? true || loading : false}
                   activeOpacity={0.7}
@@ -141,30 +120,12 @@ export default function Register() {
                       인증번호 받기
                     </Text>
                   )}
-                </TouchableOpacity> */}
+                </TouchableOpacity>
               </Animated.View>
             </View>
           </View>
         </TouchableWithoutFeedback>
       </View>
-      <Snackbar
-        visible={snackbarVisible}
-        onDismiss={() => {
-          setSnackbarVisible(false);
-        }}
-      >
-        <View className="flex flex-row items-center justify-between">
-          <Text className="text-foreground text-sm font-medium">
-            {snackbarMessage}
-          </Text>
-          <Pressable
-            onPress={() => setSnackbarVisible(false)}
-            className="bg-foreground rounded-full px-4 py-2"
-          >
-            <Text className="text-background text-xs font-semibold">확인</Text>
-          </Pressable>
-        </View>
-      </Snackbar>
     </AnimatedPageWrapper>
   );
 }

@@ -1,3 +1,4 @@
+import { SnackbarProvider } from "@/context/snackbar-context";
 import * as Sentry from "@sentry/react-native";
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack } from "expo-router";
@@ -63,14 +64,16 @@ export default Sentry.wrap(function Layout() {
   return (
     <KeyboardProvider>
       <PaperProvider theme={{ dark: true }}>
-        <GestureHandlerRootView className="flex-1">
-          <Stack
-            screenOptions={{
-              headerShown: false,
-              contentStyle: { backgroundColor: "#222" },
-            }}
-          ></Stack>
-        </GestureHandlerRootView>
+        <SnackbarProvider>
+          <GestureHandlerRootView className="flex-1">
+            <Stack
+              screenOptions={{
+                headerShown: false,
+                contentStyle: { backgroundColor: "#222" },
+              }}
+            ></Stack>
+          </GestureHandlerRootView>
+        </SnackbarProvider>
       </PaperProvider>
     </KeyboardProvider>
   );
