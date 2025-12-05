@@ -109,13 +109,13 @@ export default function Test() {
         return;
       }
 
-      await createRelationship({
+      const relationship = await createRelationship({
         male,
         female,
       });
       clearInvitation();
       setRedirectPath(null);
-      router.push(`/`);
+      router.push(`/test/chemistry/${relationship.id}`);
       return;
     }
 

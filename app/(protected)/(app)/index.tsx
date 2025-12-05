@@ -1,12 +1,14 @@
 import TabPageWrapper from "@/components/common/tab-page-wrapper";
+import RelationshipListItem from "@/components/relationship/relationship-list-item";
 import { useSnackbar } from "@/context/snackbar-context";
-import { Relationship } from "@/db/schema";
+import { Profile, Relationship } from "@/db/schema";
 import { useKakao } from "@/lib/kakao-web";
 import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/stores/auth-store";
 import { FontAwesome6 } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
 import { Image } from "expo-image";
+import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   Modal,
@@ -28,11 +30,18 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
+type RelationshipWithPartner = {
+  relationship: Relationship;
+  partner: Profile;
+};
+
 export default function Home() {
   const { profile } = useAuthStore();
   useKakao();
 
-  const [relationships, setRelationships] = useState<Relationship[]>([]);
+  const [relationships, setRelationships] = useState<RelationshipWithPartner[]>(
+    []
+  );
   const [modalVisible, setModalVisible] = useState(false);
   const { showSnackbar } = useSnackbar();
   const [loading, setLoading] = useState(true);
@@ -95,14 +104,66 @@ export default function Home() {
   useEffect(() => {
     if (!profile?.id) return;
     setLoading(true);
-    supabase
-      .from("relationships")
-      .select("*")
-      .or(`requester_id.eq.${profile.id},target_id.eq.${profile.id}`)
-      .then((response) => {
-        setRelationships(response.data ?? []);
+
+    const fetchData = async () => {
+      // 1. Fetch Relationships
+      const { data: rels, error: relError } = await supabase
+        .from("relationships")
+        .select("*")
+        .or(
+          `inviter_profile_id.eq.${profile.id},invitee_profile_id.eq.${profile.id}`
+        )
+        .order("created_at", { ascending: false });
+
+      if (relError || !rels) {
+        console.error("Error fetching relationships:", relError);
         setLoading(false);
-      });
+        return;
+      }
+
+      if (rels.length === 0) {
+        setRelationships([]);
+        setLoading(false);
+        return;
+      }
+
+      // 2. Extract Partner IDs
+      const partnerIds = rels.map((rel) =>
+        rel.inviter_profile_id === profile.id
+          ? rel.invitee_profile_id
+          : rel.inviter_profile_id
+      );
+
+      // 3. Fetch Partner Profiles
+      const { data: partners, error: partnerError } = await supabase
+        .from("profiles")
+        .select("*")
+        .in("id", partnerIds);
+
+      if (partnerError || !partners) {
+        console.error("Error fetching partners:", partnerError);
+        setLoading(false);
+        return;
+      }
+
+      // 4. Combine Data
+      const combined: RelationshipWithPartner[] = rels
+        .map((rel) => {
+          const partnerId =
+            rel.inviter_profile_id === profile.id
+              ? rel.invitee_profile_id
+              : rel.inviter_profile_id;
+          const partner = partners.find((p) => p.id === partnerId);
+          if (!partner) return null;
+          return { relationship: rel, partner };
+        })
+        .filter((item): item is RelationshipWithPartner => item !== null);
+
+      setRelationships(combined);
+      setLoading(false);
+    };
+
+    fetchData();
   }, [profile?.id]);
 
   const gesture = Gesture.Pan()
@@ -160,6 +221,23 @@ export default function Home() {
             </View>
           </TouchableOpacity>
           <View className="my-3 border-t border-pastel-gray/20"></View>
+
+          {/* Relationship List */}
+          {relationships.length > 0 && (
+            <View className="flex flex-col gap-2">
+              {relationships.map((item) => (
+                <RelationshipListItem
+                  key={item.relationship.id}
+                  relationship={item.relationship}
+                  partner={item.partner}
+                  onPress={() =>
+                    router.push(`/chemistry/${item.relationship.id}`)
+                  }
+                />
+              ))}
+            </View>
+          )}
+
           {relationships.length === 0 && !loading ? (
             <View className="mt-6 flex flex-col items-center">
               <Image

@@ -24,9 +24,10 @@ export default function TestResult() {
   const { inviterProfileId, clearInvitation } = useInvitationStore();
   const [inviterProfile, setInviterProfile] = useState<Profile | null>(null);
   const { authRedirectPath, setAuthRedirectPath } = useAuthStore();
+  const [relationshipId, setRelationshipId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (inviterProfileId) {
+    if (inviterProfileId && profile) {
       supabase
         .from("profiles")
         .select("*")
@@ -37,13 +38,26 @@ export default function TestResult() {
             setInviterProfile(data);
           }
         });
+
+      supabase
+        .from("relationships")
+        .select("id")
+        .or(
+          `and(inviter_profile_id.eq.${profile.id},invitee_profile_id.eq.${inviterProfileId}),and(inviter_profile_id.eq.${inviterProfileId},invitee_profile_id.eq.${profile.id})`
+        )
+        .maybeSingle()
+        .then(({ data }) => {
+          if (data) {
+            setRelationshipId(data.id);
+          }
+        });
     }
-  }, [inviterProfileId]);
+  }, [inviterProfileId, profile]);
 
   const handleClickNext = () => {
-    if (inviterProfile) {
+    if (inviterProfile && relationshipId) {
       clearInvitation();
-      router.push("/test/chemistry");
+      router.push(`/test/chemistry/${relationshipId}`);
     } else {
       if (authRedirectPath) {
         router.push(authRedirectPath as RelativePathString);
