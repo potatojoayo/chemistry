@@ -1,9 +1,8 @@
-import BlurHeader from "@/components/common/blur-header";
+import CleanHeader from "@/components/common/clean-header";
 import { useAuthStore } from "@/stores/auth-store";
 import { Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
-import { BlurView } from "expo-blur";
 import { Redirect, Tabs } from "expo-router";
-import { Image, Text } from "react-native";
+import { Image, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function TabLayout() {
@@ -28,16 +27,11 @@ export default function TabLayout() {
           position: "absolute",
           borderTopColor: "transparent",
           height: 56 + bottom,
+          backgroundColor: "transparent", // background handled by tabBarBackground
+          elevation: 0, // remove shadow on android
         },
         tabBarBackground: () => (
-          <BlurView
-            intensity={40}
-            tint="dark"
-            style={{
-              flex: 1,
-              backgroundColor: "transparent",
-            }}
-          />
+          <View className="flex-1 bg-background border-t border-pastel-gray/10" />
         ),
         tabBarLabelStyle: {
           fontFamily: "bold",
@@ -53,13 +47,13 @@ export default function TabLayout() {
             <Entypo size={20} name="lab-flask" color={color} />
           ),
           header: () => (
-            <BlurHeader>
+            <CleanHeader>
               <Image
                 source={require("../../../assets/images/logo-foreground.png")}
-                style={{ width: 132 }}
+                style={{ width: 120, marginTop: 8 }}
                 resizeMode="contain"
               />
-            </BlurHeader>
+            </CleanHeader>
           ),
         }}
       />
@@ -75,11 +69,11 @@ export default function TabLayout() {
             />
           ),
           header: () => (
-            <BlurHeader>
-              <Text className="text-foreground font-semibold text-2xl mb-2">
+            <CleanHeader>
+              <Text className="text-foreground font-semibold text-2xl">
                 차트
               </Text>
-            </BlurHeader>
+            </CleanHeader>
           ),
         }}
       />
@@ -91,11 +85,11 @@ export default function TabLayout() {
             <Entypo size={20} name="cog" color={color} />
           ),
           header: () => (
-            <BlurHeader>
-              <Text className="text-foreground font-semibold text-2xl mb-2">
+            <CleanHeader>
+              <Text className="text-foreground font-semibold text-2xl">
                 설정
               </Text>
-            </BlurHeader>
+            </CleanHeader>
           ),
         }}
       />

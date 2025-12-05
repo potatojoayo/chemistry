@@ -202,7 +202,7 @@ export default function Home() {
               </Text>
             </View>
           </TouchableOpacity>
-          <View className="my-3 border-t border-pastel-gray/20"></View>
+          <View className="mb-3 mt-1 border-t border-pastel-gray/20"></View>
           <TouchableOpacity
             activeOpacity={0.7}
             className="flex flex-row items-center gap-3"
@@ -220,7 +220,7 @@ export default function Home() {
               </Text>
             </View>
           </TouchableOpacity>
-          <View className="my-3 border-t border-pastel-gray/20"></View>
+          <View className="mt-3 border-t border-pastel-gray/20"></View>
 
           {/* Relationship List */}
           {relationships.length > 0 && (

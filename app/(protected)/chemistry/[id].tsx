@@ -216,7 +216,7 @@ export default function ChemistryDetailPage() {
   return (
     <AnimatedPageWrapper>
       {/* Header */}
-      <View className="flex flex-row items-center justify-between px-4 h-14 border-b border-pastel-gray/10">
+      <View className="flex flex-row items-center justify-between px-2 h-14 border-b border-pastel-gray/10">
         <Pressable onPress={() => router.back()} className="p-2">
           <FontAwesome6 name="chevron-left" size={20} color="#ECEEDF" />
         </Pressable>

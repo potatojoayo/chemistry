@@ -18,11 +18,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function PublicChemistryPage() {
   const { id } = useLocalSearchParams();
-  const insets = useSafeAreaInsets();
   const [loading, setLoading] = useState(true);
   const [relationship, setRelationship] = useState<Relationship | null>(null);
   const [partner, setPartner] = useState<Profile | null>(null);

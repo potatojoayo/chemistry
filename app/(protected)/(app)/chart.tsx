@@ -120,7 +120,7 @@ export default function Chart() {
   return (
     <TabPageWrapper>
       <ScrollView className="flex flex-col">
-        <Animated.View style={animatedStyle} className="p-3 pt-1">
+        <Animated.View style={animatedStyle} className="p-3 pt-4">
           <View className="flex flex-row gap-3">
             <View className="flex flex-col p-5 rounded-2xl bg-foreground flex-1 shadow">
               <View className="w-full border-t"></View>

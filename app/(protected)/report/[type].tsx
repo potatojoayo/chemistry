@@ -191,7 +191,7 @@ export default function ReportPage() {
   if (loading) {
     return (
       <View className="flex-1 bg-background flex-col">
-        <View className="flex flex-row items-center justify-between px-4 h-14 border-b border-pastel-gray/10 w-full">
+        <View className="flex flex-row items-center justify-between px-2 h-14 border-b border-pastel-gray/10 w-full">
           <Pressable onPress={() => router.back()} className="p-2">
             <FontAwesome6 name="chevron-left" size={20} color="#ECEEDF" />
           </Pressable>
@@ -207,8 +207,8 @@ export default function ReportPage() {
   if (error || (!aasReport && !flexibilityReport)) {
     return (
       <View className="flex-1 bg-background flex-col">
-        <View className="flex flex-row items-center justify-between px-4 h-14 border-b border-pastel-gray/10 w-full">
-          <Pressable onPress={() => router.back()} className="p-2">
+        <View className="flex flex-row items-center justify-between px-2 h-14 border-b border-pastel-gray/10 w-full">
+          <Pressable onPress={() => router.back()} className="p-0">
             <FontAwesome6 name="chevron-left" size={20} color="#ECEEDF" />
           </Pressable>
           <Text className="text-foreground font-semibold text-lg">
@@ -234,7 +234,7 @@ export default function ReportPage() {
   return (
     <View className="flex-1 flex-col bg-background">
       {/* Header */}
-      <View className="flex flex-row items-center justify-between px-4 h-14 border-b border-pastel-gray/10">
+      <View className="flex flex-row items-center justify-between px-2 h-14 border-b border-pastel-gray/10">
         <Pressable onPress={() => router.back()} className="p-2">
           <FontAwesome6 name="chevron-left" size={20} color="#ECEEDF" />
         </Pressable>
