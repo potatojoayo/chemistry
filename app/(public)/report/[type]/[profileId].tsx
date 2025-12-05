@@ -152,7 +152,7 @@ export default function PublicReportPage() {
         <Pressable onPress={() => router.push("/")}>
           <Image
             source={require("@/assets/images/logo-foreground.png")}
-            style={{ width: 120, height: 32 }}
+            style={{ width: 100, height: 32 }}
             contentFit="contain"
           />
         </Pressable>
