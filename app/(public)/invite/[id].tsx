@@ -1,6 +1,6 @@
 import AnimatedPageWrapper from "@/components/common/animated-page-wrapper";
 import { useSnackbar } from "@/context/snackbar-context";
-import { Profile } from "@/db/schema";
+import { Profile, Relationship } from "@/db/schema";
 import { createRelationship } from "@/lib/create-relationship";
 import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/stores/auth-store";
@@ -45,7 +45,8 @@ export default function Test() {
     }
   }, [id]);
 
-  const [existingRelationship, setExistingRelationship] = useState(false);
+  const [existingRelationship, setExistingRelationship] =
+    useState<Relationship | null>(null);
 
   useEffect(() => {
     if (profile && requesterProfile) {
@@ -53,12 +54,12 @@ export default function Test() {
         .from("relationships")
         .select("*")
         .or(
-          `and(inviting_profile_id.eq.${profile.id},invited_profile_id.eq.${requesterProfile.id}),and(inviting_profile_id.eq.${requesterProfile.id},invited_profile_id.eq.${profile.id})`
+          `and(inviter_profile_id.eq.${profile.id},invitee_profile_id.eq.${requesterProfile.id}),and(inviter_profile_id.eq.${requesterProfile.id},invitee_profile_id.eq.${profile.id})`
         )
         .maybeSingle()
         .then(({ data }) => {
           if (data) {
-            setExistingRelationship(true);
+            setExistingRelationship(data);
           }
         });
     }
@@ -70,7 +71,7 @@ export default function Test() {
     setRedirectPath("/invite/" + id);
     if (existingRelationship) {
       setRedirectPath(null);
-      router.push("/");
+      router.push(`/chemistry/${existingRelationship.id}`);
       return;
     }
     if (loading) return;
@@ -115,7 +116,7 @@ export default function Test() {
       });
       clearInvitation();
       setRedirectPath(null);
-      router.push(`/test/chemistry/${relationship.id}`);
+      router.push(`/chemistry/${relationship.id}`);
       return;
     }
 
@@ -193,11 +194,7 @@ export default function Test() {
                 <TouchableOpacity
                   className={`bg-foreground rounded-full h-14 items-center justify-center`}
                   activeOpacity={0.7}
-                  onPress={
-                    existingRelationship
-                      ? () => router.push("/")
-                      : handleStartTest
-                  }
+                  onPress={handleStartTest}
                 >
                   {loading ? (
                     <ActivityIndicator color="#222" />

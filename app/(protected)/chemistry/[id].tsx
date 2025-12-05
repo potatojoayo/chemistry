@@ -205,7 +205,7 @@ export default function ChemistryDetailPage() {
         <Text className="text-foreground">데이터를 찾을 수 없습니다.</Text>
         <TouchableOpacity
           className="mt-4 bg-foreground px-6 py-3 rounded-full"
-          onPress={() => router.back()}
+          onPress={() => router.replace("/")}
         >
           <Text className="text-background font-semibold">돌아가기</Text>
         </TouchableOpacity>
@@ -250,7 +250,7 @@ export default function ChemistryDetailPage() {
           <TouchableOpacity
             className="border border-foreground rounded-full h-14 items-center justify-center"
             activeOpacity={0.8}
-            onPress={() => router.back()}
+            onPress={() => router.replace("/")}
           >
             <Text className="text-foreground font-semibold text-base">
               돌아가기
