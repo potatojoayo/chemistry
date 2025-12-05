@@ -6,6 +6,8 @@ import {
   ReportPassion,
   ReportTikitaka,
 } from "@/db/schema";
+import { FontAwesome6 } from "@expo/vector-icons";
+import { Image } from "expo-image";
 import { useEffect } from "react";
 import { ScrollView, Text, View } from "react-native";
 import Animated, {
@@ -61,6 +63,29 @@ export default function ChemistryResultView({
             {myProfile?.nickname}님과 {partner.nickname}님의 케미 지수
           </Text>
         </View>
+        <View className="flex-row items-center gap-6 mt-6">
+          <View className="items-center gap-2">
+            <Image
+              source={{ uri: myProfile?.avatar_url }}
+              style={{ width: 64, height: 64, borderRadius: 32 }}
+              contentFit="cover"
+            />
+            <Text className="text-foreground font-medium">
+              {myProfile?.nickname}
+            </Text>
+          </View>
+          <FontAwesome6 name="heart" size={24} color="#FF6B6B" solid />
+          <View className="items-center gap-2">
+            <Image
+              source={{ uri: partner.avatar_url }}
+              style={{ width: 64, height: 64, borderRadius: 32 }}
+              contentFit="cover"
+            />
+            <Text className="text-foreground font-medium">
+              {partner.nickname}
+            </Text>
+          </View>
+        </View>
 
         <View className="items-center justify-center w-full my-10">
           {/* Thermometer Container */}
@@ -87,7 +112,7 @@ export default function ChemistryResultView({
         </View>
 
         {/* Reports */}
-        <View className="w-full">
+        <View className="w-full mt-4">
           {chemistryReport && (
             <ReportCard
               test="케미스트리 종합"
