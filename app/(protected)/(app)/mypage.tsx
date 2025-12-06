@@ -196,7 +196,7 @@ export default function MyPage() {
   return (
     <TabPageWrapper>
       <ScrollView className="flex flex-col">
-        <Animated.View style={animatedStyle} className="p-3 pt-6">
+        <Animated.View style={animatedStyle} className="p-3 pt-8">
           <View className="flex flex-col items-center justify-center mb-6 mt-2">
             <Pressable
               onPress={pickImage}

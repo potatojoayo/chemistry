@@ -184,7 +184,7 @@ export default function CombinedReportPage() {
           <Text className="text-foreground font-semibold text-lg">
             나의 마음 보고서
           </Text>
-          <View className="w-9" />
+          <View className="w-10" />
         </View>
       </View>
     );
@@ -200,7 +200,7 @@ export default function CombinedReportPage() {
           <Text className="text-foreground font-semibold text-lg">
             나의 마음 보고서
           </Text>
-          <View className="w-9" />
+          <View className="w-10" />
         </View>
         <View className="flex-1 items-center justify-center p-4">
           <Text className="text-foreground mb-4">
@@ -227,7 +227,7 @@ export default function CombinedReportPage() {
         <Text className="text-foreground font-semibold text-lg">
           나의 마음 보고서
         </Text>
-        <Pressable onPress={openModal} className="p-2">
+        <Pressable onPress={openModal} className="p-2 w-10">
           <FontAwesome6 name="share-nodes" size={20} color="#ECEEDF" />
         </Pressable>
       </View>
