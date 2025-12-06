@@ -1,8 +1,8 @@
 import CleanHeader from "@/components/common/clean-header";
 import { useAuthStore } from "@/stores/auth-store";
-import { Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
-import { Redirect, Tabs } from "expo-router";
-import { Image, Text, View } from "react-native";
+import { Entypo } from "@expo/vector-icons";
+import { Redirect, Tabs, router } from "expo-router";
+import { Image, Pressable, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function TabLayout() {
@@ -26,16 +26,21 @@ export default function TabLayout() {
         tabBarStyle: {
           position: "absolute",
           borderTopColor: "transparent",
-          height: 56 + bottom,
+          height: 64 + bottom,
           backgroundColor: "transparent", // background handled by tabBarBackground
           elevation: 0, // remove shadow on android
         },
         tabBarBackground: () => (
           <View className="flex-1 bg-background border-t border-pastel-gray/10" />
         ),
+        tabBarItemStyle: {
+          justifyContent: "center",
+          paddingTop: 8,
+        },
         tabBarLabelStyle: {
           fontFamily: "bold",
           fontSize: 10,
+          marginTop: 2,
         },
       }}
     >
@@ -43,14 +48,16 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "케미스트리",
-          tabBarIcon: ({ color }) => (
-            <Entypo size={20} name="lab-flask" color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <View className="w-[30px] h-[30px] items-center justify-center">
+              <Entypo size={24} name="lab-flask" color={color} />
+            </View>
           ),
           header: () => (
             <CleanHeader>
               <Image
                 source={require("../../../assets/images/logo-foreground.png")}
-                style={{ width: 120, marginTop: 8 }}
+                style={{ width: 100, height: 32 }}
                 resizeMode="contain"
               />
             </CleanHeader>
@@ -58,37 +65,35 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="chart"
+        name="mypage"
         options={{
-          title: "차트",
-          tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons
-              size={20}
-              name="view-grid-plus"
-              color={color}
-            />
+          title: "마이페이지",
+          tabBarIcon: ({ color, focused }) => (
+            <View
+              className={`w-[30px] h-[30px] items-center justify-center rounded-full border ${
+                focused ? "border-foreground" : "border-foreground/10"
+              }`}
+            >
+              <Image
+                source={{ uri: profile?.avatar_url }}
+                style={{ width: 26, height: 26, borderRadius: 12 }}
+                resizeMode="cover"
+              />
+            </View>
           ),
           header: () => (
             <CleanHeader>
-              <Text className="text-foreground font-semibold text-2xl">
-                차트
-              </Text>
-            </CleanHeader>
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="settings"
-        options={{
-          title: "설정",
-          tabBarIcon: ({ color }) => (
-            <Entypo size={20} name="cog" color={color} />
-          ),
-          header: () => (
-            <CleanHeader>
-              <Text className="text-foreground font-semibold text-2xl">
-                설정
-              </Text>
+              <View className="flex-1 flex-row items-center justify-between">
+                <Text className="text-foreground font-semibold text-2xl">
+                  마이페이지
+                </Text>
+                <Pressable
+                  onPress={() => router.push("/settings")}
+                  className="p-2"
+                >
+                  <Entypo name="cog" size={24} color="#ECEEDF" />
+                </Pressable>
+              </View>
             </CleanHeader>
           ),
         }}

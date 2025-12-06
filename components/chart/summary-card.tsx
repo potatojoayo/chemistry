@@ -22,8 +22,12 @@ export default function SummaryCard({
     >
       <View className="w-full border-foreground border-t-[0.5px]"></View>
       <Text className="text-xs text-foreground mt-1">{label}</Text>
-      <Text className="text-xl font-medium mt-6 text-foreground">{value}</Text>
-      <Text className="text-[11px] mt-1 opacity-80 text-foreground">{subValue}</Text>
+      <Text className="text-xl font-semibold mt-4 text-foreground">
+        {value}
+      </Text>
+      <Text className="text-[11px] mt-1 opacity-80 text-foreground">
+        {subValue}
+      </Text>
     </Pressable>
   );
 }

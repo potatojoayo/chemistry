@@ -1,4 +1,5 @@
 import TabPageWrapper from "@/components/common/tab-page-wrapper";
+import ProfileBadges from "@/components/home/profile-badges";
 import RelationshipListItem from "@/components/relationship/relationship-list-item";
 import { useSnackbar } from "@/context/snackbar-context";
 import { Profile, Relationship } from "@/db/schema";
@@ -187,19 +188,22 @@ export default function Home() {
       <ScrollView className="flex flex-col">
         <View className="flex flex-col p-3 pt-1">
           <TouchableOpacity
-            className="flex flex-row items-center gap-3 h-12"
+            className="flex flex-row items-center gap-3 h-14"
             activeOpacity={0.7}
-            onPress={openModal}
+            onPress={() => {
+              router.navigate("/mypage");
+            }}
           >
             <Image
               source={{ uri: profile.avatar_url }}
-              style={{ width: 36, height: 36, borderRadius: 40 }}
+              style={{ width: 40, height: 40, borderRadius: 100 }}
               contentFit="cover"
             />
             <View className="flex flex-col">
               <Text className="text-foreground font-semibold">
                 {profile.nickname}
               </Text>
+              <ProfileBadges profile={profile} />
             </View>
           </TouchableOpacity>
           <View className="mb-3 mt-1 border-t border-pastel-gray/20"></View>

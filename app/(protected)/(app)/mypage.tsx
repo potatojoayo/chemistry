@@ -14,7 +14,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-export default function Chart() {
+export default function MyPage() {
   const { profile } = useAuthStore();
   const [loading, setLoading] = useState(true);
   const [aasReport, setAasReport] = useState<ReportAAS | null>(null);

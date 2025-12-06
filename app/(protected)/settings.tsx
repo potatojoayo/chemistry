@@ -1,14 +1,21 @@
-import TabPageWrapper from "@/components/common/tab-page-wrapper";
+import CleanHeader from "@/components/common/clean-header";
 import { useAuthStore } from "@/stores/auth-store";
+import { FontAwesome6 } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Pressable, Text, TouchableOpacity, View } from "react-native";
 
 export default function Settings() {
   const { user, signOut } = useAuthStore();
   return (
-    <TabPageWrapper>
-      <View className="flex-1 flex-col justify-center mt-20 px-4">
+    <View className="flex-1 bg-background">
+      <CleanHeader>
+        <Pressable onPress={() => router.back()} className="p-2">
+          <FontAwesome6 name="chevron-left" size={20} color="#ECEEDF" />
+        </Pressable>
+        <Text className="text-foreground font-semibold text-lg ml-2">설정</Text>
+      </CleanHeader>
+      <View className="flex-1 flex-col justify-center px-4 pt-14">
         {user ? (
           <TouchableOpacity
             className="bg-foreground rounded-full py-4"
@@ -33,6 +40,6 @@ export default function Settings() {
           </TouchableOpacity>
         )}
       </View>
-    </TabPageWrapper>
+    </View>
   );
 }
