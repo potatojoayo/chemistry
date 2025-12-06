@@ -191,7 +191,7 @@ export default function Home() {
             className="flex flex-row items-center gap-3 h-14"
             activeOpacity={0.7}
             onPress={() => {
-              router.navigate("/mypage");
+              router.navigate("/report");
             }}
           >
             <Image

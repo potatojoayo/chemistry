@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/stores/auth-store";
 import { FontAwesome6 } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
-import { router, useLocalSearchParams } from "expo-router";
+import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   Modal,
@@ -26,8 +26,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-export default function ReportPage() {
-  const { type } = useLocalSearchParams<{ type: string }>();
+export default function CombinedReportPage() {
   const { profile } = useAuthStore();
   const [loading, setLoading] = useState(true);
   const [aasReport, setAasReport] = useState<ReportAAS | null>(null);
@@ -51,7 +50,7 @@ export default function ReportPage() {
   }));
 
   useEffect(() => {
-    async function fetchResult() {
+    async function fetchReports() {
       try {
         if (!profile) {
           setError("User not found");
@@ -59,60 +58,46 @@ export default function ReportPage() {
           return;
         }
 
-        if (type === "aas") {
-          if (
-            !profile.emotional_flexibility_level ||
-            !profile.attachment_type
-          ) {
-            setError("Incomplete test results");
-            setLoading(false);
-            return;
-          }
+        const promises = [];
 
-          const { data, error } = await supabase
-            .from("report_aas")
-            .select("*")
-            .eq(
-              "emotional_flexibility_level",
-              profile.emotional_flexibility_level
-            )
-            .eq("type", profile.attachment_type)
-            .limit(1)
-            .maybeSingle();
-
-          if (error) {
-            console.error("Error fetching AAS report:", error);
-            setError("Failed to load AAS report");
-          } else if (!data) {
-            setError("No report found");
-          } else {
-            setAasReport(data as ReportAAS);
-          }
-        } else if (type === "flexibility") {
-          if (!profile.flexibility_level) {
-            setError("Incomplete test results");
-            setLoading(false);
-            return;
-          }
-
-          const { data, error } = await supabase
-            .from("report_flexibility")
-            .select("*")
-            .eq("flexibility_level", profile.flexibility_level)
-            .limit(1)
-            .maybeSingle();
-
-          if (error) {
-            console.error("Error fetching flexibility report:", error);
-            setError("Failed to load flexibility report");
-          } else if (!data) {
-            setError("No report found");
-          } else {
-            setFlexibilityReport(data as ReportFlexibility);
-          }
-        } else {
-          setError("Invalid report type");
+        // Fetch AAS Report
+        if (profile.emotional_flexibility_level && profile.attachment_type) {
+          promises.push(
+            supabase
+              .from("report_aas")
+              .select("*")
+              .eq(
+                "emotional_flexibility_level",
+                profile.emotional_flexibility_level
+              )
+              .eq("type", profile.attachment_type)
+              .limit(1)
+              .maybeSingle()
+              .then(({ data, error }) => {
+                if (error) console.error("Error fetching AAS report:", error);
+                if (data) setAasReport(data as ReportAAS);
+              })
+          );
         }
+
+        // Fetch Flexibility Report
+        if (profile.flexibility_level) {
+          promises.push(
+            supabase
+              .from("report_flexibility")
+              .select("*")
+              .eq("flexibility_level", profile.flexibility_level)
+              .limit(1)
+              .maybeSingle()
+              .then(({ data, error }) => {
+                if (error)
+                  console.error("Error fetching flexibility report:", error);
+                if (data) setFlexibilityReport(data as ReportFlexibility);
+              })
+          );
+        }
+
+        await Promise.all(promises);
       } catch (e) {
         console.error("Unexpected error:", e);
         setError("An unexpected error occurred");
@@ -121,8 +106,8 @@ export default function ReportPage() {
       }
     }
 
-    fetchResult();
-  }, [profile, type]);
+    fetchReports();
+  }, [profile]);
 
   const { showSnackbar } = useSnackbar();
   const [modalVisible, setModalVisible] = useState(false);
@@ -158,7 +143,8 @@ export default function ReportPage() {
     transform: [{ translateY: contentTranslateY.value }],
   }));
 
-  const shareLink = `${Platform.OS === "web" ? window.location.origin : process.env.EXPO_PUBLIC_APP_URL}/share/report/${type}/${profile?.id}`;
+  // TODO: Update share link for combined report if needed, or share profile link
+  const shareLink = `${Platform.OS === "web" ? window.location.origin : process.env.EXPO_PUBLIC_APP_URL}/share/report/${profile?.id}`;
 
   const handleCopyLink = async () => {
     try {
@@ -196,7 +182,7 @@ export default function ReportPage() {
             <FontAwesome6 name="chevron-left" size={20} color="#ECEEDF" />
           </Pressable>
           <Text className="text-foreground font-semibold text-lg">
-            {type === "aas" ? "성인 애착 유형" : "정서적 유연성"}
+            나의 마음 보고서
           </Text>
           <View className="w-9" />
         </View>
@@ -212,7 +198,7 @@ export default function ReportPage() {
             <FontAwesome6 name="chevron-left" size={20} color="#ECEEDF" />
           </Pressable>
           <Text className="text-foreground font-semibold text-lg">
-            {type === "aas" ? "성인 애착 유형" : "정서적 유연성"}
+            나의 마음 보고서
           </Text>
           <View className="w-9" />
         </View>
@@ -239,7 +225,7 @@ export default function ReportPage() {
           <FontAwesome6 name="chevron-left" size={20} color="#ECEEDF" />
         </Pressable>
         <Text className="text-foreground font-semibold text-lg">
-          {type === "aas" ? "성인 애착 유형" : "정서적 유연성"}
+          나의 마음 보고서
         </Text>
         <Pressable onPress={openModal} className="p-2">
           <FontAwesome6 name="share-nodes" size={20} color="#ECEEDF" />
@@ -250,31 +236,37 @@ export default function ReportPage() {
           contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
           className="flex-1"
         >
-          {type === "aas" && aasReport && (
-            <ReportCard
-              test="성인 애착 유형"
-              title={aasReport.title}
-              badges={[
-                "유형: " + aasReport.type_text,
-                "마음 평온도: " + aasReport.emotional_flexibility_text,
-              ]}
-              overallEvaluation={aasReport.overall_evaluation}
-              detailEvaluations={aasReport.detail_evaluations}
-              counselingText={aasReport.counseling_text}
-            />
+          {aasReport && (
+            <View>
+              <ReportCard
+                test="성인 애착 유형"
+                title={aasReport.title}
+                badges={[
+                  "유형: " + aasReport.type_text,
+                  "마음 평온도: " + aasReport.emotional_flexibility_text,
+                ]}
+                overallEvaluation={aasReport.overall_evaluation}
+                detailEvaluations={aasReport.detail_evaluations}
+                counselingText={aasReport.counseling_text}
+              />
+            </View>
           )}
 
-          {type === "flexibility" && flexibilityReport && (
-            <ReportCard
-              test="정서적 유연성"
-              title={flexibilityReport.title}
-              badges={[
-                "유연성: " + profile?.flexibility_percentage?.toFixed(1) + "%",
-              ]}
-              overallEvaluation={flexibilityReport.overall_evaluation}
-              detailEvaluations={flexibilityReport.detail_evaluation}
-              counselingText={flexibilityReport.counseling_text}
-            />
+          {flexibilityReport && (
+            <View>
+              <ReportCard
+                test="정서적 유연성"
+                title={flexibilityReport.title}
+                badges={[
+                  "유연성: " +
+                    profile?.flexibility_percentage?.toFixed(1) +
+                    "%",
+                ]}
+                overallEvaluation={flexibilityReport.overall_evaluation}
+                detailEvaluations={flexibilityReport.detail_evaluation}
+                counselingText={flexibilityReport.counseling_text}
+              />
+            </View>
           )}
 
           <View className="gap-3">
