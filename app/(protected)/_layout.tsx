@@ -22,6 +22,7 @@ export default function ProtectedLayout() {
       <Stack.Screen name="report/[type]" />
       <Stack.Screen name="test" />
       <Stack.Screen name="settings" />
+      <Stack.Screen name="settings/nickname" />
     </Stack>
   );
 }

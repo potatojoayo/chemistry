@@ -57,7 +57,7 @@ export default function TabLayout() {
             <CleanHeader>
               <Image
                 source={require("../../../assets/images/logo-foreground.png")}
-                style={{ width: 100, height: 32 }}
+                style={{ width: 120, height: 32, marginTop: 8 }}
                 resizeMode="contain"
               />
             </CleanHeader>
@@ -84,7 +84,7 @@ export default function TabLayout() {
           header: () => (
             <CleanHeader>
               <View className="flex-1 flex-row items-center justify-between">
-                <Text className="text-foreground font-semibold text-2xl">
+                <Text className="text-foreground font-semibold text-[20px]">
                   마이페이지
                 </Text>
                 <Pressable

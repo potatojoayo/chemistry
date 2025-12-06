@@ -54,7 +54,7 @@ export const SnackbarProvider = ({ children }: { children: ReactNode }) => {
         duration={3000}
         wrapperStyle={{
           position: "absolute",
-          bottom: current.top ? undefined : (current.bottom ?? 24),
+          bottom: current.top ? undefined : (current.bottom ?? 8),
           top: current.top,
           left: 0,
           right: 0,
