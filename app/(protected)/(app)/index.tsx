@@ -114,6 +114,7 @@ export default function Home() {
         .or(
           `inviter_profile_id.eq.${profile.id},invitee_profile_id.eq.${profile.id}`
         )
+        .is("deleted_at", null)
         .order("created_at", { ascending: false });
 
       if (relError || !rels) {
@@ -139,7 +140,8 @@ export default function Home() {
       const { data: partners, error: partnerError } = await supabase
         .from("profiles")
         .select("*")
-        .in("id", partnerIds);
+        .in("id", partnerIds)
+        .is("deleted_at", null);
 
       if (partnerError || !partners) {
         console.error("Error fetching partners:", partnerError);

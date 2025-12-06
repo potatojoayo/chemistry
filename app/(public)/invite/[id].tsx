@@ -33,6 +33,7 @@ export default function Test() {
         .from("profiles")
         .select("*")
         .eq("id", id)
+        .is("deleted_at", null)
         .then(({ data, error }) => {
           if (error) {
             showSnackbar({
@@ -56,6 +57,7 @@ export default function Test() {
         .or(
           `and(inviter_profile_id.eq.${profile.id},invitee_profile_id.eq.${requesterProfile.id}),and(inviter_profile_id.eq.${requesterProfile.id},invitee_profile_id.eq.${profile.id})`
         )
+        .is("deleted_at", null)
         .maybeSingle()
         .then(({ data }) => {
           if (data) {

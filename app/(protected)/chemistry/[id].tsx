@@ -66,6 +66,7 @@ export default function ChemistryDetailPage() {
           .from("relationships")
           .select("*")
           .eq("id", id)
+          .is("deleted_at", null)
           .single();
 
         if (relError) {
@@ -86,6 +87,7 @@ export default function ChemistryDetailPage() {
           .from("profiles")
           .select("*")
           .eq("id", partnerId)
+          .is("deleted_at", null)
           .single();
 
         if (partnerError) {

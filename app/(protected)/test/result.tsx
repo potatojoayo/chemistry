@@ -32,6 +32,7 @@ export default function TestResult() {
         .from("profiles")
         .select("*")
         .eq("id", inviterProfileId)
+        .is("deleted_at", null)
         .single()
         .then(({ data }) => {
           if (data) {
@@ -45,6 +46,7 @@ export default function TestResult() {
         .or(
           `and(inviter_profile_id.eq.${profile.id},invitee_profile_id.eq.${inviterProfileId}),and(inviter_profile_id.eq.${inviterProfileId},invitee_profile_id.eq.${profile.id})`
         )
+        .is("deleted_at", null)
         .maybeSingle()
         .then(({ data }) => {
           if (data) {

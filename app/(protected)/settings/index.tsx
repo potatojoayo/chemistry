@@ -1,20 +1,38 @@
 import AnimatedPageWrapper from "@/components/common/animated-page-wrapper";
 import CleanHeader from "@/components/common/clean-header";
+import ConfirmationModal from "@/components/common/confirmation-modal";
 import SettingsItem from "@/components/settings/settings-item";
 import { useAuthStore } from "@/stores/auth-store";
 import { FontAwesome6 } from "@expo/vector-icons";
 import Constants from "expo-constants";
 import { router } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 
 export default function Settings() {
-  const { user, signOut } = useAuthStore();
+  const { user, signOut, deleteAccount } = useAuthStore();
   const version = Constants.expoConfig?.version ?? "1.0.0";
+  const [isLogoutModalVisible, setIsLogoutModalVisible] = useState(false);
+  const [isDeleteAccountModalVisible, setIsDeleteAccountModalVisible] =
+    useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleLogout = async () => {
     await signOut();
-    // router.replace("/login"); // signOut usually handles redirection or state change
+    setIsLogoutModalVisible(false);
+  };
+
+  const handleDeleteAccount = async () => {
+    try {
+      setIsDeleting(true);
+      await deleteAccount();
+      // No need to set isDeleting false or close modal as we are signing out/redirecting
+      setIsDeleteAccountModalVisible(false);
+    } catch (error) {
+      console.error("Failed to delete account", error);
+      setIsDeleting(false);
+      // Optionally show error alert here
+    }
   };
 
   return (
@@ -70,17 +88,38 @@ export default function Settings() {
               <SettingsItem
                 label="로그아웃"
                 icon="arrow-right-from-bracket"
-                onPress={handleLogout}
+                onPress={() => setIsLogoutModalVisible(true)}
               />
               <SettingsItem
                 label="회원 탈퇴"
                 icon="user-xmark"
-                onPress={() => router.push("/settings/delete-account")}
+                onPress={() => setIsDeleteAccountModalVisible(true)}
                 isDestructive
               />
             </View>
           </View>
         </ScrollView>
+
+        <ConfirmationModal
+          visible={isLogoutModalVisible}
+          onClose={() => setIsLogoutModalVisible(false)}
+          onConfirm={handleLogout}
+          title="로그아웃"
+          message="정말 로그아웃 하시겠습니까?"
+          confirmText="로그아웃"
+          isDestructive
+        />
+
+        <ConfirmationModal
+          visible={isDeleteAccountModalVisible}
+          onClose={() => !isDeleting && setIsDeleteAccountModalVisible(false)}
+          onConfirm={handleDeleteAccount}
+          title="회원 탈퇴"
+          message={`회원 탈퇴 시 모든 데이터가 삭제되며\n복구할 수 없습니다.\n정말 탈퇴하시겠습니까?`}
+          confirmText="탈퇴하기"
+          isDestructive
+          isLoading={isDeleting}
+        />
       </View>
     </AnimatedPageWrapper>
   );

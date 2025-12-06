@@ -235,7 +235,7 @@ export default function MyPage() {
             </Pressable>
           </View>
           <View className="border-t border-foreground/10 my-2"></View>
-          <Text className="mb-3 text-foreground font-semibold text-xl">
+          <Text className="mb-6 text-foreground font-semibold text-xl">
             내 차트
           </Text>
           <View className="flex flex-row gap-3">

@@ -72,6 +72,7 @@ export const profiles = pgTable(
     passion_type: text("passion_type"),
     passion_index: real("passion_index"),
     gender: text("gender").notNull(),
+    deleted_at: timestamp("deleted_at", { withTimezone: true, mode: "string" }),
   },
   (table) => [
     pgPolicy("public can view all profiles", {
@@ -198,6 +199,7 @@ export const relationships = pgTable(
     passion_index: real("passion_index").notNull(),
     flexibility_score: real("flexibility_score").notNull(),
     flexibility_level: smallint("flexibility_level").notNull(),
+    deleted_at: timestamp("deleted_at", { withTimezone: true, mode: "string" }),
   },
   (table) => [
     unique("uq_relation_pair").on(

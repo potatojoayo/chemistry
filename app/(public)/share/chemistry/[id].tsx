@@ -45,6 +45,7 @@ export default function PublicChemistryPage() {
           .from("relationships")
           .select("*")
           .eq("id", id)
+          .is("deleted_at", null)
           .single();
 
         if (relError) {
@@ -60,7 +61,8 @@ export default function PublicChemistryPage() {
         const { data: profiles, error: profilesError } = await supabase
           .from("profiles")
           .select("*")
-          .in("id", [relData.inviter_profile_id, relData.invitee_profile_id]);
+          .in("id", [relData.inviter_profile_id, relData.invitee_profile_id])
+          .is("deleted_at", null);
 
         if (profilesError || !profiles || profiles.length !== 2) {
           console.error("Error fetching profiles:", profilesError);

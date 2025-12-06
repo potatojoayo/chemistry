@@ -17,7 +17,7 @@ export default function PrivacyPolicy() {
             개인정보 처리방침
           </Text>
         </CleanHeader>
-        <ScrollView className="flex-1 px-4 pt-4">
+        <ScrollView className="flex-1 px-3 pt-8">
           <Text className="text-foreground">
             개인정보 처리방침 내용이 들어갈 자리입니다.
           </Text>

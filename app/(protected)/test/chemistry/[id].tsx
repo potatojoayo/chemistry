@@ -38,6 +38,7 @@ export default function TestChemistryResultPage() {
           .from("relationships")
           .select("*")
           .eq("id", id)
+          .is("deleted_at", null)
           .single();
 
         if (relError) {
@@ -58,6 +59,7 @@ export default function TestChemistryResultPage() {
           .from("profiles")
           .select("*")
           .eq("id", partnerId)
+          .is("deleted_at", null)
           .single();
 
         if (partnerError) {

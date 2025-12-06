@@ -17,6 +17,7 @@ export const createRelationship = async ({
       .or(
         `and(inviting_profile_id.eq.${male.id},invited_profile_id.eq.${female.id}),and(inviting_profile_id.eq.${female.id},invited_profile_id.eq.${male.id})`
       )
+      .is("deleted_at", null)
       .maybeSingle();
 
     if (existing) {

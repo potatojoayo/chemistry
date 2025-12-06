@@ -16,6 +16,7 @@ interface AuthState {
   setAuthRedirectPath: (path: string | null) => void;
   fetchProfile: () => Promise<void>;
   signOut: () => Promise<void>;
+  deleteAccount: () => Promise<void>;
   init: () => Promise<void>;
 }
 
@@ -39,6 +40,7 @@ export const useAuthStore = create<AuthState>()(
             .from("profiles")
             .select("*")
             .eq("user_id", user.id)
+            .is("deleted_at", null)
             .single();
 
           if (error) {
@@ -59,6 +61,53 @@ export const useAuthStore = create<AuthState>()(
           set({ user: null, profile: null, loading: false });
         } catch (error) {
           console.error("Error signing out:", error);
+        }
+      },
+
+      deleteAccount: async () => {
+        const user = get().user;
+        if (!user) return;
+
+        const now = new Date().toISOString();
+
+        try {
+          // 1. Soft delete profile
+          const { error: profileError } = await supabase
+            .from("profiles")
+            .update({ deleted_at: now })
+            .eq("user_id", user.id);
+
+          if (profileError) {
+            console.error("Error soft deleting profile:", profileError);
+            throw profileError;
+          }
+
+          // 2. Soft delete relationships (inviter or invitee)
+          // We need the profile ID first
+          const profile = get().profile;
+          if (profile) {
+            const { error: relationshipError } = await supabase
+              .from("relationships")
+              .update({ deleted_at: now })
+              .or(
+                `inviter_profile_id.eq.${profile.id},invitee_profile_id.eq.${profile.id}`
+              );
+
+            if (relationshipError) {
+              console.error(
+                "Error soft deleting relationships:",
+                relationshipError
+              );
+              // We might not want to throw here if profile deletion succeeded,
+              // but for data integrity it's good to know.
+              // For now, let's log and proceed to sign out.
+            }
+          }
+
+          await get().signOut();
+        } catch (error) {
+          console.error("Error deleting account:", error);
+          throw error;
         }
       },
 
